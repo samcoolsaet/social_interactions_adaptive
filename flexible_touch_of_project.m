@@ -10,9 +10,6 @@ engage_box.List = { [1 1 1], [1 1 1], 1, [0 -7] };
 fix = SingleTarget(touch_);
 fix.Target = [0 -7];
 fix.Threshold = 1;
-
-con3 = Concurrent(fix);
-con3.add(engage_box);
 %% designing trial buttons
 %drawing button boxes
 trial_box = BoxGraphic(null_);
@@ -48,17 +45,19 @@ img.List = { TrialRecord.User.frame, [0 0] };
 tc = TimeCounter(null_);
 tc.Duration = 3000;
 
-% running timecounter and showing buttons together for first scene
-con1 = Concurrent(tc);
-con1.add(mov);
-con1.add(trial_box);
+% merging touch and visual for engagement button
+con1 = Concurrent(fix);
 con1.add(engage_box);
 
-% showing buttons and adding touch targets.
-con2 = Concurrent(mul);
-con2.add(img);
+% running timecounter and showing buttons together for first scene
+con2 = Concurrent(tc);
+con2.add(mov);
 con2.add(trial_box);
-con2.add(engage_box);
+
+% showing buttons and adding touch targets.
+con3 = Concurrent(mul);
+con3.add(img);
+con3.add(trial_box);
 
 % temporary cue
 
@@ -71,8 +70,8 @@ end
 %% running scenes
 
 % run engagement scene
-scene3 = create_scene(con3);
-run_scene(scene3, 10);
+scene1 = create_scene(con1);
+run_scene(scene1, 10);
 
 % run animation scene
 
@@ -81,12 +80,12 @@ run_scene(scene3, 10);
 % tf = istouching;
 % if ~tf
 
-scene = create_scene(con1);
-run_scene(scene, 10);
-
-% run frame and answering scene
 scene2 = create_scene(con2);
 run_scene(scene2, 10);
+
+% run frame and answering scene
+scene3 = create_scene(con3);
+run_scene(scene3, 10);
 
 %% evaluate
 if TrialRecord.User.grooming & mul.ChosenTarget == 1

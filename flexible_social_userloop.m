@@ -14,26 +14,49 @@ persistent timing_filenames_retrieved
     
 % mltaskobject(stim, MLConfig, TrialRecord);
 
-% creating taskobject out of stimuli path
-stim_struct = dir('stimuli');
-frame_struct = dir('frames');
-TrialRecord.User.stimulus_list = {stim_struct.name};
-TrialRecord.User.stimulus_list(1:2) = [];
-TrialRecord.User.frame_list = {frame_struct.name};
-TrialRecord.User.frame_list(1:2) = [];
+% orienting between stimuli and frame files
+% creating individual folder lists and general stim and frame lists
+chasing_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\stimuli\chasing');
+chasing_list = {chasing_struct.name};
+chasing_list(1:2) = [];
+fighting_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\stimuli\fighting');
+fighting_list = {fighting_struct.name};
+fighting_list(1:2) = [];
+grooming_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\stimuli\grooming');
+grooming_list = {grooming_struct.name};
+grooming_list(1:2) = [];
+mounting_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\stimuli\mounting');
+mounting_list = {mounting_struct.name};
+mounting_list(1:2) = [];
+
+stimulus_list = [chasing_list, fighting_list, grooming_list, mounting_list];
+
+chasing_frame_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\frames\chasing');
+chasing_frame_list = {chasing_frame_struct.name};
+chasing_frame_list(1:2) = [];
+fighting_frame_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\frames\fighting');
+fighting_frame_list = {fighting_frame_struct.name};
+fighting_frame_list(1:2) = [];
+grooming_frame_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\frames\grooming');
+grooming_frame_list = {grooming_frame_struct.name};
+grooming_frame_list(1:2) = [];
+mounting_frame_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\frames\mounting');
+mounting_frame_list = {mounting_frame_struct.name};
+mounting_frame_list(1:2) = [];
+
+frame_list = [chasing_frame_list, fighting_frame_list, grooming_frame_list, mounting_frame_list];
 
 % setting condition sequence, maintaining it over userloops and picking
 % condition
 
 if TrialRecord.CurrentTrialNumber == 0
-    TrialRecord.User.condition_sequence = randperm(length(TrialRecord.User.stimulus_list) * 3);
+    TrialRecord.User.condition_sequence = randperm(length(stimulus_list) * 3);
 end
 
 
-stimulus_sequence = mod(TrialRecord.User.condition_sequence,length(TrialRecord.User.stimulus_list)) + 1;
+stimulus_sequence = mod(TrialRecord.User.condition_sequence,length(stimulus_list)) + 1;
 TrialRecord.User.stimulus_sequence_index = mod(TrialRecord.CurrentTrialNumber, length(TrialRecord.User.condition_sequence)) + 1;
 TrialRecord.User.stimulus = stimulus_sequence(TrialRecord.User.stimulus_sequence_index);
-% TrialRecord.NextCondition = TrialRecord.User.stimulus;
 
 % intitializing question
 
@@ -44,29 +67,30 @@ TrialRecord.User.patienting = false;
 TrialRecord.User.grooming = false;
 TrialRecord.User.chasing = false;
 TrialRecord.User.mounting = false;
+TrialRecord.User.fighting = false;
 
 if TrialRecord.User.condition_sequence(TrialRecord.User.stimulus_sequence_index) <= ... 
-        length( TrialRecord.User.stimulus_list )
+        length( stimulus_list )
     TrialRecord.User.categorizing = true;
     if TrialRecord.User.categorizing
-        if strncmpi('groom', TrialRecord.User.stimulus_list{TrialRecord.User.stimulus}, 5)
+        if strncmpi('groom', stimulus_list{TrialRecord.User.stimulus}, 5)
             TrialRecord.User.grooming = true;
             TrialRecord.NextCondition = 1;
-        elseif strncmpi('chas', TrialRecord.User.stimulus_list{TrialRecord.User.stimulus}, 4)
+        elseif strncmpi('chas', stimulus_list{TrialRecord.User.stimulus}, 4)
             TrialRecord.User.chasing = true;
             TrialRecord.NextCondition = 2;
-        elseif strncmpi('mount', TrialRecord.User.stimulus_list{TrialRecord.User.stimulus}, 5)
+        elseif strncmpi('mount', stimulus_list{TrialRecord.User.stimulus}, 5)
             TrialRecord.User.mounting = true;
             TrialRecord.NextCondition = 3;
-%         elseif strncmpi('placeholder', TrialRecord.User.stimulus_list{TrialRecord.User.stimulus}, 5)
-%             
-%             TrialRecord.NextCondition = 4;
+        elseif strncmpi('fight', stimulus_list{TrialRecord.User.stimulus}, 5)
+            TrialRecord.User.fighting = true;
+            TrialRecord.NextCondition = 4;
         end
     end
-elseif length( TrialRecord.User.stimulus_list ) < ... 
+elseif length( stimulus_list ) < ... 
         TrialRecord.User.condition_sequence(TrialRecord.User.stimulus_sequence_index) && ... 
         TrialRecord.User.condition_sequence(TrialRecord.User.stimulus_sequence_index) <= ...
-        (2 * length( TrialRecord.User.stimulus_list ))
+        (2 * length( stimulus_list ))
     TrialRecord.User.agenting = true;
     TrialRecord.NextCondition = 5;
 else 
@@ -74,20 +98,34 @@ else
     TrialRecord.NextCondition = 6;
 end
 
-% creating task objects
-% task_object1 = strcat('mov(C:\Users\samco\Documents\GitHub\social_interactions\stimuli\', ...
-%     TrialRecord.User.stimulus_list{TrialRecord.User.stimulus}, ', 0, 0, 0)');
-% task_object2 = strcat('pic(C:\Users\samco\Documents\GitHub\social_interactions\frames\', ... 
-%     TrialRecord.User.frame_list{TrialRecord.User.stimulus}, ', 0, 0)');
+% determining correct folder name and define indexes for within folders
+if TrialRecord.User.stimulus <= length(chasing_list)        % stimulus_list = [chasing_list, fighting_list, grooming_list, mounting_list];
+    folder = 'chasing';
+    folder_index = TrialRecord.User.stimulus;
+    indexed = chasing_list{folder_index};
+elseif TrialRecord.User.stimulus <= length(chasing_list)+length(fighting_list)
+    folder = 'fighting';
+    folder_index = TrialRecord.User.stimulus - length(chasing_list);
+    indexed = fighting_list{folder_index};
+elseif TrialRecord.User.stimulus <= length(chasing_list)+length(fighting_list)+length(grooming_list)
+    folder = 'grooming';
+    folder_index = TrialRecord.User.stimulus - (length(chasing_list)+length(fighting_list));
+    indexed = grooming_list{folder_index};
+elseif TrialRecord.User.stimulus <= ... 
+        length(chasing_list)+length(fighting_list)+length(grooming_list)+length(mounting_list)
+    folder = 'mounting';
+    folder_index = TrialRecord.User.stimulus - (length(chasing_list)+length(fighting_list)+length(grooming_list));
+    indexed = mounting_list{folder_index};
+end
 
-TrialRecord.User.movie = strcat('C:\Users\samco\Documents\GitHub\social_interactions\stimuli\', ... 
-    TrialRecord.User.stimulus_list{TrialRecord.User.stimulus});
-TrialRecord.User.frame = strcat('C:\Users\samco\Documents\GitHub\social_interactions\frames\', ... 
-    TrialRecord.User.frame_list{TrialRecord.User.stimulus});
+% creating path to chosen stimulus and according frame
+TrialRecord.User.movie = strcat('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\stimuli\', ... 
+    folder, '\', indexed);
+TrialRecord.User.frame = strcat('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\frames\', ... 
+    folder, '\', frame_list{TrialRecord.User.stimulus});
 
 % creating condition
 
-% C = {task_object1, task_object2, 'fix(0,0)'};
 C = {'fix(0,0)'};
 
 
