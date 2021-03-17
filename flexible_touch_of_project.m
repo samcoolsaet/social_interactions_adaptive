@@ -64,7 +64,7 @@ con3.add(trial_box);
 cue = CircleGraphic(null_);
 cue.List = {[1 1 1], [1 1 1], 1, [-6 0] };
 if TrialRecord.User.agenting
-    con2.add(cue);
+    con3.add(cue);
 end
 
 %% running scenes
@@ -88,18 +88,23 @@ scene3 = create_scene(con3);
 run_scene(scene3, 10);
 
 %% evaluate
-if TrialRecord.User.grooming & mul.ChosenTarget == 1
+if TrialRecord.User.chasing & mul.ChosenTarget == 1
     dashboard(2, 'success!!! <3 ');
     trialerror(0);
     goodmonkey(reward_dur);
-elseif TrialRecord.User.chasing & mul.ChosenTarget == 2
+elseif TrialRecord.User.grooming & mul.ChosenTarget == 2
     dashboard(2, 'success!!! <3 ');
     trialerror(0);
     goodmonkey(reward_dur);
-elseif TrialRecord.User.mounting & mul.ChosenTarget == 3
+elseif TrialRecord.User.holding & mul.ChosenTarget == 3
     dashboard(2, 'success!!! <3 ');
     trialerror(0);
     goodmonkey(reward_dur);
+elseif TrialRecord.User.mounting & mul.ChosenTarget == 4
+    dashboard(2, 'success!!! <3 ');
+    trialerror(0);
+    goodmonkey(reward_dur);
+
 elseif TrialRecord.User.agenting & mul.ChosenTarget == 1
     dashboard(2, 'success!!! <3 ');
     trialerror(0);
