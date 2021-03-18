@@ -4,41 +4,42 @@ hotkey('r', 'goodmonkey(reward_dur, ''juiceline'', MLConfig.RewardFuncArgs.Juice
 %% designing engage_button
 % draw button box
 engage_box = BoxGraphic(null_);
-engage_box.List = { [1 1 1], [1 1 1], 1, [0 -7] };
+engage_box.List = { [1 1 1], [1 1 1], 1, [10 0] };
 
 % set touch target
 fix = SingleTarget(touch_);
-fix.Target = [0 -7];
+fix.Target = [10 0];
 fix.Threshold = 1;
 %% designing trial buttons
 %drawing button boxes
+
 trial_box = BoxGraphic(null_);
 if TrialRecord.User.categorizing
-    trial_box.List = { [1 0 0], [1 0 0], 1, [-5 6]; ...
-        [1 0 0], [1 0 0], 1, [-3 6];...
-        [1 0 0], [1 0 0], 1, [3 6]; ...
-        [1 0 0], [1 0 0], 1, [5 6]};
+    trial_box.List = { [1 0 0], [1 0 0], 1, [-8 -7]; ...
+        [0 1 0], [0 1 0], 1.25, [-8 -3];...
+        [0 0 1], [0 0 1], 1, [-8 3]; ...
+        [1 1 0], [1 1 0], 1, [-8 7]};
 elseif TrialRecord.User.agenting || TrialRecord.User.patienting
-    trial_box.List = {[1 0 0], [1 0 0], 1, [-3 -6]; ...
-        [1 0 0], [1 0 0], 1, [3 -6]};
+    trial_box.List = {[0 1 1], [0 1 1], 1, [8 -3]; ...
+        [1 0 1], [1 0 1], 1, [8 3]};
 end
 
 % setting touch targets
 mul = MultiTarget(touch_);
 if TrialRecord.User.categorizing
-    mul.Target = [-5 6; -3 6; 3 6; 5 6];
+    mul.Target = [-8 -7; -8 -3; -8 3; -8 7];
 elseif TrialRecord.User.agenting || TrialRecord.User.patienting
-    mul.Target = [-3 -6; 3 -6];
+    mul.Target = [8 -3; 8 3];
 end
 mul.Threshold = 1;
 mul.WaitTime = 150000;
 mul.HoldTime = 0;
 %% setting up animations and frames
 mov = MovieGraphic(fix);
-mov.List = { TrialRecord.User.movie, [0 0] };   % movie filename
+mov.List = { TrialRecord.User.movie, [0 0], 0, 1.25, 90 };   % movie filename
 % tc = TimeCounter(mov);
 img = ImageGraphic(null_);
-img.List = { TrialRecord.User.frame, [0 0] };
+img.List = { TrialRecord.User.frame, [0 0], 0, 1.25, 90 };
 %% constructing scenes
 % setting timecounter for duration of animation in first scene
 
@@ -62,11 +63,10 @@ con3.add(trial_box);
 % temporary cue
 
 cue = CircleGraphic(null_);
-cue.List = {[1 1 1], [1 1 1], 1, [-6 0] };
+cue.List = {[1 1 1], [1 1 1], 1, [0 0] };
 if TrialRecord.User.agenting
     con3.add(cue);
 end
-
 %% running scenes
 
 % run engagement scene
@@ -84,7 +84,7 @@ scene2 = create_scene(con2);
 run_scene(scene2, 10);
 
 % run frame and answering scene
-scene3 = create_scene(con3);
+scene3 = create_scene(con3, 1);
 run_scene(scene3, 10);
 
 %% evaluate
@@ -104,7 +104,6 @@ elseif TrialRecord.User.mounting & mul.ChosenTarget == 4
     dashboard(2, 'success!!! <3 ');
     trialerror(0);
     goodmonkey(reward_dur);
-
 elseif TrialRecord.User.agenting & mul.ChosenTarget == 1
     dashboard(2, 'success!!! <3 ');
     trialerror(0);
