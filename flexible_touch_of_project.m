@@ -21,9 +21,9 @@ holding_box = {[0 0 1], [0 0 1], 1, [-8 3]};
 mounting_box = {[1 1 0], [1 1 0], 1, [-8 7]};
 
 no_boxes = TrialRecord.User.chasing_on + TrialRecord.User.grooming_on + TrialRecord.User.holding_on + TrialRecord.User.mounting_on;
-box_features = [chasing_box; grooming_box; holding_box; mounting_box];
+all_boxes = [chasing_box; grooming_box; holding_box; mounting_box];
 if TrialRecord.User.categorizing
-    trial_box.List = box_features(1:no_boxes, 1:4);
+    trial_box.List = all_boxes(1:no_boxes, 1:4);
 elseif TrialRecord.User.agenting || TrialRecord.User.patienting
     trial_box.List = {[0 1 1], [0 1 1], 1, [8 -3]; ...
         [1 0 1], [1 0 1], 1, [8 3]};
@@ -31,11 +31,13 @@ end
 
 % setting touch targets
 mul = MultiTarget(touch_);
+all_targets = [all_boxes{1, 4}; all_boxes{2, 4}; all_boxes{3, 4}; all_boxes{4, 4}];
 if TrialRecord.User.categorizing
-    mul.Target = [-8 -7; -8 -3; -8 3; -8 7];
+    mul.Target = all_targets(1:no_boxes, :);
 elseif TrialRecord.User.agenting || TrialRecord.User.patienting
     mul.Target = [8 -3; 8 3];
 end
+
 mul.Threshold = 1;
 mul.WaitTime = 150000;
 mul.HoldTime = 0;
