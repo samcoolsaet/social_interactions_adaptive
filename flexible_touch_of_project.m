@@ -30,17 +30,21 @@ elseif TrialRecord.User.agenting || TrialRecord.User.patienting
 end
 
 % setting touch targets
-mul = MultiTarget(touch_);
+if nr_boxes == 1
+    touch = SingleTarget(touch_);
+else
+    touch = MultiTarget(touch_);
+    touch.WaitTime = 150000;
+    touch.HoldTime = 0;
+end
 all_targets = [all_boxes{1, 4}; all_boxes{2, 4}; all_boxes{3, 4}; all_boxes{4, 4}];
 if TrialRecord.User.categorizing
-    mul.Target = all_targets(1:nr_boxes, :);
+    touch.Target = all_targets(1:nr_boxes, :);
 elseif TrialRecord.User.agenting || TrialRecord.User.patienting
-    mul.Target = [8 -3; 8 3];
+    touch.Target = [8 -3; 8 3];
 end
 
-mul.Threshold = 1;
-mul.WaitTime = 150000;
-mul.HoldTime = 0;
+touch.Threshold = 1;
 %% setting up animations and frames
 mov = MovieGraphic(fix);
 mov.List = { TrialRecord.User.movie, [0 0], 0, 1.25, 90 };   % movie filename
@@ -63,7 +67,7 @@ con2.add(mov);
 con2.add(trial_box);
 
 % showing buttons and adding touch targets.
-con3 = Concurrent(mul);
+con3 = Concurrent(touch);
 con3.add(img);
 con3.add(trial_box);
 
@@ -95,33 +99,41 @@ scene3 = create_scene(con3, 1);
 run_scene(scene3, 10);
 
 %% evaluate
-if TrialRecord.User.chasing & mul.ChosenTarget == 1
-    dashboard(2, 'success!!! <3 ');
-    trialerror(0);
-    goodmonkey(reward_dur);
-elseif TrialRecord.User.grooming & mul.ChosenTarget == 2
-    dashboard(2, 'success!!! <3 ');
-    trialerror(0);
-    goodmonkey(reward_dur);
-elseif TrialRecord.User.holding & mul.ChosenTarget == 3
-    dashboard(2, 'success!!! <3 ');
-    trialerror(0);
-    goodmonkey(reward_dur);
-elseif TrialRecord.User.mounting & mul.ChosenTarget == 4
-    dashboard(2, 'success!!! <3 ');
-    trialerror(0);
-    goodmonkey(reward_dur);
-elseif TrialRecord.User.agenting & mul.ChosenTarget == 1
-    dashboard(2, 'success!!! <3 ');
-    trialerror(0);
-    goodmonkey(reward_dur);
-elseif TrialRecord.User.patienting & mul.ChosenTarget == 2
-    dashboard(2, 'success!!! <3 ');
-    trialerror(0)
-    goodmonkey(reward_dur);
+if nr_boxes == 1
+    if touch.Success
+        dashboard(2, 'success!!! <3 ');
+        trialerror(0);
+        goodmonkey(reward_dur);
+    end
 else
-    dashboard(2, 'FAIL!!!');
-    trialerror(6);
+    if TrialRecord.User.chasing & touch.ChosenTarget == 1
+        dashboard(2, 'success!!! <3 ');
+        trialerror(0);
+        goodmonkey(reward_dur);
+    elseif TrialRecord.User.grooming & touch.ChosenTarget == 2
+        dashboard(2, 'success!!! <3 ');
+        trialerror(0);
+        goodmonkey(reward_dur);
+    elseif TrialRecord.User.holding & touch.ChosenTarget == 3
+        dashboard(2, 'success!!! <3 ');
+        trialerror(0);
+        goodmonkey(reward_dur);
+    elseif TrialRecord.User.mounting & touch.ChosenTarget == 4
+        dashboard(2, 'success!!! <3 ');
+        trialerror(0);
+        goodmonkey(reward_dur);
+    elseif TrialRecord.User.agenting & touch.ChosenTarget == 1
+        dashboard(2, 'success!!! <3 ');
+        trialerror(0);
+        goodmonkey(reward_dur);
+    elseif TrialRecord.User.patienting & touch.ChosenTarget == 2
+        dashboard(2, 'success!!! <3 ');
+        trialerror(0)
+        goodmonkey(reward_dur);
+    else
+        dashboard(2, 'FAIL!!!');
+        trialerror(6);
+    end
 end
 
 idle(0,[], 20);

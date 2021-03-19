@@ -30,7 +30,7 @@ elseif mod(TrialRecord.CurrentTrialNumber, blocksize) == 0
 end
 
 % toggling conditions on
-training_categorization = false; % complete task or training categorization
+training_categorization = true; % complete task or training categorization
 training_agent_patient = false;
 
 if training_categorization
@@ -41,12 +41,14 @@ if training_categorization
     agent_patient = false;
     if TrialRecord.User.progression_number >=0
         TrialRecord.User.chasing_on = true;
-        TrialRecord.User.grooming_on = true;
     end
     if TrialRecord.User.progression_number >=1
-        TrialRecord.User.holding_on = true;
+        TrialRecord.User.grooming_on = true;
     end
     if TrialRecord.User.progression_number >=2
+        TrialRecord.User.holding_on = true;
+    end
+    if TrialRecord.User.progression_number >=3
         TrialRecord.User.mounting_on = true;
     end
 else
@@ -84,6 +86,7 @@ holding_frame_list(1:2) = [];
 mounting_frame_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\frames\mounting');
 mounting_frame_list = {mounting_frame_struct.name};
 mounting_frame_list(1:2) = [];
+
 
 if TrialRecord.User.chasing_on && TrialRecord.User.grooming_on && TrialRecord.User.holding_on && TrialRecord.User.mounting_on
     stimulus_list = [chasing_list, grooming_list, holding_list,  mounting_list];   % I could just make the stimulus list as an array with rows and identy each row as a category
