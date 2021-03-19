@@ -85,7 +85,6 @@ mounting_frame_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions
 mounting_frame_list = {mounting_frame_struct.name};
 mounting_frame_list(1:2) = [];
 
-
 if TrialRecord.User.chasing_on && TrialRecord.User.grooming_on && TrialRecord.User.holding_on && TrialRecord.User.mounting_on
     stimulus_list = [chasing_list, grooming_list, holding_list,  mounting_list];   % I could just make the stimulus list as an array with rows and identy each row as a category
     frame_list = [chasing_frame_list, grooming_frame_list, holding_frame_list, mounting_frame_list];
@@ -123,11 +122,14 @@ if TrialRecord.CurrentTrialNumber == 0
     else
         TrialRecord.User.condition_sequence = randperm(length(stimulus_list));
     end
+    if training_agent_patient
+        TrialRecord.User.condition_sequence = randperm(length(stimulus_list) * 2);
+    end
 end
 
 
 stimulus_sequence = mod(TrialRecord.User.condition_sequence,length(stimulus_list)) + 1; % is sequence of animations
-TrialRecord.User.stimulus_sequence_index = mod(TrialRecord.CurrentTrialNumber, length(TrialRecord.User.condition_sequence)) + 1;
+TrialRecord.User.stimulus_sequence_index = mod(TrialRecord.CurrentTrialNumber, length(stimulus_sequence)) + 1;
 TrialRecord.User.stimulus = stimulus_sequence(TrialRecord.User.stimulus_sequence_index);
 
 % intitializing question
@@ -141,34 +143,44 @@ TrialRecord.User.chasing = false;
 TrialRecord.User.holding = false;
 TrialRecord.User.mounting = false;
 
-
-if TrialRecord.User.condition_sequence(TrialRecord.User.stimulus_sequence_index) <= ...   % I could also easly turn the condition sequence into a cell array with rows and identy each row as category, agent and patient...
-        length( stimulus_list )
-    TrialRecord.User.categorizing = true;
-    if TrialRecord.User.categorizing
-        if strncmpi('chas', stimulus_list{TrialRecord.User.stimulus}, 4)
-            TrialRecord.User.chasing = true;
-            TrialRecord.NextCondition = 1;
-        elseif strncmpi('groom', stimulus_list{TrialRecord.User.stimulus}, 5)
-            TrialRecord.User.grooming = true;
-            TrialRecord.NextCondition = 2;
-        elseif strncmpi('hold', stimulus_list{TrialRecord.User.stimulus}, 4)
-            TrialRecord.User.holding = true;
-            TrialRecord.NextCondition = 3;
-        elseif strncmpi('mount', stimulus_list{TrialRecord.User.stimulus}, 5)
-            TrialRecord.User.mounting = true;
-            TrialRecord.NextCondition = 4;
-        end
+if training_agent_patient
+    if TrialRecord.User.condition_sequence(TrialRecord.User.stimulus_sequence_index) <= ...   % I could also easly turn the condition sequence into a cell array with rows and identy each row as category, agent and patient...
+            length( stimulus_list )
+        TrialRecord.User.agenting = true;
+        TrialRecord.NextCondition = 5;
+    else
+        TrialRecord.User.patienting = true;
+        TrialRecord.NextCondition = 6;
     end
-elseif length( stimulus_list ) < ... 
-        TrialRecord.User.condition_sequence(TrialRecord.User.stimulus_sequence_index) && ... 
-        TrialRecord.User.condition_sequence(TrialRecord.User.stimulus_sequence_index) <= ...
-        (2 * length( stimulus_list ))
-    TrialRecord.User.agenting = true;
-    TrialRecord.NextCondition = 5;
-else 
-    TrialRecord.User.patienting = true;
-    TrialRecord.NextCondition = 6;
+else
+    if TrialRecord.User.condition_sequence(TrialRecord.User.stimulus_sequence_index) <= ...   % I could also easly turn the condition sequence into a cell array with rows and identy each row as category, agent and patient...
+            length( stimulus_list )
+        TrialRecord.User.categorizing = true;
+        if TrialRecord.User.categorizing
+            if strncmpi('chas', stimulus_list{TrialRecord.User.stimulus}, 4)
+                TrialRecord.User.chasing = true;
+                TrialRecord.NextCondition = 1;
+            elseif strncmpi('groom', stimulus_list{TrialRecord.User.stimulus}, 5)
+                TrialRecord.User.grooming = true;
+                TrialRecord.NextCondition = 2;
+            elseif strncmpi('hold', stimulus_list{TrialRecord.User.stimulus}, 4)
+                TrialRecord.User.holding = true;
+                TrialRecord.NextCondition = 3;
+            elseif strncmpi('mount', stimulus_list{TrialRecord.User.stimulus}, 5)
+                TrialRecord.User.mounting = true;
+                TrialRecord.NextCondition = 4;
+            end
+        end
+    elseif length( stimulus_list ) < ... 
+            TrialRecord.User.condition_sequence(TrialRecord.User.stimulus_sequence_index) && ... 
+            TrialRecord.User.condition_sequence(TrialRecord.User.stimulus_sequence_index) <= ...
+            (2 * length( stimulus_list ))
+        TrialRecord.User.agenting = true;
+        TrialRecord.NextCondition = 5;
+    else 
+        TrialRecord.User.patienting = true;
+        TrialRecord.NextCondition = 6;
+    end
 end
 
 % determining correct folder name and define indexes for within folders
