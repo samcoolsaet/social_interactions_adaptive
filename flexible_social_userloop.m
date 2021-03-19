@@ -14,6 +14,11 @@ persistent timing_filenames_retrieved
     
 % mltaskobject(stim, MLConfig, TrialRecord);
 
+% chasing_on = true;
+% holding_on = true;
+% grooming_on = true;
+% mounting_on = true;
+
 agent_patient = false;
 
 % orienting between stimuli and frame files
@@ -66,11 +71,15 @@ frame_list = [chasing_frame_list, grooming_frame_list, holding_frame_list, mount
 % condition
 
 if TrialRecord.CurrentTrialNumber == 0
-    TrialRecord.User.condition_sequence = randperm(length(stimulus_list) * 3);
+    if agent_patient
+        TrialRecord.User.condition_sequence = randperm(length(stimulus_list) * 3);
+    else
+        TrialRecord.User.condition_sequence = randperm(length(stimulus_list));
+    end
 end
 
 
-stimulus_sequence = mod(TrialRecord.User.condition_sequence,length(stimulus_list)) + 1;
+stimulus_sequence = mod(TrialRecord.User.condition_sequence,length(stimulus_list)) + 1; % is sequence of animations
 TrialRecord.User.stimulus_sequence_index = mod(TrialRecord.CurrentTrialNumber, length(TrialRecord.User.condition_sequence)) + 1;
 TrialRecord.User.stimulus = stimulus_sequence(TrialRecord.User.stimulus_sequence_index);
 
@@ -90,11 +99,11 @@ if TrialRecord.User.condition_sequence(TrialRecord.User.stimulus_sequence_index)
         length( stimulus_list )
     TrialRecord.User.categorizing = true;
     if TrialRecord.User.categorizing
-        if strncmpi('groom', stimulus_list{TrialRecord.User.stimulus}, 5)
-            TrialRecord.User.grooming = true;
-            TrialRecord.NextCondition = 1;
-        elseif strncmpi('chas', stimulus_list{TrialRecord.User.stimulus}, 4)
+        if strncmpi('chas', stimulus_list{TrialRecord.User.stimulus}, 4)
             TrialRecord.User.chasing = true;
+            TrialRecord.NextCondition = 1;
+        elseif strncmpi('groom', stimulus_list{TrialRecord.User.stimulus}, 5)
+            TrialRecord.User.grooming = true;
             TrialRecord.NextCondition = 2;
         elseif strncmpi('hold', stimulus_list{TrialRecord.User.stimulus}, 4)
             TrialRecord.User.holding = true;
@@ -153,7 +162,7 @@ C = {'sqr([2 1], [1 0 0], 0, 0, -1)'};
 % end
 
 % blocksize = length(TrialRecord.User.condition_sequence);
-blocksize = 1;
+blocksize = 3;
 
 if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.performance = 0;
@@ -166,4 +175,5 @@ elseif mod(TrialRecord.CurrentTrialNumber, blocksize) == 0
         TrialRecord.User.progression_number = TrialRecord.User.progression_number + 1;
     end
 end
-end        
+TrialRecord.User.progression_number
+end  
