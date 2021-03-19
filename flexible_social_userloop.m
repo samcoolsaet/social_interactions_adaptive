@@ -11,15 +11,51 @@ persistent timing_filenames_retrieved
         timing_filenames_retrieved = true;
     return
     end
-    
-% mltaskobject(stim, MLConfig, TrialRecord);
 
-TrialRecord.User.chasing_on = true;
-TrialRecord.User.grooming_on = true;
-TrialRecord.User.holding_on = false;
-TrialRecord.User.mounting_on = false;
+% determining next block and difficulty based on progression number
 
-agent_patient = false;
+blocksize = 1;
+% blocksize = length(TrialRecord.User.condition_sequence);
+
+if TrialRecord.CurrentTrialNumber == 0
+    TrialRecord.User.performance = 0;
+    TrialRecord.User.progression_number = 0;
+elseif mod(TrialRecord.CurrentTrialNumber, blocksize) == 0
+    boolean_errors_per_block = TrialRecord.TrialErrors(end-(blocksize-1) : end) == 0;
+    TrialRecord.User.performance = mean(boolean_errors_per_block);
+    TrialRecord.NextBlock = TrialRecord.CurrentBlock + 1;
+    if TrialRecord.User.performance >= 0.80
+        TrialRecord.User.progression_number = TrialRecord.User.progression_number + 1;
+    end
+end
+
+% toggling conditions on
+training_categorization = false; % complete task or training categorization
+training_agent_patient = false;
+
+if training_categorization
+    TrialRecord.User.chasing_on = false;
+    TrialRecord.User.grooming_on = false;
+    TrialRecord.User.holding_on = false;
+    TrialRecord.User.mounting_on = false;
+    agent_patient = false;
+    if TrialRecord.User.progression_number >=0
+        TrialRecord.User.chasing_on = true;
+        TrialRecord.User.grooming_on = true;
+    end
+    if TrialRecord.User.progression_number >=1
+        TrialRecord.User.holding_on = true;
+    end
+    if TrialRecord.User.progression_number >=2
+        TrialRecord.User.mounting_on = true;
+    end
+else
+    TrialRecord.User.chasing_on = true;
+    TrialRecord.User.grooming_on = true;
+    TrialRecord.User.holding_on = true;
+    TrialRecord.User.mounting_on = true;
+    agent_patient = true;  
+end
 
 % orienting between stimuli and frame files
 % creating individual folder lists and general stim and frame lists
@@ -136,6 +172,8 @@ else
 end
 
 % determining correct folder name and define indexes for within folders
+% all_folders = {'chasing','grooming','holding','mounting'} and then I can
+% index
 if TrialRecord.User.stimulus <= length(chasing_list)        % stimulus_list = [chasing_list, grooming_list, holding_list, mounting_list];
     folder = 'chasing';
     folder_index = TrialRecord.User.stimulus;
@@ -165,25 +203,4 @@ TrialRecord.User.frame = strcat('C:\Users\samco\Documents\GitHub\social_interact
 
 C = {'sqr([2 1], [1 0 0], 0, 0, -1)'};
 
-
-% determining next block
-
-% if mod(TrialRecord.CurrentTrialNumber, length(TrialRecord.User.condition_sequence)) == 0
-%     TrialRecord.NextBlock = (TrialRecord.CurrentTrialNumber / length(TrialRecord.User.condition_sequence)) + 1;
-% end
-
-% blocksize = length(TrialRecord.User.condition_sequence);
-blocksize = 3;
-
-if TrialRecord.CurrentTrialNumber == 0
-    TrialRecord.User.performance = 0;
-    TrialRecord.User.progression_number = 0;
-elseif mod(TrialRecord.CurrentTrialNumber, blocksize) == 0
-    boolean_errors_per_block = TrialRecord.TrialErrors(end-(blocksize-1) : end) == 0;
-    TrialRecord.User.performance = mean(boolean_errors_per_block);
-    TrialRecord.NextBlock = TrialRecord.CurrentBlock + 1;
-    if TrialRecord.User.performance >= 0.80
-        TrialRecord.User.progression_number = TrialRecord.User.progression_number + 1;
-    end
-end
 end  
