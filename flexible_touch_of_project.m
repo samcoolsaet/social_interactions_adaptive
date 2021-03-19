@@ -19,14 +19,15 @@ chasing_box = {[1 0 0], [1 0 0], 1, [-8 -7]};
 grooming_box = {[0 1 0], [0 1 0], 1.25, [-8 -3]};
 holding_box = {[0 0 1], [0 0 1], 1, [-8 3]};
 mounting_box = {[1 1 0], [1 1 0], 1, [-8 7]};
+agent_box = {[0 1 1], [0 1 1], 1, [8 -3]};
+patient_box = {[1 0 1], [1 0 1], 1, [8 3]};
 
 nr_boxes = TrialRecord.User.chasing_on + TrialRecord.User.grooming_on + TrialRecord.User.holding_on + TrialRecord.User.mounting_on;
-all_boxes = [chasing_box; grooming_box; holding_box; mounting_box];
+all_boxes = [chasing_box; grooming_box; holding_box; mounting_box; agent_box; patient_box];
 if TrialRecord.User.categorizing
     trial_box.List = all_boxes(1:nr_boxes, 1:4);
 elseif TrialRecord.User.agenting || TrialRecord.User.patienting
-    trial_box.List = {[0 1 1], [0 1 1], 1, [8 -3]; ...
-        [1 0 1], [1 0 1], 1, [8 3]};
+    trial_box.List = all_boxes(5:6, 1:4);
 end
 
 % setting touch targets
@@ -37,11 +38,15 @@ else
     touch.WaitTime = 150000;
     touch.HoldTime = 0;
 end
-all_targets = [all_boxes{1, 4}; all_boxes{2, 4}; all_boxes{3, 4}; all_boxes{4, 4}];
+all_targets = [all_boxes{1, 4}; all_boxes{2, 4}; all_boxes{3, 4}; all_boxes{4, 4}; all_boxes{5, 4}; all_boxes{6, 4}];
 if TrialRecord.User.categorizing
     touch.Target = all_targets(1:nr_boxes, :);
 elseif TrialRecord.User.agenting || TrialRecord.User.patienting
-    touch.Target = [8 -3; 8 3];
+    if nr_boxes == 1
+        touch.Target = all_targets(TrialRecord.CurrentCondition, :);
+    else
+        touch.Target = all_targets(5:6, :); % hier mag ik maar 1 input geven als progression number 0 is, want singletarget.
+    end
 end
 
 touch.Threshold = 1;

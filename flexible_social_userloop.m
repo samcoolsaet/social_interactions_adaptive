@@ -31,7 +31,7 @@ end
 
 % toggling conditions on
 training_categorization = true; % complete task or training categorization
-training_agent_patient = false;
+training_agent_patient = true;
 
 if training_categorization
     TrialRecord.User.chasing_on = false;
