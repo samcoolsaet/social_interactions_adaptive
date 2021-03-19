@@ -14,10 +14,10 @@ persistent timing_filenames_retrieved
     
 % mltaskobject(stim, MLConfig, TrialRecord);
 
-% chasing_on = true;
-% holding_on = true;
-% grooming_on = true;
-% mounting_on = true;
+TrialRecord.User.chasing_on = true;
+TrialRecord.User.grooming_on = true;
+TrialRecord.User.holding_on = false;
+TrialRecord.User.mounting_on = false;
 
 agent_patient = false;
 
@@ -36,8 +36,6 @@ mounting_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adapt
 mounting_list = {mounting_struct.name};
 mounting_list(1:2) = [];
 
-stimulus_list = [chasing_list, grooming_list, holding_list,  mounting_list];
-
 chasing_frame_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\frames\chasing');
 chasing_frame_list = {chasing_frame_struct.name};
 chasing_frame_list(1:2) = [];
@@ -51,7 +49,20 @@ mounting_frame_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions
 mounting_frame_list = {mounting_frame_struct.name};
 mounting_frame_list(1:2) = [];
 
-frame_list = [chasing_frame_list, grooming_frame_list, holding_frame_list, mounting_frame_list];
+
+if TrialRecord.User.chasing_on && TrialRecord.User.grooming_on && TrialRecord.User.holding_on && TrialRecord.User.mounting_on
+    stimulus_list = [chasing_list, grooming_list, holding_list,  mounting_list];   % I could just make the stimulus list as an array with rows and identy each row as a category
+    frame_list = [chasing_frame_list, grooming_frame_list, holding_frame_list, mounting_frame_list];
+elseif TrialRecord.User.chasing_on && TrialRecord.User.grooming_on && TrialRecord.User.holding_on       
+    stimulus_list = [chasing_list, grooming_list, holding_list];
+    frame_list = [chasing_frame_list, grooming_frame_list, holding_frame_list];
+elseif TrialRecord.User.chasing_on && TrialRecord.User.grooming_on
+    stimulus_list = [chasing_list, grooming_list];
+    frame_list = [chasing_frame_list, grooming_frame_list];
+elseif TrialRecord.User.chasing_on
+    stimulus_list = chasing_list;
+    frame_list = chasing_frame_list;
+end
 
 % % img_size in degrees = 15*9, frames sizes (x, y), locations
 % % open the file
@@ -95,7 +106,7 @@ TrialRecord.User.holding = false;
 TrialRecord.User.mounting = false;
 
 
-if TrialRecord.User.condition_sequence(TrialRecord.User.stimulus_sequence_index) <= ... 
+if TrialRecord.User.condition_sequence(TrialRecord.User.stimulus_sequence_index) <= ...   % I could also easly turn the condition sequence into a cell array with rows and identy each row as category, agent and patient...
         length( stimulus_list )
     TrialRecord.User.categorizing = true;
     if TrialRecord.User.categorizing
@@ -175,5 +186,4 @@ elseif mod(TrialRecord.CurrentTrialNumber, blocksize) == 0
         TrialRecord.User.progression_number = TrialRecord.User.progression_number + 1;
     end
 end
-TrialRecord.User.progression_number
 end  

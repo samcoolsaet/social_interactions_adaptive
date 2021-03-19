@@ -14,11 +14,20 @@ fix.Threshold = 1;
 %drawing button boxes
 
 trial_box = BoxGraphic(null_);
+
+% chasing_box = {[1 0 0], [1 0 0], 1, [-8 -7]};
+% grooming_box = {[0 1 0], [0 1 0], 1.25, [-8 -3]};
+% holding_box = {[0 0 1], [0 0 1], 1, [-8 3]};
+% mounting_box = {[1 1 0], [1 1 0], 1, [-8 7]};
+
+% no_boxes = TrialRecord.User.chasing_on + TrialRecord.User.grooming_on + TrialRecord.User.holding_on + TrialRecord.User.mounting_on;
+% box_features = [chasing_box; grooming_box; holding_box; mounting_box]
 if TrialRecord.User.categorizing
     trial_box.List = { [1 0 0], [1 0 0], 1, [-8 -7]; ...
         [0 1 0], [0 1 0], 1.25, [-8 -3];...
         [0 0 1], [0 0 1], 1, [-8 3]; ...
         [1 1 0], [1 1 0], 1, [-8 7]};
+%     trial_box.List = (no_boxes, 1:4);
 elseif TrialRecord.User.agenting || TrialRecord.User.patienting
     trial_box.List = {[0 1 1], [0 1 1], 1, [8 -3]; ...
         [1 0 1], [1 0 1], 1, [8 3]};
