@@ -30,10 +30,10 @@ elseif mod(TrialRecord.CurrentTrialNumber, blocksize) == 0
 end
 
 % toggling conditions on
-training_categorization = true; % complete task or training categorization
-training_agent_patient = true;
+TrialRecord.User.training_categorization = false; % complete task or training categorization
+TrialRecord.User.training_agent_patient = false;
 
-if training_categorization
+if TrialRecord.User.training_categorization
     TrialRecord.User.chasing_on = false;
     TrialRecord.User.grooming_on = false;
     TrialRecord.User.holding_on = false;
@@ -125,7 +125,7 @@ if TrialRecord.CurrentTrialNumber == 0
     else
         TrialRecord.User.condition_sequence = randperm(length(stimulus_list));
     end
-    if training_agent_patient
+    if TrialRecord.User.training_agent_patient
         TrialRecord.User.condition_sequence = randperm(length(stimulus_list) * 2);
     end
 end
@@ -146,7 +146,7 @@ TrialRecord.User.chasing = false;
 TrialRecord.User.holding = false;
 TrialRecord.User.mounting = false;
 
-if training_agent_patient
+if TrialRecord.User.training_agent_patient
     if TrialRecord.User.condition_sequence(TrialRecord.User.stimulus_sequence_index) <= ...   % I could also easly turn the condition sequence into a cell array with rows and identy each row as category, agent and patient...
             length( stimulus_list )
         TrialRecord.User.agenting = true;
