@@ -116,6 +116,10 @@ tc_movie.Duration = 3000;
 tc_answer = TimeCounter(null_);
 tc_answer.Duration = 5000;
 
+% webcam
+% cam = WebcamMonitor(null_);
+% cam.CamNumber = 1;
+
 % merging touch and visual for engagement button
 con1 = Concurrent(fix);
 con1.add(engage_box);
@@ -131,7 +135,6 @@ or.add(tc_answer);
 con3 = Concurrent(or);
 con3.add(img);
 con3.add(trial_box);
-% con3.add(bgc);
 
 % temporary cue
 
@@ -141,7 +144,6 @@ if TrialRecord.User.agenting
     con3.add(cue);
 end
 %% running scenes
-
 % run engagement scene
 scene1 = create_scene(con1);
 run_scene(scene1, 10);
@@ -156,6 +158,10 @@ scene2 = create_scene(con2);
 run_scene(scene2, 10);
 
 % run frame and answering scene
+tf = istouching;
+while istouching
+    idle(0);
+end
 if TrialRecord.User.categorizing
     set_bgcolor([1 0.5 1]);   % change the background color  
 elseif TrialRecord.User.agenting | TrialRecord.User.patienting
@@ -166,7 +172,6 @@ run_scene(scene3, 10);
 
 set_bgcolor([]);        % change it back to the original color
 idle(0);
-
 %% evaluate
 if nr_boxes == 1
     if touch.Success
@@ -210,9 +215,12 @@ else
         dashboard(2, 'no response');
         trialerror(1);
         idle(0, [1 0 0], 20);
+%         TrialRecord.User.repeat = true; % ask lucas for repeat and sound
+%         effect
     else
         dashboard(2, 'FAIL!!!');
         trialerror(6);
         idle(0, [1 0 0], 20);
+%         TrialRecord.User.repeat = true;
     end
 end

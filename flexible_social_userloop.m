@@ -13,6 +13,9 @@ persistent timing_filenames_retrieved
     end
 
 % determining next block and difficulty based on progression number
+%%%%% I can make my own currenttrialvariable based on the trialrecord for
+%%%%% the repeat function. like TrialRecord.User.curent_trial =
+%%%%% TrialRecord.CurrentTrial
 
 blocksize = 1;
 % blocksize = length(TrialRecord.User.condition_sequence);
