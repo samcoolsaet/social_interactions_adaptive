@@ -1,6 +1,8 @@
 hotkey('x', 'escape_screen(); assignin(''caller'',''continue_'',false);');
 hotkey('r', 'goodmonkey(reward_dur, ''juiceline'', MLConfig.RewardFuncArgs.JuiceLine, ''eventmarker'', 14, ''nonblocking'', 1);');   % manual reward
-
+hotkey('p', 'TrialRecord.User.progression_number = TrialRecord.User.progression_number + 1;');
+hotkey('m', 'TrialRecord.User.progression_number = TrialRecord.User.progression_number - 1; dashboard(1, string(TrialRecord.User.progression_number));');
+dashboard(1, string(TrialRecord.User.progression_number));
 %% designing engage_button
 % draw button box
 engage_box = BoxGraphic(null_);
@@ -164,21 +166,24 @@ while istouching
 end
 if TrialRecord.User.categorizing
     set_bgcolor([1 0.5 1]);   % change the background color  
-elseif TrialRecord.User.agenting | TrialRecord.User.patienting
+elseif TrialRecord.User.agenting || TrialRecord.User.patienting
     set_bgcolor([1 1 1]);
 end
-scene3 = create_scene(con3, 1);
+
+scene3 = create_scene(con3, 1); % something goes wrong here with the task object for some reason, works without task object
 run_scene(scene3, 10);
 
 set_bgcolor([]);        % change it back to the original color
 idle(0);
 %% evaluate
+[y, fs] = audioread('test.wav');
 if nr_boxes == 1
     if touch.Success
         dashboard(2, 'success!!! <3 ');
         trialerror(0);
         goodmonkey(reward_dur);
         idle(0, [0 1 0], 20);
+        TrialRecord.User.repeat = false;
     end
 else
     if TrialRecord.User.chasing & touch.ChosenTarget == 1
@@ -186,41 +191,52 @@ else
         trialerror(0);
         goodmonkey(reward_dur);
         idle(0, [0 1 0], 20);
+        TrialRecord.User.repeat = false;
+        sound(y); % audioplayer is more interesting :D
     elseif TrialRecord.User.grooming & touch.ChosenTarget == 2
         dashboard(2, 'success!!! <3 ');
         trialerror(0);
         goodmonkey(reward_dur);
         idle(0, [0 1 0], 20);
+        TrialRecord.User.repeat = false;
+        sound(y);
     elseif TrialRecord.User.holding & touch.ChosenTarget == 3
         dashboard(2, 'success!!! <3 ');
         trialerror(0);
         goodmonkey(reward_dur);
         idle(0, [0 1 0], 20);
+        TrialRecord.User.repeat = false;
+        sound(y);
     elseif TrialRecord.User.mounting & touch.ChosenTarget == 4
         dashboard(2, 'success!!! <3 ');
         trialerror(0);
         goodmonkey(reward_dur);
         idle(0, [0 1 0], 20);
+        TrialRecord.User.repeat = false;
+        sound(y);
     elseif TrialRecord.User.agenting & touch.ChosenTarget == 1
         dashboard(2, 'success!!! <3 ');
         trialerror(0);
         goodmonkey(reward_dur);
         idle(0, [0 1 0], 20);
+        TrialRecord.User.repeat = false;
+        sound(y);
     elseif TrialRecord.User.patienting & touch.ChosenTarget == 2
         dashboard(2, 'success!!! <3 ');
         trialerror(0)
         goodmonkey(reward_dur);
         idle(0, [0 1 0], 20);
+        TrialRecord.User.repeat = false;
+        sound(y);
     elseif tc_answer.Success
         dashboard(2, 'no response');
         trialerror(1);
-        idle(0, [1 0 0], 20);
-%         TrialRecord.User.repeat = true; % ask lucas for repeat and sound
-%         effect
+        idle(5000, [1 0 0], 20);
+        TrialRecord.User.repeat = true;  % if repeat, progression number should not change!!!
     else
         dashboard(2, 'FAIL!!!');
         trialerror(6);
-        idle(0, [1 0 0], 20);
-%         TrialRecord.User.repeat = true;
+        idle(5000, [1 0 0], 20);
+        TrialRecord.User.repeat = true;
     end
 end
