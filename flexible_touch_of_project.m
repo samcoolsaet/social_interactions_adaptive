@@ -73,29 +73,24 @@ if TrialRecord.User.training_categorization
         mounting_box = {[1 1 0], [1 1 0], standard_button_size, [-8 7]};
     end
 end
-% if TrialRecord.User.current_sum_categories == 1
-%     if TrialRecord.Using.chasing
-%         new_button_size = correct_button_size;
+% if TrialRecord.User.training_agent_patient
+%     if TrialRecord.User.current_sum_categories == 1
+%         if TrialRecord.User.agenting
+%             agent_box = {[0 1 1], [0 1 1], correct_button_size, [8 -3]};
+%         else
+%             agent_box = {[0 1 1], [0 1 1], wrong_button_size, [8 -3]};
+%         end
 %     else
-%         new_button_size = wrong_button_size;
+%         agent_box = {[0 1 1], [0 1 1], standard_button_size, [8 -3]};
 %     end
-% elseif TrialRecord.User.current_sum_categories == 2
-%     if TrialRecord.Using.grooming
-%         new_button_size = correct_button_size;
+%     if TrialRecord.User.current_sum_categories == 2
+%         if TrialRecord.User.patienting
+%             patient_box = {[1 0 1], [1 0 1], correct_button_size, [8 3]};
+%         else
+%             patient_box = {[1 0 1], [1 0 1], wrong_button_size, [8 3]};
+%         end
 %     else
-%         new_button_size = wrong_button_size;
-%     end
-% elseif TrialRecord.User.current_sum_categories == 3
-%     if TrialRecord.Using.holding
-%         new_button_size = correct_button_size;
-%     else
-%         new_button_size = wrong_button_size;
-%     end
-% elseif TrialRecord.User.current_sum_categories == 4
-%     if TrialRecord.Using.mounting
-%         new_button_size = correct_button_size;
-%     else
-%         new_button_size = wrong_button_size;
+%         patient_box = {[1 0 1], [1 0 1], standard_button_size, [8 3]};
 %     end
 % end
 
@@ -103,45 +98,15 @@ end
 
 trial_box = BoxGraphic(null_);
 
-% chasing_box = {[1 0 0], [1 0 0], 2, [-8 -7]};
-% grooming_box = {[0 1 0], [0 1 0], 2, [-8 -2.34]};
-% holding_box = {[0 0 1], [0 0 1], 2, [-8 2.34]};
-% mounting_box = {[1 1 0], [1 1 0], 2, [-8 7]};
-% agent_box = {[0 1 1], [0 1 1], 2, [8 -3]};
-% patient_box = {[1 0 1], [1 0 1], 2, [8 3]};
-    
-% if TrialRecord.User.training_categorization
-%     if TrialRecord.User.chasing
-%         chasing_box = {[1 0 0], [1 0 0], correct_button_size, [-8 -7]};
-%         grooming_box = {[0 1 0], [0 1 0], wrong_button_size, [-8 -2.34]};
-%         holding_box = {[0 0 1], [0 0 1], wrong_button_size, [-8 2.34]};
-%         mounting_box = {[1 1 0], [1 1 0], wrong_button_size, [-8 7]};
-%     elseif TrialRecord.User.grooming
-%         chasing_box = {[1 0 0], [1 0 0], wrong_button_size, [-8 -7]};
-%         grooming_box = {[0 1 0], [0 1 0], correct_button_size, [-8 -2.34]};
-%         holding_box = {[0 0 1], [0 0 1], wrong_button_size, [-8 2.34]};
-%         mounting_box = {[1 1 0], [1 1 0], wrong_button_size, [-8 7]};
-%     elseif TrialRecord.User.holding
-%         chasing_box = {[1 0 0], [1 0 0], wrong_button_size, [-8 -7]};
-%         grooming_box = {[0 1 0], [0 1 0], wrong_button_size, [-8 -2.34]};
-%         holding_box = {[0 0 1], [0 0 1], correct_button_size, [-8 2.34]};
-%         mounting_box = {[1 1 0], [1 1 0], wrong_button_size, [-8 7]};
-%     elseif TrialRecord.User.mounting
-%         chasing_box = {[1 0 0], [1 0 0], wrong_button_size, [-8 -7]};
-%         grooming_box = {[0 1 0], [0 1 0], wrong_button_size, [-8 -2.34]};
-%         holding_box = {[0 0 1], [0 0 1], wrong_button_size, [-8 2.34]};
-%         mounting_box = {[1 1 0], [1 1 0], correct_button_size, [-8 7]};
-%     end
-% end
-% if TrialRecord.User.training_agent_patient
-%     if TrialRecord.User.agenting
-%         agent_box = {[0 1 1], [0 1 1], correct_button_size, [8 -3]};
-%         patient_box = {[1 0 1], [1 0 1], wrong_button_size, [8 3]};
-%     elseif TrialRecord.User.patienting
-%         agent_box = {[0 1 1], [0 1 1], wrong_button_size, [8 -3]};
-%         patient_box = {[1 0 1], [1 0 1], correct_button_size, [8 3]};
-%     end
-% end
+if TrialRecord.User.training_agent_patient
+    if TrialRecord.User.agenting
+        agent_box = {[0 1 1], [0 1 1], correct_button_size, [8 -3]};
+        patient_box = {[1 0 1], [1 0 1], wrong_button_size, [8 3]};
+    elseif TrialRecord.User.patienting
+        agent_box = {[0 1 1], [0 1 1], wrong_button_size, [8 -3]};
+        patient_box = {[1 0 1], [1 0 1], correct_button_size, [8 3]};
+    end
+end
 
 all_boxes = [chasing_box; grooming_box; holding_box; mounting_box; agent_box; patient_box];
 if TrialRecord.User.categorizing

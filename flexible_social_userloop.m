@@ -79,6 +79,19 @@ else
     TrialRecord.User.mounting_on = true;
     agent_patient = true;  
 end
+% if TrialRecord.User.training_agent_patient
+%     TrialRecord.User.agent_on = false;
+%     TrialRecord.User.patient_on = false;
+%     if TrialRecord.User.category_progression >=0
+%         TrialRecord.User.agent_on = true;
+%     end
+%     if TrialRecord.User.category_progression >=1
+%         TrialRecord.User.chasing_on = true;
+%     end
+% else
+%     TrialRecord.User.agent_on = false;
+%     TrialRecord.User.patient_on = false;
+% end
 
 TrialRecord.User.current_sum_categories = sum([TrialRecord.User.chasing_on, ... 
     TrialRecord.User.grooming_on,TrialRecord.User.holding_on, ...
@@ -156,14 +169,14 @@ end
 % setting condition sequence, maintaining it over userloops and picking
 % condition
 
-if TrialRecord.User.current_sum_categories ~= previous_sum_categories % TrialRecord.CurrentTrialNumber == 0 % nondedju ook een probleem, want de lijsten breiden uit
-    if agent_patient
-        TrialRecord.User.condition_sequence = randperm(length(stimulus_list) * 3);
+if TrialRecord.User.current_sum_categories ~= previous_sum_categories
+    if agent_patient    
+        TrialRecord.User.condition_sequence = randperm(length(stimulus_list) * 3); % basically, the number of repititions per stimulus 3 for full experiment
     else
-        TrialRecord.User.condition_sequence = randperm(length(stimulus_list));
+        TrialRecord.User.condition_sequence = randperm(length(stimulus_list)); % 1 for only agent or only behavior
     end
     if TrialRecord.User.training_agent_patient
-        TrialRecord.User.condition_sequence = randperm(length(stimulus_list) * 2);
+        TrialRecord.User.condition_sequence = randperm(length(stimulus_list) * 2); % this agent_on & patient_on?
     end
 end
 
