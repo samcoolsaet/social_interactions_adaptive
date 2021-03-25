@@ -1,6 +1,11 @@
 function [C,timingfile,userdefined_trialholder] = social_userloop(MLConfig,TrialRecord)
 %% Code
-
+%%%%%%%%%%%%%%%% ik krijg een error 'Index exceeds the number of array
+%%%%%%%%%%%%%%%% elements (23).' bij trial 24 maar belangrijk is te weten
+%%%%%%%%%%%%%%%% dat ik bij aanvang van elke category opnieuw alle stimuli
+%%%%%%%%%%%%%%%% in de pool gooi, dus als moutning aanvangt verwacht hij
+%%%%%%%%%%%%%%%% ergens enkel nog het aantal mounting stimuli en niet de
+%%%%%%%%%%%%%%%% volle 23.
 % return values
 C = [];
 timingfile = 'flexible_touch_of_project.m';  % Placeholder, real timing file assigned below.
@@ -34,7 +39,7 @@ elseif mod(TrialRecord.CurrentTrialNumber, blocksize) == 0
     end
 end
 TrialRecord.User.category_progression = TrialRecord.User.progression_number / 5;
-if TrialRecord.User.category_progression <= 3
+if TrialRecord.User.category_progression <= 4
     TrialRecord.User.size_progression = TrialRecord.User.progression_number - ... 
         floor(TrialRecord.User.progression_number / 5)*5;
 end
