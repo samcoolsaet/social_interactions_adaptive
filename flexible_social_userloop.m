@@ -13,9 +13,6 @@ persistent timing_filenames_retrieved
     end
 
 % determining next block and difficulty based on progression number
-%%%%% I can make my own currenttrialvariable based on the trialrecord for
-%%%%% the repeat function. like TrialRecord.User.curent_trial =
-%%%%% TrialRecord.CurrentTrial
 
 blocksize = 1;
 % blocksize = length(TrialRecord.User.condition_sequence);
@@ -23,6 +20,7 @@ blocksize = 1;
 if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.performance = 0;
     TrialRecord.User.progression_number = 0;
+    TrialRecord.User.repeat = false; % initializing repeat for first trial
 elseif mod(TrialRecord.CurrentTrialNumber, blocksize) == 0
     boolean_errors_per_block = TrialRecord.TrialErrors(end-(blocksize-1) : end) == 0;
     TrialRecord.User.performance = mean(boolean_errors_per_block);
@@ -34,6 +32,11 @@ elseif mod(TrialRecord.CurrentTrialNumber, blocksize) == 0
             TrialRecord.User.progression_number = TrialRecord.User.progression_number - 1;
         end
     end
+end
+TrialRecord.User.category_progression = TrialRecord.User.progression_number / 5;
+if TrialRecord.User.category_progression <= 3
+    TrialRecord.User.size_progression = TrialRecord.User.progression_number - ... 
+        floor(TrialRecord.User.progression_number / 5)*5;
 end
 
 % toggling conditions on
@@ -52,16 +55,16 @@ if TrialRecord.User.training_categorization
     TrialRecord.User.holding_on = false;
     TrialRecord.User.mounting_on = false;
     agent_patient = false;
-    if TrialRecord.User.progression_number >=0
+    if TrialRecord.User.category_progression >=0
         TrialRecord.User.chasing_on = true;
     end
-    if TrialRecord.User.progression_number >=1
+    if TrialRecord.User.category_progression >=1
         TrialRecord.User.grooming_on = true;
     end
-    if TrialRecord.User.progression_number >=2
+    if TrialRecord.User.category_progression >=2
         TrialRecord.User.holding_on = true;
     end
-    if TrialRecord.User.progression_number >=3
+    if TrialRecord.User.category_progression >=3
         TrialRecord.User.mounting_on = true;
     end
 else
@@ -115,13 +118,16 @@ if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.general_frame_list = [TrialRecord.User.chasing_frame_list, TrialRecord.User.grooming_frame_list, TrialRecord.User.holding_frame_list, TrialRecord.User.mounting_frame_list];
 end
 
-if ~TrialRecord.User.mounting_on       
+if TrialRecord.User.mounting_on
+    stimulus_list = TrialRecord.User.general_stimulus_list;
+    frame_list = TrialRecord.User.general_frame_list;
+elseif  ~TrialRecord.User.mounting_on && TrialRecord.User.holding_on
     stimulus_list = TrialRecord.User.general_stimulus_list(1, 1:(end-length(TrialRecord.User.mounting_list)));
     frame_list = TrialRecord.User.general_frame_list(1, 1:(end-length(TrialRecord.User.mounting_frame_list)));
-elseif TrialRecord.User.chasing_on && TrialRecord.User.grooming_on
+elseif ~TrialRecord.User.holding_on && TrialRecord.User.grooming_on
     stimulus_list = TrialRecord.User.general_stimulus_list(1, 1:(length(TrialRecord.User.chasing_list)+length(TrialRecord.User.grooming_list)));
     frame_list = TrialRecord.User.general_frame_list(1, 1:(length(TrialRecord.User.chasing_frame_list)+length(TrialRecord.User.grooming_frame_list)));
-elseif TrialRecord.User.chasing_on
+elseif ~TrialRecord.User.grooming_on && TrialRecord.User.chasing_on
     stimulus_list = TrialRecord.User.general_stimulus_list(1, 1:length(TrialRecord.User.chasing_list));
     frame_list = TrialRecord.User.general_frame_list(1, 1:length(TrialRecord.User.chasing_frame_list));
 end
@@ -160,7 +166,6 @@ end
 stimulus_sequence = mod(TrialRecord.User.condition_sequence,length(stimulus_list)) + 1; % is sequence of animations
 if TrialRecord.User.current_sum_categories ~= previous_sum_categories % TrialRecord.CurrentTrialNumber == 0 % probleem voor training, want lijsten breiden uit
     TrialRecord.User.stimulus_sequence_index = mod(TrialRecord.CurrentTrialNumber, length(stimulus_sequence)) + 1;
-    TrialRecord.User.repeat = false;    % initializing repeat for first trial
 else
     if ~TrialRecord.User.repeat
         TrialRecord.User.stimulus_sequence_index =  TrialRecord.User.stimulus_sequence_index + 1;

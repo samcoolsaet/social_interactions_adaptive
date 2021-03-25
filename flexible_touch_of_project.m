@@ -18,14 +18,28 @@ fix.Threshold = 2;
 
 standard_button_size = 2;
 button_size_difference = 1.5;
-button_size_step = (1 - TrialRecord.User.progression_number * 0.1) * button_size_difference;
+button_size_step = (1 - TrialRecord.User.size_progression * 0.2) * button_size_difference;
 if button_size_step > 0
     correct_button_size = 2 + button_size_step;
-    wrong_button_size = 2 - button_size_step;
+    if TrialRecord.User.current_sum_categories == 2
+        wrong_button_size = 2 - button_size_step; %%%%%%%% hier schort toch nog iets, ik wil vanaf 3 knoppen, alleen de nieuwe nieuwe knop aanpassen.
+    else
+        wrong_button_size = standard_button_size;
+    end
 else
     correct_button_size = standard_button_size;
-    wrong_button_size = standard_button_size;
+    wrong_button_size = standard_button_size; %%%% aanpassen met if statement naargelang category progression
 end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% if TrialRecord.User.current_sum_categories == 2
+%     new_button = grooming_box;
+% elseif TrialRecord.User.current_sum_categories == 3
+%     new_button = holding_box;
+% elseif TrialRecord.User.current_sum_categories == 4
+%     new_button = mounting_box;
+% end
+
+new_button_size = % de new_button is altijd de laatste button
 
 %drawing button boxes
 
@@ -71,7 +85,7 @@ if TrialRecord.User.training_agent_patient
     end
 end
 
-nr_boxes = TrialRecord.User.chasing_on + TrialRecord.User.grooming_on + TrialRecord.User.holding_on + TrialRecord.User.mounting_on;
+nr_boxes = TrialRecord.User.current_sum_categories;
 all_boxes = [chasing_box; grooming_box; holding_box; mounting_box; agent_box; patient_box];
 if TrialRecord.User.categorizing
     trial_box.List = all_boxes(1:nr_boxes, 1:4);
@@ -184,6 +198,7 @@ if nr_boxes == 1
         goodmonkey(reward_dur);
         idle(0, [0 1 0], 20);
         TrialRecord.User.repeat = false;
+        sound(y, fs);
     end
 else
     if TrialRecord.User.chasing & touch.ChosenTarget == 1
@@ -192,42 +207,42 @@ else
         goodmonkey(reward_dur);
         idle(0, [0 1 0], 20);
         TrialRecord.User.repeat = false;
-        sound(y); % audioplayer is more interesting :D
+        sound(y, fs);
     elseif TrialRecord.User.grooming & touch.ChosenTarget == 2
         dashboard(2, 'success!!! <3 ');
         trialerror(0);
         goodmonkey(reward_dur);
         idle(0, [0 1 0], 20);
         TrialRecord.User.repeat = false;
-        sound(y);
+        sound(y, fs);
     elseif TrialRecord.User.holding & touch.ChosenTarget == 3
         dashboard(2, 'success!!! <3 ');
         trialerror(0);
         goodmonkey(reward_dur);
         idle(0, [0 1 0], 20);
         TrialRecord.User.repeat = false;
-        sound(y);
+        sound(y, fs);
     elseif TrialRecord.User.mounting & touch.ChosenTarget == 4
         dashboard(2, 'success!!! <3 ');
         trialerror(0);
         goodmonkey(reward_dur);
         idle(0, [0 1 0], 20);
         TrialRecord.User.repeat = false;
-        sound(y);
+        sound(y, fs);
     elseif TrialRecord.User.agenting & touch.ChosenTarget == 1
         dashboard(2, 'success!!! <3 ');
         trialerror(0);
         goodmonkey(reward_dur);
         idle(0, [0 1 0], 20);
         TrialRecord.User.repeat = false;
-        sound(y);
+        sound(y, fs);
     elseif TrialRecord.User.patienting & touch.ChosenTarget == 2
         dashboard(2, 'success!!! <3 ');
         trialerror(0)
         goodmonkey(reward_dur);
         idle(0, [0 1 0], 20);
         TrialRecord.User.repeat = false;
-        sound(y);
+        sound(y, fs);
     elseif tc_answer.Success
         dashboard(2, 'no response');
         trialerror(1);
