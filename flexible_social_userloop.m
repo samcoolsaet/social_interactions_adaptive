@@ -12,8 +12,7 @@ persistent timing_filenames_retrieved
     end
 
 %% determining next block and difficulty based on a general progression number
-
-blocksize = 1;
+blocksize = 10; % i should come with a clear definition of a blok
 % blocksize = length(TrialRecord.User.condition_sequence);
 
 if TrialRecord.CurrentTrialNumber == 0
@@ -35,10 +34,19 @@ end
 
 % setting independant category and button progression based on progression
 % number
-TrialRecord.User.category_progression = TrialRecord.User.progression_number / 5;
+category_progression_factor = 1; %blocksize*category_progression_factor for +1category
+agent_patient_progression_factor = 1; %blocksize*category_progression_factor for +1category
+TrialRecord.User.size_progression_factor = blocksize*category_progression_factor;
+constant_no_trials_at_max_size = 5;
+TrialRecord.User.category_progression = TrialRecord.User.progression_number / ... 
+    (category_progression_factor*blocksize + constant_no_trials_at_max_size);
+TrialRecord.User.agent_patient_progression = TrialRecord.User.progression_number / ... 
+    (agent_patient_progression_factor*blocksize + constant_no_trials_at_max_size);
 if TrialRecord.User.category_progression <= 4
-    TrialRecord.User.size_progression = TrialRecord.User.progression_number - ...  %%%% morgen nakijken ze
-        floor(TrialRecord.User.progression_number / 5)*5;
+    TrialRecord.User.size_progression = mod(TrialRecord.User.progression_number, TrialRecord.User.size_progression_factor);
+end
+if TrialRecord.User.agent_patient_progression <= 2
+    TrialRecord.User.size_progression = mod(TrialRecord.User.progression_number, TrialRecord.User.size_progression_factor);
 end
 
 %% toggling conditions on
@@ -81,10 +89,10 @@ if TrialRecord.User.training_categorization
         TrialRecord.User.mounting_on = true;
     end
 elseif TrialRecord.User.training_agent_patient
-    if TrialRecord.User.category_progression >=0
+    if TrialRecord.User.agent_patient_progression >=0
         TrialRecord.User.agent_on = true;
     end
-    if TrialRecord.User.category_progression >=1
+    if TrialRecord.User.agent_patient_progression >=1
         TrialRecord.User.patient_on = true;
     end
 else
@@ -302,6 +310,5 @@ TrialRecord.User.frame = strcat('C:\Users\samco\Documents\GitHub\social_interact
     folder, '\', frame_list{TrialRecord.User.stimulus});
 
 % creating condition
-
-    C = {'sqr([2 1], [1 0 0], 0, 0, -1)'};
+C = {'sqr([2 1], [1 0 0], 0, 0, -1)'};
 end
