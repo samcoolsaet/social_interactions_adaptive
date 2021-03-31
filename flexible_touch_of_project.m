@@ -148,11 +148,18 @@ img.List = { TrialRecord.User.frame, [0 0], 0, 1.25, 90 };
 %% constructing scenes
 % setting timecounter for duration of animation in first scene and time to
 % answer
+% movie_duration = 3000;
+% answer_time = 5000;
+% tc_movie = TimeCounter(null_);
+% tc_movie.Duration = movie_duration;
+% tc_answer = TimeCounter(null_);
+% tc_answer.Duration = answer_time;
+
 movie_duration = 3000;
 answer_time = 5000;
 tc_movie = TimeCounter(null_);
 tc_movie.Duration = movie_duration;
-tc_answer = TimeCounter(null_);
+tc_answer = TimeCounter(touch);
 tc_answer.Duration = answer_time;
 
 % webcam
@@ -212,6 +219,8 @@ run_scene(scene3, 10);
 
 set_bgcolor([]);        % change it back to the original color
 idle(0);
+
+tc_answer.Success
 %% evaluate
 [y1, fs1] = audioread('test.wav');
 [y2, fs2] = audioread('test2.wav');
@@ -223,6 +232,12 @@ if TrialRecord.User.current_sum_categories == 1
         idle(0, [0 1 0], 20);
         TrialRecord.User.repeat = false;
         sound(y1, fs1);
+    elseif tc_answer.Success
+        dashboard(2, 'no response');
+        trialerror(1);
+        sound(y2, fs2);
+        idle(5000, [1 0 0], 20);
+        TrialRecord.User.repeat = true;  % if repeat, progression number should not change!!!
     end
 else
     if TrialRecord.User.chasing & touch.ChosenTarget == 1
