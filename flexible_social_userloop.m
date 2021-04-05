@@ -12,21 +12,34 @@ persistent timing_filenames_retrieved
     end
 %% constants
 % progression
-progression_trials = 1;                                                     % the number of trials when the size is adapting
-constant_no_trials_at_max_size = 1;                                         % the number of trials to consolidate the current size progression 
-blocksize = progression_trials + constant_no_trials_at_max_size;            % a block is the elementary unit, a block determines whether the progression number increases/decreases/stays the same
-category_progression_factor = 1;                                            % number of progression number steps needed to add a category
-agent_patient_progression_factor = 1;                                       % blocksize*category_progression_factor for +1category
-TrialRecord.User.size_progression_factor = ...                              % the number of progression number steps needed to go from start size to end size
-    progression_trials*category_progression_factor;
-start_progression_number = 0;                                               % the progression number to start training with
+blocksize = 2;                                                              % The blocksize is the number of animations that will be shown for the first time.a block is the elementary unit, a block determines whether the progression number increases/decreases/stays the same.
+                                                                            % block def: a set number of stimuli that have been showed for the first time
+TrialRecord.User.size_progression_factor = ...                              % the number of progression number steps needed to go from start size to end size, used for both category and agent patient
+    2;
+category_progression_factor = 4;                                            % number of progression number steps needed to add a category button
+agent_patient_progression_factor = 4;                                       % number of progression number steps needed to add a patient button
+progression_trials = blocksize * TrialRecord.User.size_progression_factor;  % the number of trials needed to get to the final size
+consolidation_trials = blocksize * ...
+    (category_progression_factor-TrialRecord.User.size_progression_factor); % the number of trials to consolidate the current size progression 
+
+start_progression_number = 10;                                               % the progression number to start training with
+
+succes_threshold = 0.80;                                                    % if performance is bigger than or equal to this, progression number + 1
+fail_threshold = 0;                                                         % if performance is smaller than or equal to this, progression number - 1
+TrialRecord.User.max_c_progression_number = category_progression_factor * 4 - 1;                               % last button active + at final size
+% max_ap_progression_number =agent_patient_progression_factor * 1 + ...
+%     TrialRecord.User.size_progression_factor;
+min_c_progression_number = 0;
+% max_ap_progression_number =agent_patient_progression_factor * 1 + ...
+%     TrialRecord.User.size_progression_factor;
+
 
 % training
-TrialRecord.User.training_categorization = true;                            % complete task or training categorization
+TrialRecord.User.training_categorization = true;                            % complete task or training
 TrialRecord.User.training_agent_patient = false;
 
 % fixed constants
-TrialRecord.User.chasing_on = false;
+TrialRecord.User.chasing_on = false;                                        % all false for script to work
 TrialRecord.User.grooming_on = false;
 TrialRecord.User.holding_on = false;
 TrialRecord.User.mounting_on = false;
@@ -45,62 +58,75 @@ TrialRecord.User.holding = false;
 TrialRecord.User.mounting = false;
 %% initializing for first trial
 if TrialRecord.CurrentTrialNumber == 0
-    TrialRecord.User.stimulus_sequence_index = 1;
+    TrialRecord.User.stimulus_sequence_index = 0; % 1
     TrialRecord.User.no_wrong_repeats = -1;
     TrialRecord.User.performance = 0;
     TrialRecord.User.progression_number = start_progression_number;
-    TrialRecord.User.repeat = false; % initializing repeat for first trial
-    previous_sum_categories = 0;    % calculations of previous sum categories
+    TrialRecord.User.repeat = false;                                        
+    previous_sum_categories = 0;                                            
 else
-    previous_sum_categories = TrialRecord.User.current_sum_categories;  % calculations of previous sum categories
+    previous_sum_categories = TrialRecord.User.current_sum_categories;      % calculations of previous sum categories
 end
 %% determining next block and difficulty based on a general progression number
 % counting number of repeats per block
+% %check this with new index stuff at 0 trials index is 0
 % no_repeats_total = TrialRecord.CurrentTrialWithinBlock - blocksize;
-if mod(TrialRecord.User.stimulus_sequence_index-1, blocksize) == 0 && TrialRecord.CurrentTrialNumber ~= 0 % stim seq index to not keep repeats into account
-    TrialRecord.TrialErrors
-    boolean_mistakes_per_block = TrialRecord.TrialErrors(end-TrialRecord.CurrentTrialWithinBlock+1 : end) ~= 0; % actual indexing according to blocksize + consecutive repeats
-    no_first_time_mistakes = 0;
-    index = 1;
-    while index ~= length(boolean_mistakes_per_block) -1
-        if boolean_mistakes_per_block(index) == 1 && boolean_mistakes_per_block(index+1) == 0
-            no_first_time_mistakes = no_first_time_mistakes + 1;
+if mod(TrialRecord.User.stimulus_sequence_index, blocksize) == 0 ...      % after previous block, do the following. does't work with blokcsize = 1
+        && TrialRecord.CurrentTrialNumber ~=0 && ...
+        ~TrialRecord.User.repeat                                            % stim seq index to not keep repeats into account
+    boolean_mistakes_per_block = TrialRecord.TrialErrors...                 % convert the trialerrors vector into a boolean vector
+        (end-TrialRecord.CurrentTrialWithinBlock+1 : end) ~= 0;             
+    no_first_time_mistakes = 0;                                             % init the number of first time mistakes
+    index = 1;                                                              % init the index
+    while index ~= length(boolean_mistakes_per_block)                       % while we haven't ran over the complete boolean vector
+        if boolean_mistakes_per_block(index) == 1 && ...                    % a 1 will always be followed by a zero because the a wrong trial repeats until the correct answer is given
+                boolean_mistakes_per_block(index+1) == 0                    % if a 1 is followed by a zero, this is an indicator for a first time mistake
+            no_first_time_mistakes = no_first_time_mistakes + 1;            
         end
         index = index + 1;
     end
-    no_first_time_corrects = blocksize - no_first_time_mistakes;
-    TrialRecord.User.performance = no_first_time_corrects/blocksize;% performance is the mean of the number of the first time successes, repeats are TAKEN INTO ACCOUNT, FIX THIS!!!
-    TrialRecord.NextBlock = TrialRecord.CurrentBlock + 1;
-    if TrialRecord.User.performance >= 0.80 % && ~TrialRecord.User.repeat     % progression number shouldn't be influenced by repetitions
-        TrialRecord.User.progression_number = TrialRecord.User.progression_number + 1;
-    elseif TrialRecord.User.performance == 0 % && ~TrialRecord.User.repeat
-        if TrialRecord.User.progression_number > 0
-            TrialRecord.User.progression_number = TrialRecord.User.progression_number - 1;
-        end
+    no_first_time_corrects = blocksize - no_first_time_mistakes;            % the number of corrects is the complement of the first time wrong ones according to the blocksize
+    TrialRecord.User.performance = no_first_time_corrects/blocksize;        % performance is the first time corrects over the blocksize ( first time stimuli are shown )
+    TrialRecord.NextBlock = TrialRecord.CurrentBlock + 1;                   % move to the nect block after all of this
+    if TrialRecord.User.performance >= succes_threshold && ...              % if performance is over the threshold, add a progression number
+            TrialRecord.User.progression_number < TrialRecord.User. ...
+            max_c_progression_number                                        % but the progression number can not go above max number
+        TrialRecord.User.progression_number = ... 
+            TrialRecord.User.progression_number + 1;
+    elseif TrialRecord.User.performance <= fail_threshold && ...            % if performance is under the threshold and progression number is not already at the min progression number, substract a progression number
+            TrialRecord.User.progression_number > min_c_progression_number
+        TrialRecord.User.progression_number = ... 
+            TrialRecord.User.progression_number - 1;
     end
 end
+% if TrialRecord.User.progression_number > max_c_progression_number;
+%     TrialRecord.User.progression_number = max_c_progression_number;
+% end
 
 % setting independant category and button progression based on progression
 % number
-TrialRecord.User.category_progression = ...
+TrialRecord.User.category_progression = ...                                 % the category progression factor, which should be at least bigger than than the size progression factor in order 
+    TrialRecord.User.progression_number / ...                               % in order to go through the complete size evolution before adding a category, determines the number of progression
+    (category_progression_factor);                                          % number steps needed to increase category progression + 1
+TrialRecord.User.agent_patient_progression = ...                            % analogous to category
     TrialRecord.User.progression_number / ... 
-    (category_progression_factor*blocksize);                                % multiply by blocksize because the sizes have to be completely adjusted first before adding category
-TrialRecord.User.agent_patient_progression = TrialRecord.User.progression_number / ... 
-    (agent_patient_progression_factor*blocksize);
-if TrialRecord.User.category_progression <= 4
-    TrialRecord.User.size_progression = mod(TrialRecord.User.progression_number, TrialRecord.User.size_progression_factor);
+    (agent_patient_progression_factor);
+
+
+if TrialRecord.User.category_progression <= 4 && ...                        % as long as not all the buttons are unlocked, reset size progression when new button is added
+        TrialRecord.User.training_categorization
+    TrialRecord.User.size_progression = ...                                 % something not right check this
+        mod(TrialRecord.User.progression_number, ...
+        category_progression_factor);                                       
 end
-if TrialRecord.User.agent_patient_progression <= 2
-    TrialRecord.User.size_progression = mod(TrialRecord.User.progression_number, TrialRecord.User.size_progression_factor);
+if TrialRecord.User.agent_patient_progression <= 2 && ...                   % analogous
+        TrialRecord.User.training_agent_patient
+    TrialRecord.User.size_progression = ... 
+        mod(TrialRecord.User.progression_number, ... 
+        TrialRecord.User.size_progression_factor);
 end
 
 %% toggling conditions on
-
-% difference between current and previous sum of categories acts as a
-% switch for new stimulus list creation involving new categories and other
-% changes that have to be made when categories are added
-
-
 % training progression switches. at the end ( if not training ) all switches
 % are turned on 
 if TrialRecord.User.training_categorization
@@ -133,12 +159,11 @@ else
 end
 
 % calculation current sum categories after switches have been altered
-TrialRecord.User.current_sum_categories = sum([TrialRecord.User.chasing_on, ... 
-    TrialRecord.User.grooming_on,TrialRecord.User.holding_on, ...
-    TrialRecord.User.mounting_on, TrialRecord.User.agent_on, ... 
+TrialRecord.User.current_sum_categories = sum([TrialRecord.User.chasing_on, ... % difference between current and previous sum of categories acts as a 
+    TrialRecord.User.grooming_on,TrialRecord.User.holding_on, ...               % switch for new stimulus list creation involving new categories and other
+    TrialRecord.User.mounting_on, TrialRecord.User.agent_on, ...                % changes that have to be made when categories are added
     TrialRecord.User.patient_on]);
 %% orienting between stimuli and frame files creating individual folder lists and general stim and frame lists
-
 % Do all of this for trial 0 because it would be inefficient to repeat and
 % I want these variables to be fixed throughout the run
 if TrialRecord.CurrentTrialNumber == 0
@@ -210,21 +235,25 @@ end
 % condition. depending on switches stimuli have to be showed once, twice or
 % thrice
 
-if TrialRecord.User.current_sum_categories ~= previous_sum_categories
-    if ~TrialRecord.User.training_categorization && ~TrialRecord.User.training_agent_patient
-        TrialRecord.User.no_repetitions = 3; % 3 repititions for category, agent and patient
+if TrialRecord.User.current_sum_categories ~= previous_sum_categories       % at the start or whenever category is added
+    if ~TrialRecord.User.training_categorization && ... 
+            ~TrialRecord.User.training_agent_patient
+        TrialRecord.User.no_repetitions = 3;                                % 3 repititions for category, agent and patient
     elseif TrialRecord.User.agent_on && TrialRecord.User.patient_on 
-        TrialRecord.User.no_repetitions = 2; % 2 for agent, patient
-    elseif TrialRecord.User.training_categorization || TrialRecord.User.agent_on || TrialRecord.User.patient_on
-        TrialRecord.User.no_repetitions = 1; % 1 for category or agent or patient
+        TrialRecord.User.no_repetitions = 2;                                % 2 for agent, patient
+    elseif TrialRecord.User.training_categorization || ... 
+            TrialRecord.User.agent_on || TrialRecord.User.patient_on
+        TrialRecord.User.no_repetitions = 1;                                % 1 for category or agent or patient
     end
-    TrialRecord.User.condition_sequence = randperm(length(stimulus_list) * TrialRecord.User.no_repetitions);
+    TrialRecord.User.condition_sequence = ...                               % make a permutation of no_repetitions*length (stim list)
+        randperm(length(stimulus_list) * TrialRecord.User.no_repetitions);
 end
 
-stimulus_sequence = mod(TrialRecord.User.condition_sequence,length(stimulus_list)); % is sequence of animations taking into account repititions with the modulo
-stim_sequence_zero = find(stimulus_sequence == 0);
-switch TrialRecord.User.no_repetitions
-    case 1
+stimulus_sequence = ... 
+    mod(TrialRecord.User.condition_sequence,length(stimulus_list));         % converting the random order to a list of indexes for the stimuli in range 1:length(stim list)
+stim_sequence_zero = find(stimulus_sequence == 0);                          
+switch TrialRecord.User.no_repetitions                                      % if there is a 0, this means that it is the last number of the stim list, so replace this with the length(stim_list)
+    case 1                                                                  % has to be done once, twice or thrice, depending on number of repetitions
         stimulus_sequence(stim_sequence_zero(1)) = length(stimulus_list);
     case 2
         stimulus_sequence(stim_sequence_zero(1)) = length(stimulus_list);
@@ -235,48 +264,34 @@ switch TrialRecord.User.no_repetitions
         stimulus_sequence(stim_sequence_zero(3)) = length(stimulus_list);
 end
 
-
-% if TrialRecord.User.current_sum_categories ~= previous_sum_categories % SOLVED : indexing resets whenever category gets added %%%%%% ik denk dat dit het probleem is voor mijn error in het begin! MORGEN CHECKEN!!!
-%     TrialRecord.User.stimulus_sequence_index = mod(TrialRecord.CurrentTrialNumber, length(stimulus_sequence)) + 1;
-% %     TrialRecord.User.stimulus_sequence_index = mod(TrialRecord.CurrentTrialNumber, length(stimulus_sequence));
-% %     if TrialRecord.User.stimulus_sequence_index == 0 & TrialRecord.CurrentTrialNumber ~= 0   %%%%%
-% %         TrialRecord.User.stimulus_sequence_index = length(stimulus_sequence);
-% %     end
-% elseif ~TrialRecord.User.repeat % whenever repeat is off, add +1 to index
-%     TrialRecord.User.stimulus_sequence_index =  TrialRecord.User.stimulus_sequence_index + 1;
-% end
-
-if TrialRecord.User.current_sum_categories ~= previous_sum_categories
-    TrialRecord.User.stimulus_sequence_index = 1; % initialize index or start at 1 everytime the pool of stimuli changes
+if TrialRecord.User.current_sum_categories ~= previous_sum_categories...
+        && TrialRecord.CurrentTrialNumber ~= 0
+    TrialRecord.User.stimulus_sequence_index = 0; % 1                          % initialize index or start at 1 everytime the pool of stimuli changes
 end
-if ~TrialRecord.User.repeat % whenever repeat is off, add +1 to index
+if ~TrialRecord.User.repeat                                                 % whenever repeat is off, add +1 to index
     TrialRecord.User.stimulus_sequence_index =  TrialRecord.User.stimulus_sequence_index + 1;
 end
-if TrialRecord.User.stimulus_sequence_index == length(stimulus_list)+1  % if we went through the complete list, restart at 1
+if TrialRecord.User.stimulus_sequence_index == length(stimulus_list)+1      % if we went through the complete list, restart at 1
     TrialRecord.User.stimulus_sequence_index = 1;
 end
-% TrialRecord.User.stimulus_sequence_index = mod(TrialRecord.CurrentTrialNumber, length(stimulus_sequence)) + 1;
-TrialRecord.User.stimulus = stimulus_sequence(TrialRecord.User.stimulus_sequence_index);
+TrialRecord.User.stimulus = stimulus_sequence(TrialRecord.User.stimulus_sequence_index); % extract the number of the stimulus with the stim index from the stim sequence list
 
 % intitializing question
-
-
-
 if TrialRecord.User.training_agent_patient
-    if TrialRecord.User.condition_sequence(TrialRecord.User.stimulus_sequence_index) <= ...   % I could also easly turn the condition sequence into a cell array with rows and identy each row as category, agent and patient...
+    if TrialRecord.User.condition_sequence(TrialRecord.User.stimulus_sequence_index) <= ...   % if the number belongs to the first half of the total amount of numbers, then it is an agent question
             length( stimulus_list )
         TrialRecord.User.agenting = true;
         TrialRecord.NextCondition = 5;
     else
-        TrialRecord.User.patienting = true;
-        TrialRecord.NextCondition = 6;
+        TrialRecord.User.patienting = true;                                 % else, this is a patient question
+        TrialRecord.NextCondition = 6;                                      % this is a way of tagging the condition sequence and since the sequence is random, it is valid
     end
 else
-    if TrialRecord.User.condition_sequence(TrialRecord.User.stimulus_sequence_index) <= ...   % I could also easly turn the condition sequence into a cell array with rows and identy each row as category, agent and patient...
+    if TrialRecord.User.condition_sequence(TrialRecord.User.stimulus_sequence_index) <= ...   % if the number belongs to the first third of the total amount of numbers, then it is a category question
             length( stimulus_list )
         TrialRecord.User.categorizing = true;
         if TrialRecord.User.categorizing
-            if strncmpi('chas', stimulus_list{TrialRecord.User.stimulus}, 4)
+            if strncmpi('chas', stimulus_list{TrialRecord.User.stimulus}, 4)    % check for title of the animation to determine actual category
                 TrialRecord.User.chasing = true;
                 TrialRecord.NextCondition = 1;
             elseif strncmpi('groom', stimulus_list{TrialRecord.User.stimulus}, 5)
@@ -290,13 +305,13 @@ else
                 TrialRecord.NextCondition = 4;
             end
         end
-    elseif length( stimulus_list ) < ... 
+    elseif length( stimulus_list ) < ...                                    % if it belongs to the 2nd third of the portion, then it is an agent question
             TrialRecord.User.condition_sequence(TrialRecord.User.stimulus_sequence_index) && ... 
             TrialRecord.User.condition_sequence(TrialRecord.User.stimulus_sequence_index) <= ...
             (2 * length( stimulus_list ))
         TrialRecord.User.agenting = true;
         TrialRecord.NextCondition = 5;
-    else 
+    else                                                                    % else, it is a patient question
         TrialRecord.User.patienting = true;
         TrialRecord.NextCondition = 6;
     end
@@ -305,9 +320,9 @@ end
 % determining correct folder name and define indexes for within folders
 % all_folders = {'chasing','grooming','holding','mounting'} and then I can
 % index
-if TrialRecord.User.stimulus <= length(TrialRecord.User.chasing_list)        % stimulus_list = [chasing_list, grooming_list, holding_list, mounting_list];
-    folder = 'chasing';
-    folder_index = TrialRecord.User.stimulus;
+if TrialRecord.User.stimulus <= length(TrialRecord.User.chasing_list)        %  this is based on the idea that the general stim list is a sum of all the lists, so stimulus_list = [chasing_list, grooming_list, holding_list, mounting_list];
+    folder = 'chasing';                                                      % I can divide the general list in chunks according to the lengths of the sublists general_stimulus_list = [chasing_list, grooming_list, holding_list, mounting_list];
+    folder_index = TrialRecord.User.stimulus;                                % check 1: chasing, 2: grooming, 3:holding, 4: mounting
     indexed = TrialRecord.User.chasing_list{folder_index};
 elseif TrialRecord.User.stimulus <= length(TrialRecord.User.chasing_list)+length(TrialRecord.User.grooming_list)
     folder = 'grooming';
@@ -326,9 +341,9 @@ end
 
 % creating path to chosen stimulus and according frame
 TrialRecord.User.movie = strcat('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\stimuli\', ... 
-    folder, '\', indexed);
+    folder, '\', indexed);                                                  % complete path of the animation
 TrialRecord.User.frame = strcat('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\frames\', ... 
-    folder, '\', frame_list{TrialRecord.User.stimulus});
+    folder, '\', frame_list{TrialRecord.User.stimulus});                    % and frame
 
 % creating condition
 C = {'sqr([2 1], [1 0 0], 0, 0, -1)'};

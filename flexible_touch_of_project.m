@@ -3,6 +3,12 @@ hotkey('r', 'goodmonkey(reward_dur, ''juiceline'', MLConfig.RewardFuncArgs.Juice
 hotkey('p', 'TrialRecord.User.progression_number = TrialRecord.User.progression_number + 1;');
 hotkey('m', 'TrialRecord.User.progression_number = TrialRecord.User.progression_number - 1; dashboard(1, string(TrialRecord.User.progression_number));');
 dashboard(1, string(TrialRecord.User.progression_number));
+
+%%%%%%%%%%%%%
+% add parameters to the bhv2 files with function from monkeylogic
+% size progressie, category or agent patient prgression, performance, time
+% to answer, stimulus name.
+%%%%%%%%%%%%%
 %% designing engage_button
 % draw button box
 engage_box = BoxGraphic(null_);
@@ -18,7 +24,8 @@ fix.Threshold = 2;
 
 standard_button_size = 2;
 button_size_difference = 1.5;
-button_size_step = (1 - TrialRecord.User.size_progression * 1/TrialRecord.User.size_progression_factor) * button_size_difference;
+button_size_step = (1 - TrialRecord.User.size_progression/...
+    TrialRecord.User.size_progression_factor) * button_size_difference;
 if button_size_step > 0
     correct_button_size = 2 + button_size_step;
     wrong_button_size = 2 - button_size_step;
@@ -214,14 +221,38 @@ elseif TrialRecord.User.agenting || TrialRecord.User.patienting
     set_bgcolor([1 1 1]);
 end
 
-scene3 = create_scene(con3, 1); % something goes wrong here with the task object for some reason, works without task object
-run_scene(scene3, 10);
+scene3 = create_scene(con3, 1);
+fliptime = run_scene(scene3, 10);
 
 set_bgcolor([]);        % change it back to the original color
 idle(0);
 
-tc_answer.Success
+if TrialRecord.User.current_sum_categories == 1
+    answer_time = touch.Time - fliptime;
+else
+    answer_time = touch.RT;
+end
 %% evaluate
+% make reward scale with ( a fraction of ) progression number correlated
+% with the goal for that day?
+% reward_factor = 0.25;
+% max_reward_dur = 100;
+% min_reward_dur = 50;
+% reward_window = max_reward_dur - min_reward_dur;
+% % expected_progression = 10; % reward goes from min to max over 10
+% % progression numbers
+% variable_reward_portion = TrialRecord.User.progression_number/ ...          % here the variable portion is calculated based on a fraction of the complete task.
+%     (TrialRecord.User.max_c_progression_number*reward_factor) * reward_window;
+% % % this is the same but with a set progression number as goal for that day
+% % variable_reward_portion = TrialRecord.User.progression_number/ ...    
+% %     (expected_progression) * reward_window;
+% 
+% if variable_reward_portion <= 50                                            % I want to stay below max reward
+%     reward_dur = min_reward_dur + variable_reward_portion;
+% else
+%     reward_dur = max_reward_dur;
+% end
+
 [y1, fs1] = audioread('test.wav');
 [y2, fs2] = audioread('test2.wav');
 if TrialRecord.User.current_sum_categories == 1
@@ -296,3 +327,13 @@ else
         TrialRecord.User.repeat = true;
     end
 end
+% add parameters to the bhv2 files with function from monkeylogic
+% size progressie, category or agent patient prgression, performance, time
+% to answer, stimulus name.
+bhv_variable('size_progression', TrialRecord.User.size_progression,...
+    'category_progression', TrialRecord.User.category_progression,...
+    'performance', TrialRecord.User.performance,...
+    'progression_number', TrialRecord.User.progression_number,...
+    'stimulus_name', TrialRecord.User.movie,...
+    'index',TrialRecord.User.stimulus_sequence_index,...
+    'answer_time', answer_time);
