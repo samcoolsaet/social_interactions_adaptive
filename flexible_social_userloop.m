@@ -12,17 +12,17 @@ persistent timing_filenames_retrieved
     end
 %% constants
 % progression
-blocksize = 2;                                                              % The blocksize is the number of animations that will be shown for the first time.a block is the elementary unit, a block determines whether the progression number increases/decreases/stays the same.
+TrialRecord.User.blocksize = 2;                                                              % The blocksize is the number of animations that will be shown for the first time.a block is the elementary unit, a block determines whether the progression number increases/decreases/stays the same.
                                                                             % block def: a set number of stimuli that have been showed for the first time
 TrialRecord.User.size_progression_factor = ...                              % the number of progression number steps needed to go from start size to end size, used for both category and agent patient
     2;
 category_progression_factor = 4;                                            % number of progression number steps needed to add a category button
 agent_patient_progression_factor = 4;                                       % number of progression number steps needed to add a patient button
-progression_trials = blocksize * TrialRecord.User.size_progression_factor;  % the number of trials needed to get to the final size
-consolidation_trials = blocksize * ...
+progression_trials = TrialRecord.User.blocksize * TrialRecord.User.size_progression_factor;  % the number of trials needed to get to the final size
+consolidation_trials = TrialRecord.User.blocksize * ...
     (category_progression_factor-TrialRecord.User.size_progression_factor); % the number of trials to consolidate the current size progression 
 
-start_progression_number = 10;                                               % the progression number to start training with
+start_progression_number = 0;                                               % the progression number to start training with
 
 succes_threshold = 0.80;                                                    % if performance is bigger than or equal to this, progression number + 1
 fail_threshold = 0;                                                         % if performance is smaller than or equal to this, progression number - 1
@@ -63,30 +63,58 @@ if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.performance = 0;
     TrialRecord.User.progression_number = start_progression_number;
     TrialRecord.User.repeat = false;                                        
-    previous_sum_categories = 0;                                            
+    previous_sum_categories = 0;
+    TrialRecord.User.repetitions = 0;
 else
     previous_sum_categories = TrialRecord.User.current_sum_categories;      % calculations of previous sum categories
 end
-%% determining next block and difficulty based on a general progression number
-% counting number of repeats per block
-% %check this with new index stuff at 0 trials index is 0
-% no_repeats_total = TrialRecord.CurrentTrialWithinBlock - blocksize;
-if mod(TrialRecord.User.stimulus_sequence_index, blocksize) == 0 ...      % after previous block, do the following. does't work with blokcsize = 1
+
+
+%% determining next block and difficulty based on a general progression number %%%%%% maybe create a vector with the length of trialerrors but displaying the stimulus sequence numbers, this way I can keep track of actual fails and just going on when failing because the number of repeats hits the limit
+% % counting number of repeats per block
+% % %check this with new index stuff at 0 trials index is 0
+% % no_repeats_total = TrialRecord.CurrentTrialWithinBlock - blocksize;
+% if mod(TrialRecord.User.stimulus_sequence_index, TrialRecord.User.blocksize) == 0 ...      % after previous block, do the following. does't work with blokcsize = 1
+%         && TrialRecord.CurrentTrialNumber ~=0 && ...
+%         ~TrialRecord.User.repeat                                            % stim seq index to not keep repeats into account
+%     boolean_mistakes_per_block = TrialRecord.TrialErrors...                 % convert the trialerrors vector into a boolean vector
+%         (end-TrialRecord.CurrentTrialWithinBlock+1 : end) ~= 0;             
+%     no_first_time_mistakes = 0;                                             % init the number of first time mistakes
+%     index = 1;                                                              % init the index
+%     while index ~= length(boolean_mistakes_per_block)                       % while we haven't ran over the complete boolean vector
+%         if boolean_mistakes_per_block(index) == 1 && ...                    % a 1 will always be followed by a zero because the a wrong trial repeats until the correct answer is given
+%                 boolean_mistakes_per_block(index+1) == 0                    % if a 1 is followed by a zero, this is an indicator for a first time mistake
+%             no_first_time_mistakes = no_first_time_mistakes + 1;            
+%         end
+%         index = index + 1;
+%     end
+%     no_first_time_corrects = TrialRecord.User.blocksize - no_first_time_mistakes;            % the number of corrects is the complement of the first time wrong ones according to the blocksize
+%     TrialRecord.User.performance = no_first_time_corrects/TrialRecord.User.blocksize;        % performance is the first time corrects over the blocksize ( first time stimuli are shown )
+%     TrialRecord.NextBlock = TrialRecord.CurrentBlock + 1;                   % move to the nect block after all of this
+%     if TrialRecord.User.performance >= succes_threshold && ...              % if performance is over the threshold, add a progression number
+%             TrialRecord.User.progression_number < TrialRecord.User. ...
+%             max_c_progression_number                                        % but the progression number can not go above max number
+%         TrialRecord.User.progression_number = ... 
+%             TrialRecord.User.progression_number + 1;
+%     elseif TrialRecord.User.performance <= fail_threshold && ...            % if performance is under the threshold and progression number is not already at the min progression number, substract a progression number
+%             TrialRecord.User.progression_number > min_c_progression_number
+%         TrialRecord.User.progression_number = ... 
+%             TrialRecord.User.progression_number - 1;
+%     end
+% end
+
+if mod(TrialRecord.User.stimulus_sequence_index, TrialRecord.User.blocksize) == 0 ...      % after previous block, do the following. does't work with blokcsize = 1
         && TrialRecord.CurrentTrialNumber ~=0 && ...
         ~TrialRecord.User.repeat                                            % stim seq index to not keep repeats into account
-    boolean_mistakes_per_block = TrialRecord.TrialErrors...                 % convert the trialerrors vector into a boolean vector
-        (end-TrialRecord.CurrentTrialWithinBlock+1 : end) ~= 0;             
-    no_first_time_mistakes = 0;                                             % init the number of first time mistakes
-    index = 1;                                                              % init the index
-    while index ~= length(boolean_mistakes_per_block)                       % while we haven't ran over the complete boolean vector
-        if boolean_mistakes_per_block(index) == 1 && ...                    % a 1 will always be followed by a zero because the a wrong trial repeats until the correct answer is given
-                boolean_mistakes_per_block(index+1) == 0                    % if a 1 is followed by a zero, this is an indicator for a first time mistake
-            no_first_time_mistakes = no_first_time_mistakes + 1;            
-        end
-        index = index + 1;
+    trialerrors_block = TrialRecord.TrialErrors(end-TrialRecord.CurrentTrialWithinBlock+1 : end);
+    first_time = zeros(1, length(TrialRecord.User.index_trialerror));
+    first_time_index = 1;
+    while first_time_index ~= length(TrialRecord.User.index_trialerror)+1
+        first_time(first_time_index) = trialerrors_block(TrialRecord.User.index_trialerror(first_time_index));
+        first_time_index = first_time_index + 1;
     end
-    no_first_time_corrects = blocksize - no_first_time_mistakes;            % the number of corrects is the complement of the first time wrong ones according to the blocksize
-    TrialRecord.User.performance = no_first_time_corrects/blocksize;        % performance is the first time corrects over the blocksize ( first time stimuli are shown )
+    boolean_corrects_per_block = first_time == 0;
+    TrialRecord.User.performance = mean(boolean_corrects_per_block);
     TrialRecord.NextBlock = TrialRecord.CurrentBlock + 1;                   % move to the nect block after all of this
     if TrialRecord.User.performance >= succes_threshold && ...              % if performance is over the threshold, add a progression number
             TrialRecord.User.progression_number < TrialRecord.User. ...
@@ -99,6 +127,8 @@ if mod(TrialRecord.User.stimulus_sequence_index, blocksize) == 0 ...      % afte
             TrialRecord.User.progression_number - 1;
     end
 end
+
+
 % if TrialRecord.User.progression_number > max_c_progression_number;
 %     TrialRecord.User.progression_number = max_c_progression_number;
 % end
