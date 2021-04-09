@@ -247,6 +247,141 @@ elseif ~TrialRecord.User.grooming_on && TrialRecord.User.chasing_on
     frame_list = TrialRecord.User.general_frame_list(1, 1:length(TrialRecord.User.chasing_frame_list));
 end
 
+%%%%%%%%%%%%%%%%%
+if TrialRecord.CurrentTrialNumber == 0
+boolean_repeats = [structure.c_repeats] == 4
+if TrialRecord.CurrentTrialNumber == 0 || TrialRecord.User.current_sum_categories ~= previous_sum_categories || mean van de repeats of the successes compleet zijn %%%% boolean maken voor de repeats, als ik dan het gemiddelde neem van de boolean_repeats en de successes en dat is gelijk aan 0.50, is de structure volledig doorlopen.
+    structure = struct('stimuli', {}, 'frames', {}, 'c_repeats', {}, 'c_success', {}, 'a_repeats', {}, 'a_success', {}, 'p_repeats', {}, 'p_success', {}, 'folder', {});
+    index = 1;
+    while index ~= length(stimulus_list)+1;
+        structure(index).stimuli = stimulus_list(index);
+        structure(index).frames = frame_list(index);
+        structure(index).c_repeats = 0;
+        structure(index).c_success = 0;
+        structure(index).a_repeats = 0;
+        structure(index).a_success = 0;
+        structure(index).p_repeats = 0;
+        structure(index).p_success = 0;
+        if index <= length(TrialRecord.User.chasing_list)
+            structure(index).folder = 'chasing';
+        elseif index <= length(TrialRecord.User.chasing_list) + length(TrialRecord.User.grooming_list)
+            structure(index).folder = 'grooming';
+        elseif index <= length(TrialRecord.User.chasing_list) + length(TrialRecord.User.grooming_list) + length(TrialRecord.User.holding_list)
+            structure(index).folder = 'holding';
+        elseif index <= length(TrialRecord.User.general_stimulus_list)
+            structure(index).folder = 'mounting';
+        end
+        index = index+1;
+    end
+end
+% determine categorizing, agent or patient ( codes 1,2 and 3)
+category = false;
+agent = false;
+patient = false;
+
+if mean([structure.c_success]) ~= 1 && mean([structure.c_repeats]) ~= 4 ...
+        && (TrialRecord.User.chasing_on || TrialRecord.User.grooming_on || TrialRecord.User.holding_on || TrialRecord.User.mounting_on)
+    category = true;
+end
+if mean([structure.a_success]) ~= 1 && mean([structure.a_repeats]) ~= 4 ...
+        && TrialRecord.User.agent_on
+    agent = true;
+end
+if mean([structure.p_success]) ~= 1 && mean([structure.p_repeats]) ~= 4 ...
+        && TrialRecord.User.patient_on
+    patient = true;
+end
+
+question = randperm(sum([category agent patient], 'all'), 1);
+index2 = 1;
+active_stim = struct('stimuli', {}, 'frames', {}, 'c_repeats', {}, 'c_success', {}, 'a_repeats', {}, 'a_success', {}, 'p_repeats', {}, 'p_success', {}, 'folder', {});
+
+if ~TrialRecord.User.training_agent_patient
+    switch question
+        case 1
+            while index2 ~= length(stimulus_list)+1
+                if structure(index2).c_repeats < 4 && structure(index2).c_success ~= 1
+                    active_stim(end+1) = structure(index2)
+                end
+                index2 = index2 +1;
+            end
+        case 2
+            while index2 ~= length(stimulus_list)+1
+                if structure(index2).a_repeats < 4 && structure(index2).a_success ~= 1
+                    active_stim(end+1) = structure(index2)
+                end
+                index2 = index2 +1;
+            end
+        case 3
+            while index2 ~= length(stimulus_list)+1
+                if structure(index2).p_repeats < 4 && structure(index2).p_success ~= 1
+                    active_stim(end+1) = structure(index2)
+                end
+                index2 = index2 +1;
+            end
+    end
+else
+    switch question
+        case 1
+            while index2 ~= length(stimulus_list)+1
+                if structure(index2).a_repeats < 4 && structure(index2).a_success ~= 1
+                    active_stim(end+1) = structure(index2)
+                end
+                index2 = index2 +1;
+            end
+        case 2
+            while index2 ~= length(stimulus_list)+1
+                if structure(index2).a_repeats < 4 && structure(index2).a_success ~= 1
+                    active_stim(end+1) = structure(index2)
+                end
+                index2 = index2 +1;
+            end
+    end
+end
+
+chosen_stim_index = randperm(length(active_stim), 1);
+
+if ~TrialRecord.User.training_agent_patient
+    switch question
+        case 1
+            if strncmpi('chas', active_stim(chosen_stim_index).stimuli, 4)    % check for title of the animation to determine actual category
+                TrialRecord.User.chasing = true;
+                TrialRecord.NextCondition = 1;
+            elseif strncmpi('groom', active_stim(chosen_stim_index).stimuli, 5)
+                TrialRecord.User.grooming = true;
+                TrialRecord.NextCondition = 2;
+            elseif strncmpi('hold', active_stim(chosen_stim_index).stimuli, 4)
+                TrialRecord.User.holding = true;
+                TrialRecord.NextCondition = 3;
+            elseif strncmpi('mount', active_stim(chosen_stim_index).stimuli, 5)
+                TrialRecord.User.mounting = true;
+                TrialRecord.NextCondition = 4;
+            end
+        case 2
+            TrialRecord.NextCondition = 5;
+            TrialRecord.User.agenting = true;
+        case 3
+            TrialRecord.NextCondition = 6;
+            TrialRecord.User.patienting = true;
+    end
+else
+    switch question
+        case 1
+            TrialRecord.NextCondition = 5;
+            TrialRecord.User.agenting = true;
+        case 2
+            TrialRecord.NextCondition = 6;
+            TrialRecord.User.patienting = true;
+    end
+end
+
+TrialRecord.User.movie = strcat('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\stimuli\', ... 
+    active_stim(chosen_stim_index).folder, '\', active_stim(chosen_stim_index).stimuli);                                                  % complete path of the animation
+TrialRecord.User.frame = strcat('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\frames\', ... 
+    active_stim(chosen_stim_index).folder, '\', active_stim(chosen_stim_index).frames);                    % and frame
+
+%%%%%%%%%%%%%%%
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for frame...
 % % img_size in degrees = 15*9, frames sizes (x, y), locations
 % % open the file

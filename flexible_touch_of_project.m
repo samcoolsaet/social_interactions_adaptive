@@ -17,6 +17,7 @@ x_axes = [-12 12];
 y_axes = [-10 -3.33 3.33 10];
 movie_duration = 3000;
 answer_time = 5000;
+standard_time_out = 3000;
 
 %  init boxes
 engaging_box = { [1 1 1], [1 1 1], standard_button_size, [10 0] };
@@ -246,7 +247,6 @@ end
 % else
 %     reward_dur = max_reward_dur;
 % end
-standard_time_out = 3000;
 if TrialRecord.CurrentTrialNumber <= 10
     time_out = standard_time_out;
 else
@@ -360,7 +360,19 @@ if mod(TrialRecord.User.stimulus_sequence_index, TrialRecord.User.blocksize) == 
         index = index + 1;
     end
 end
+%%%%%%%%%%%%%%%
+if TrialRecord.User.categorizing
+    c_boolean_repeats = [TrialRecord.User.structure.c_repeats] == 4;
+    c_structure_completion = mean(boolean_repeats + TrialRecord.User.structure.c_success);
+elseif TrialRecord.User.agenting
+    a_boolean_repeats = [TrialRecord.User.structure.a_repeats] == 4;
+    a_structure_completion = mean(boolean_repeats + TrialRecord.User.structure.a_success);
+elseif TrialRecord.User.patienting
+    p_boolean_repeats = [TrialRecord.User.structure.p_repeats] == 4;
+    p_structure_completion = mean(boolean_repeats + TrialRecord.User.structure.p_success);
+end
 
+%%%%%%%%%%%%%%%%%
 % add parameters to the bhv2 files with function from monkeylogic
 % size progressie, category or agent patient prgression, performance, time
 % to answer, stimulus name.
