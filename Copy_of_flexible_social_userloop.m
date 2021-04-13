@@ -12,14 +12,14 @@ persistent timing_filenames_retrieved
     end
 %% constants
 % progression
-TrialRecord.User.blocksize = 2;                                                              % The blocksize is the number of animations that will be shown for the first time.a block is the elementary unit, a block determines whether the progression number increases/decreases/stays the same.
+blocksize = 2;                                                              % The blocksize is the number of animations that will be shown for the first time.a block is the elementary unit, a block determines whether the progression number increases/decreases/stays the same.
                                                                             % block def: a set number of stimuli that have been showed for the first time
 TrialRecord.User.size_progression_factor = ...                              % the number of progression number steps needed to go from start size to end size, used for both category and agent patient
     2;
 category_progression_factor = 4;                                            % number of progression number steps needed to add a category button
 agent_patient_progression_factor = 4;                                       % number of progression number steps needed to add a patient button
-progression_trials = TrialRecord.User.blocksize * TrialRecord.User.size_progression_factor;  % the number of trials needed to get to the final size
-consolidation_trials = TrialRecord.User.blocksize * ...
+progression_trials = blocksize * TrialRecord.User.size_progression_factor;  % the number of trials needed to get to the final size
+consolidation_trials = blocksize * ...
     (category_progression_factor-TrialRecord.User.size_progression_factor); % the number of trials to consolidate the current size progression 
 
 start_progression_number = 8;                                               % the progression number to start training with
@@ -65,8 +65,8 @@ end
 
 
 %% determining next block and difficulty based on a general progression number %%%%%% maybe create a vector with the length of trialerrors but displaying the stimulus sequence numbers, this way I can keep track of actual fails and just going on when failing because the number of repeats hits the limit
-if mod(TrialRecord.CurrentTrialNumber-1, TrialRecord.User.blocksize) == 0 ...      % after previous block, do the following. does't work with blokcsize = 1
-        && TrialRecord.CurrentTrialNumber ~=0        
+if mod(TrialRecord.CurrentTrialNumber-1, blocksize) == 0 ...      % after previous block, do the following. does't work with blokcsize = 1
+        && TrialRecord.CurrentTrialNumber ~= 1        
     trialerrors_block = TrialRecord.TrialErrors(end-blocksize+1 : end);
     boolean_corrects_per_block = trialerrors_block == 0;
     TrialRecord.User.performance = mean(boolean_corrects_per_block);
@@ -295,16 +295,16 @@ end
 if ~TrialRecord.User.training_agent_patient
     switch question
         case 1
-            if strncmpi('chas', active_stim(TrialRecord.User.chosen_stim_index).stimuli, 4)    % check for title of the animation to determine actual category
+            if strncmpi('chas', active_stim(TrialRecord.User.chosen_stim_index_active).stimuli, 4)    % check for title of the animation to determine actual category
                 TrialRecord.User.chasing = true;
                 TrialRecord.NextCondition = 1;
-            elseif strncmpi('groom', active_stim(TrialRecord.User.chosen_stim_index).stimuli, 5)
+            elseif strncmpi('groom', active_stim(TrialRecord.User.chosen_stim_index_active).stimuli, 5)
                 TrialRecord.User.grooming = true;
                 TrialRecord.NextCondition = 2;
-            elseif strncmpi('hold', active_stim(TrialRecord.User.chosen_stim_index).stimuli, 4)
+            elseif strncmpi('hold', active_stim(TrialRecord.User.chosen_stim_index_active).stimuli, 4)
                 TrialRecord.User.holding = true;
                 TrialRecord.NextCondition = 3;
-            elseif strncmpi('mount', active_stim(TrialRecord.User.chosen_stim_index).stimuli, 5)
+            elseif strncmpi('mount', active_stim(TrialRecord.User.chosen_stim_index_active).stimuli, 5)
                 TrialRecord.User.mounting = true;
                 TrialRecord.NextCondition = 4;
             end
@@ -328,9 +328,9 @@ else
 end
 
 TrialRecord.User.movie = strcat('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\stimuli\', ... 
-    active_stim(TrialRecord.User.chosen_stim_index).folder, '\', active_stim(TrialRecord.User.chosen_stim_index).stimuli);                                                  % complete path of the animation
+    active_stim(TrialRecord.User.chosen_stim_index_active).folder, '\', active_stim(TrialRecord.User.chosen_stim_index_active).stimuli);                                                  % complete path of the animation
 TrialRecord.User.frame = strcat('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\frames\', ... 
-    active_stim(TrialRecord.User.chosen_stim_index).folder, '\', active_stim(TrialRecord.User.chosen_stim_index).frames);                    % and frame
+    active_stim(TrialRecord.User.chosen_stim_index_active).folder, '\', active_stim(TrialRecord.User.chosen_stim_index_active).frames);                    % and frame
 
 %%%%%%%%%%%%%%%
 
