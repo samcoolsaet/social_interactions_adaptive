@@ -352,6 +352,21 @@ elseif TrialRecord.User.patienting & touch.ChosenTarget ~= 2
     end
 end
 
+% for active stimuli
+a_c_boolean_fails = [TrialRecord.User.active_stim.c_fails] == TrialRecord.User.max_fails;
+a_c_structure_completion = mean(c_boolean_fails + [TrialRecord.User.active_stim.c_success]);
+a_a_boolean_fails = [TrialRecord.User.active_stim.a_fails] == TrialRecord.User.max_fails;
+a_a_structure_completion = mean(a_boolean_fails + [TrialRecord.User.active_stim.a_success]);
+a_p_boolean_fails = [TrialRecord.User.active_stim.p_fails] == TrialRecord.User.max_fails;
+a_p_structure_completion = mean(p_boolean_fails + [TrialRecord.User.active_stim.p_success]);
+
+TrialRecord.User.active_stim_completion = mean(a_c_boolean_fails + [TrialRecord.User.active_stim.c_success] ...
++ a_a_boolean_fails + [TrialRecord.User.structure.a_success] + a_p_boolean_fails + [TrialRecord.User.active_stim.p_success]) ... 
+/(TrialRecord.User.agent_on+TrialRecord.User.patient_on+TrialRecord.User.category);
+
+TrialRecord.User.completed_stimuli = sum(a_c_boolean_fails + [TrialRecord.User.active_stim.c_success] ...
++ a_a_boolean_fails + [TrialRecord.User.active_stim.a_success] + a_p_boolean_fails + [TrialRecord.User.active_stim.p_success], 'all');
+
 % for structure
 c_boolean_fails = [TrialRecord.User.structure.c_fails] == TrialRecord.User.max_fails;
 c_structure_completion = mean(c_boolean_fails + [TrialRecord.User.structure.c_success]);

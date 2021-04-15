@@ -12,14 +12,14 @@ persistent timing_filenames_retrieved
     end
 %% constants
 % progression
-blocksize = 2;                                                              % The blocksize is the number of animations that will be shown for the first time.a block is the elementary unit, a block determines whether the progression number increases/decreases/stays the same.
+TrialRecord.User.blocksize = 2;                                                              % The TrialRecord.User.blocksize is the number of animationsthe monkey has to complete.a block is the elementary unit, a block determines whether the progression number increases/decreases/stays the same.
                                                                             % block def: a set number of stimuli that have been showed for the first time
 TrialRecord.User.size_progression_factor = ...                              % the number of progression number steps needed to go from start size to end size, used for both category and agent patient
     2;
 category_progression_factor = 4;                                            % number of progression number steps needed to add a category button
 agent_patient_progression_factor = 4;                                       % number of progression number steps needed to add a patient button
-progression_trials = blocksize * TrialRecord.User.size_progression_factor;  % the number of trials needed to get to the final size
-consolidation_trials = blocksize * ...
+progression_trials = TrialRecord.User.blocksize * TrialRecord.User.size_progression_factor;  % the number of trials needed to get to the final size
+consolidation_trials = TrialRecord.User.blocksize * ...
     (category_progression_factor-TrialRecord.User.size_progression_factor); % the number of trials to consolidate the current size progression 
 
 start_progression_number = 8;                                               % the progression number to start training with
@@ -32,7 +32,6 @@ TrialRecord.User.max_c_progression_number = category_progression_factor * 4 - 1;
 min_c_progression_number = 0;
 % max_ap_progression_number =agent_patient_progression_factor * 1 + ...
 %     TrialRecord.User.size_progression_factor;
-
 
 % training
 TrialRecord.User.training_categorization = true;                            % complete task or training
@@ -59,15 +58,16 @@ if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.performance = 0;
     TrialRecord.User.progression_number = start_progression_number;
     previous_sum_categories = 0;
+    TrialRecord.User.max_fails = 3;
 else
     previous_sum_categories = TrialRecord.User.current_sum_categories;      % calculations of previous sum categories
 end
 
 
 %% determining next block and difficulty based on a general progression number %%%%%% maybe create a vector with the length of trialerrors but displaying the stimulus sequence numbers, this way I can keep track of actual fails and just going on when failing because the number of repeats hits the limit
-if mod(TrialRecord.CurrentTrialNumber-1, blocksize) == 0 ...      % after previous block, do the following. does't work with blokcsize = 1
-        && TrialRecord.CurrentTrialNumber ~= 1        
-    trialerrors_block = TrialRecord.TrialErrors(end-blocksize+1 : end);
+if mod(TrialRecord.CurrentTrialNumber, TrialRecord.User.blocksize) == 0 ...      % after previous block, do the following. does't work with blokcsize = 1
+        && TrialRecord.CurrentTrialNumber ~= 0  %%%% work with completion of the active stimuli      
+    trialerrors_block = TrialRecord.TrialErrors(end-TrialRecord.User.blocksize+1 : end);
     boolean_corrects_per_block = trialerrors_block == 0;
     TrialRecord.User.performance = mean(boolean_corrects_per_block);
     TrialRecord.NextBlock = TrialRecord.CurrentBlock + 1;                   % move to the nect block after all of this
@@ -204,12 +204,12 @@ if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.overall_completion = 0;
 end
 if TrialRecord.User.current_sum_categories ~= previous_sum_categories ...
-        || TrialRecord.User.overall_completion == 1
+        || TrialRecord.User.active_stim_completion == 1
     TrialRecord.User.structure = struct('stimuli', {}, 'frames', {}, 'c_fails', {}, ... 
         'c_success', {}, 'a_fails', {}, 'a_success', {}, ...
         'p_fails', {}, 'p_success', {}, 'folder', {});
     index = 1;
-    while index ~= length(stimulus_list)+1;
+    while index ~= length(stimulus_list)+1
         TrialRecord.User.structure(index).stimuli = stimulus_list(index);
         TrialRecord.User.structure(index).frames = frame_list(index);
         TrialRecord.User.structure(index).c_fails = 0;
@@ -231,33 +231,40 @@ if TrialRecord.User.current_sum_categories ~= previous_sum_categories ...
         end
         index = index+1;
     end
+    TrialRecord.User.initial_TrialRecord.User.active_stim = struct('stimuli', {}, 'frames', {}, 'c_fails', {}, 'c_success', {}, 'a_fails', {}, 'a_success', {}, 'p_fails', {}, 'p_success', {}, 'folder', {});
+    index3 = 1;
+    initial_TrialRecord.User.active_stim_index = randperm(length(TrialRecord.User.structure), TrialRecord.User.blocksize);
+    while index3 ~= TrialRecord.User.blocksize + 1
+        TrialRecord.User.initial_TrialRecord.User.active_stim(end+1) = TrialRecord.User.structure(initial_TrialRecord.User.active_stim_index(index3));
+        index3 = index3 + 1;
+    end
 end
 % determine categorizing, agent or patient ( codes 1,2 and 3)
 
 question = randperm(sum([TrialRecord.User.category TrialRecord.User.agent_on TrialRecord.User.patient_on], 'all'), 1);
-index2 = 1;
-active_stim = struct('stimuli', {}, 'frames', {}, 'c_fails', {}, 'c_success', {}, 'a_fails', {}, 'a_success', {}, 'p_fails', {}, 'p_success', {}, 'folder', {});
+TrialRecord.User.active_stim = struct('stimuli', {}, 'frames', {}, 'c_fails', {}, 'c_success', {}, 'a_fails', {}, 'a_success', {}, 'p_fails', {}, 'p_success', {}, 'folder', {});
 
+index2 = 1;
 if ~TrialRecord.User.training_agent_patient
     switch question
         case 1
-            while index2 ~= length(stimulus_list)+1
-                if TrialRecord.User.structure(index2).c_fails < 4 && TrialRecord.User.structure(index2).c_success ~= 1
-                    active_stim(end+1) = TrialRecord.User.structure(index2);
+            while index2 ~= length(TrialRecord.User.initial_TrialRecord.User.active_stim)+1
+                if TrialRecord.User.initial_TrialRecord.User.active_stim(index2).c_fails <= TrialRecord.User.max_fails && TrialRecord.User.initial_TrialRecord.User.active_stim(index2).c_success ~= 1
+                    TrialRecord.User.active_stim(end+1) = TrialRecord.User.initial_TrialRecord.User.active_stim(index2);
                 end
                 index2 = index2 +1;
             end
         case 2
             while index2 ~= length(stimulus_list)+1
-                if TrialRecord.User.structure(index2).a_fails < 4 && TrialRecord.User.structure(index2).a_success ~= 1
-                    active_stim(end+1) = TrialRecord.User.structure(index2);
+                if TrialRecord.User.initial_TrialRecord.User.active_stim(index2).a_fails <= TrialRecord.User.max_fails && TrialRecord.User.initial_TrialRecord.User.active_stim(index2).a_success ~= 1
+                    TrialRecord.User.active_stim(end+1) = TrialRecord.User.initial_TrialRecord.User.active_stim(index2);
                 end
                 index2 = index2 +1;
             end
         case 3
             while index2 ~= length(stimulus_list)+1
-                if TrialRecord.User.structure(index2).p_fails < 4 && TrialRecord.User.structure(index2).p_success ~= 1
-                    active_stim(end+1) = TrialRecord.User.structure(index2);
+                if TrialRecord.User.initial_TrialRecord.User.active_stim(index2).p_fails <= TrialRecord.User.max_fails && TrialRecord.User.initial_TrialRecord.User.active_stim(index2).p_success ~= 1
+                    TrialRecord.User.active_stim(end+1) = TrialRecord.User.initial_TrialRecord.User.active_stim(index2);
                 end
                 index2 = index2 +1;
             end
@@ -266,23 +273,23 @@ else
     switch question
         case 1
             while index2 ~= length(stimulus_list)+1
-                if TrialRecord.User.structure(index2).a_fails < 4 && TrialRecord.User.structure(index2).a_success ~= 1
-                    active_stim(end+1) = TrialRecord.User.structure(index2);
+                if TrialRecord.User.initial_TrialRecord.User.active_stim(index2).a_fails <= TrialRecord.User.max_fails && TrialRecord.User.initial_TrialRecord.User.active_stim(index2).a_success ~= 1
+                    TrialRecord.User.active_stim(end+1) = TrialRecord.User.initial_TrialRecord.User.active_stim(index2);
                 end
                 index2 = index2 +1;
             end
         case 2
             while index2 ~= length(stimulus_list)+1
-                if TrialRecord.User.structure(index2).p_fails < 4 && TrialRecord.User.structure(index2).p_success ~= 1
-                    active_stim(end+1) = TrialRecord.User.structure(index2);
+                if TrialRecord.User.initial_TrialRecord.User.active_stim(index2).p_fails <= TrialRecord.User.max_fails && TrialRecord.User.initial_TrialRecord.User.active_stim(index2).p_success ~= 1
+                    TrialRecord.User.active_stim(end+1) = TrialRecord.User.initial_TrialRecord.User.active_stim(index2);
                 end
                 index2 = index2 +1;
             end
     end
 end
 
-TrialRecord.User.chosen_stim_index_active = randperm(length(active_stim), 1);
-stimulus_chosen_in_active = active_stim(TrialRecord.User.chosen_stim_index_active).stimuli;
+TrialRecord.User.chosen_stim_index_active = randperm(length(TrialRecord.User.active_stim), 1);
+stimulus_chosen_in_active = TrialRecord.User.active_stim(TrialRecord.User.chosen_stim_index_active).stimuli;
 i = 1;
 while i ~= length(TrialRecord.User.structure)+1
     if strcmp(stimulus_chosen_in_active, TrialRecord.User.structure(i).stimuli)
@@ -295,16 +302,16 @@ end
 if ~TrialRecord.User.training_agent_patient
     switch question
         case 1
-            if strncmpi('chas', active_stim(TrialRecord.User.chosen_stim_index_active).stimuli, 4)    % check for title of the animation to determine actual category
+            if strncmpi('chas', TrialRecord.User.active_stim(TrialRecord.User.chosen_stim_index_active).stimuli, 4)    % check for title of the animation to determine actual category
                 TrialRecord.User.chasing = true;
                 TrialRecord.NextCondition = 1;
-            elseif strncmpi('groom', active_stim(TrialRecord.User.chosen_stim_index_active).stimuli, 5)
+            elseif strncmpi('groom', TrialRecord.User.active_stim(TrialRecord.User.chosen_stim_index_active).stimuli, 5)
                 TrialRecord.User.grooming = true;
                 TrialRecord.NextCondition = 2;
-            elseif strncmpi('hold', active_stim(TrialRecord.User.chosen_stim_index_active).stimuli, 4)
+            elseif strncmpi('hold', TrialRecord.User.active_stim(TrialRecord.User.chosen_stim_index_active).stimuli, 4)
                 TrialRecord.User.holding = true;
                 TrialRecord.NextCondition = 3;
-            elseif strncmpi('mount', active_stim(TrialRecord.User.chosen_stim_index_active).stimuli, 5)
+            elseif strncmpi('mount', TrialRecord.User.active_stim(TrialRecord.User.chosen_stim_index_active).stimuli, 5)
                 TrialRecord.User.mounting = true;
                 TrialRecord.NextCondition = 4;
             end
@@ -328,9 +335,9 @@ else
 end
 
 TrialRecord.User.movie = strcat('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\stimuli\', ... 
-    active_stim(TrialRecord.User.chosen_stim_index_active).folder, '\', active_stim(TrialRecord.User.chosen_stim_index_active).stimuli);                                                  % complete path of the animation
+    TrialRecord.User.active_stim(TrialRecord.User.chosen_stim_index_active).folder, '\', TrialRecord.User.active_stim(TrialRecord.User.chosen_stim_index_active).stimuli);                                                  % complete path of the animation
 TrialRecord.User.frame = strcat('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\frames\', ... 
-    active_stim(TrialRecord.User.chosen_stim_index_active).folder, '\', active_stim(TrialRecord.User.chosen_stim_index_active).frames);                    % and frame
+    TrialRecord.User.active_stim(TrialRecord.User.chosen_stim_index_active).folder, '\', TrialRecord.User.active_stim(TrialRecord.User.chosen_stim_index_active).frames);                    % and frame
 
 %%%%%%%%%%%%%%%
 
