@@ -13,7 +13,7 @@ persistent timing_filenames_retrieved
 %% constants
 % progression
 TrialRecord.User.blocksize = 10;                                                              % The TrialRecord.User.blocksize is the number of animationsthe monkey has to complete.a block is the elementary unit, a block determines whether the progression number increases/decreases/stays the same.
-                                                                            % block def: a set number of stimuli that have been showed for the first time
+%%% maybe later create a blocksize as a function of previous performance to quickly skip to his level when starting again.                                                                            % block def: a set number of stimuli that have been showed for the first time
 TrialRecord.User.size_progression_factor = ...                              % the number of progression number steps needed to go from start size to end size, used for both category and agent patient
     5;
 category_progression_factor = TrialRecord.User.size_progression_factor + 2; % number of progression number steps needed to add a category button
@@ -22,7 +22,7 @@ progression_trials = TrialRecord.User.blocksize * TrialRecord.User.size_progress
 consolidation_trials = TrialRecord.User.blocksize * ...
     (category_progression_factor-TrialRecord.User.size_progression_factor); % the number of trials to consolidate the current size progression 
 
-start_progression_number = 0;                                               % the progression number to start training with
+start_progression_number = 19;                                               % the progression number to start training with
 
 succes_threshold = 0.80;                                                    % if performance is bigger than or equal to this, progression number + 1
 fail_threshold = 0;                                                         % if performance is smaller than or equal to this, progression number - 1
@@ -120,10 +120,10 @@ if TrialRecord.User.training_categorization
         TrialRecord.User.grooming_on = true;
     end
     if TrialRecord.User.category_progression >=2
-        TrialRecord.User.holding_on = true;
+        TrialRecord.User.mounting_on = true;
     end
     if TrialRecord.User.category_progression >=3
-        TrialRecord.User.mounting_on = true;
+        TrialRecord.User.holding_on = true;
     end
 elseif TrialRecord.User.training_agent_patient
     if TrialRecord.User.agent_patient_progression >=0
@@ -155,46 +155,46 @@ if TrialRecord.CurrentTrialNumber == 0
     % dir() gives a struct of the contents of the path
     chasing_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\stimuli\chasing');
     grooming_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\stimuli\grooming');
-    holding_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\stimuli\holding');
     mounting_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\stimuli\mounting');
+    holding_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\stimuli\holding');
     % isolating the name field
     TrialRecord.User.chasing_list = {chasing_struct.name};
     TrialRecord.User.grooming_list = {grooming_struct.name};
-    TrialRecord.User.holding_list = {holding_struct.name};
     TrialRecord.User.mounting_list = {mounting_struct.name};
+    TrialRecord.User.holding_list = {holding_struct.name};
     % deleting the 2 empty spots from the name field
     TrialRecord.User.chasing_list(1:2) = [];
     TrialRecord.User.grooming_list(1:2) = [];
-    TrialRecord.User.holding_list(1:2) = [];
     TrialRecord.User.mounting_list(1:2) = [];
+    TrialRecord.User.holding_list(1:2) = [];
 
     % analogous for the frames
     chasing_frame_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\frames\chasing');
     grooming_frame_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\frames\grooming');
-    holding_frame_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\frames\holding');
     mounting_frame_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\frames\mounting');
+    holding_frame_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\frames\holding');
     TrialRecord.User.chasing_frame_list = {chasing_frame_struct.name};
     TrialRecord.User.grooming_frame_list = {grooming_frame_struct.name};
-    TrialRecord.User.holding_frame_list = {holding_frame_struct.name};
     TrialRecord.User.mounting_frame_list = {mounting_frame_struct.name};
+    TrialRecord.User.holding_frame_list = {holding_frame_struct.name};
     TrialRecord.User.chasing_frame_list(1:2) = [];
     TrialRecord.User.grooming_frame_list(1:2) = [];
-    TrialRecord.User.holding_frame_list(1:2) = [];
     TrialRecord.User.mounting_frame_list(1:2) = [];
+    TrialRecord.User.holding_frame_list(1:2) = [];
 
     % creating general lists with all the files
-    TrialRecord.User.general_stimulus_list = [TrialRecord.User.chasing_list, TrialRecord.User.grooming_list, TrialRecord.User.holding_list,  TrialRecord.User.mounting_list]; 
-    TrialRecord.User.general_frame_list = [TrialRecord.User.chasing_frame_list, TrialRecord.User.grooming_frame_list, TrialRecord.User.holding_frame_list, TrialRecord.User.mounting_frame_list];
+    TrialRecord.User.general_stimulus_list = [TrialRecord.User.chasing_list, TrialRecord.User.grooming_list, TrialRecord.User.mounting_list, TrialRecord.User.holding_list]; 
+    TrialRecord.User.general_frame_list = [TrialRecord.User.chasing_frame_list, TrialRecord.User.grooming_frame_list, TrialRecord.User.mounting_frame_list, TrialRecord.User.holding_frame_list];
 end
 
 % creating useable stimulus list depending on the switches
-if TrialRecord.User.mounting_on || TrialRecord.User.agent_on || TrialRecord.User.patient_on
+if TrialRecord.User.holding_on || TrialRecord.User.agent_on || TrialRecord.User.patient_on
     stimulus_list = TrialRecord.User.general_stimulus_list;
     frame_list = TrialRecord.User.general_frame_list;
-elseif  ~TrialRecord.User.mounting_on && TrialRecord.User.holding_on
-    stimulus_list = TrialRecord.User.general_stimulus_list(1, 1:(end-length(TrialRecord.User.mounting_list)));
-    frame_list = TrialRecord.User.general_frame_list(1, 1:(end-length(TrialRecord.User.mounting_frame_list)));
-elseif ~TrialRecord.User.holding_on && TrialRecord.User.grooming_on
+elseif  ~TrialRecord.User.holding_on && TrialRecord.User.mounting_on
+    stimulus_list = TrialRecord.User.general_stimulus_list(1, 1:(end-length(TrialRecord.User.holding_list)));
+    frame_list = TrialRecord.User.general_frame_list(1, 1:(end-length(TrialRecord.User.holding_frame_list)));
+elseif ~TrialRecord.User.mounting_on && TrialRecord.User.grooming_on
     stimulus_list = TrialRecord.User.general_stimulus_list(1, 1:(length(TrialRecord.User.chasing_list)+length(TrialRecord.User.grooming_list)));
     frame_list = TrialRecord.User.general_frame_list(1, 1:(length(TrialRecord.User.chasing_frame_list)+length(TrialRecord.User.grooming_frame_list)));
 elseif ~TrialRecord.User.grooming_on && TrialRecord.User.chasing_on
@@ -227,10 +227,10 @@ if TrialRecord.User.current_sum_categories ~= previous_sum_categories ...
                 length(TrialRecord.User.grooming_list)
             TrialRecord.User.structure(index).folder = 'grooming';
         elseif index <= length(TrialRecord.User.chasing_list) + ... 
-                length(TrialRecord.User.grooming_list) + length(TrialRecord.User.holding_list)
-            TrialRecord.User.structure(index).folder = 'holding';
-        elseif index <= length(TrialRecord.User.general_stimulus_list)
+                length(TrialRecord.User.grooming_list) + length(TrialRecord.User.mounting_list)
             TrialRecord.User.structure(index).folder = 'mounting';
+        elseif index <= length(TrialRecord.User.general_stimulus_list)
+            TrialRecord.User.structure(index).folder = 'holding';
         end
         index = index+1;
     end
@@ -364,11 +364,11 @@ if ~TrialRecord.User.training_agent_patient
             elseif strncmpi('groom', TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).stimuli, 5)
                 TrialRecord.User.grooming = true;
                 TrialRecord.NextCondition = 2;
-            elseif strncmpi('hold', TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).stimuli, 4)
-                TrialRecord.User.holding = true;
-                TrialRecord.NextCondition = 3;
             elseif strncmpi('mount', TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).stimuli, 5)
                 TrialRecord.User.mounting = true;
+                TrialRecord.NextCondition = 3;
+            elseif strncmpi('hold', TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).stimuli, 4)
+                TrialRecord.User.holding = true;
                 TrialRecord.NextCondition = 4;
             end
             TrialRecord.User.categorizing = true;

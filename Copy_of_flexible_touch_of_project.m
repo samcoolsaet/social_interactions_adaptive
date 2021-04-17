@@ -17,8 +17,8 @@ standard_time_out = 3000;
 engaging_box = { [1 1 1], [1 1 1], standard_button_size, [10 0] };
 chasing_box = {[1 0 0], [1 0 0], standard_button_size, [x_axes(1) y_axes(1)]};
 grooming_box = {[0 1 0], [0 1 0], standard_button_size, [x_axes(1) y_axes(2)]};
-holding_box = {[0 0 1], [0 0 1], standard_button_size, [x_axes(1) y_axes(3)]};
-mounting_box = {[1 1 0], [1 1 0], standard_button_size, [x_axes(1) y_axes(4)]};
+mounting_box = {[1 1 0], [1 1 0], standard_button_size, [x_axes(1) y_axes(3)]};
+holding_box = {[0 0 1], [0 0 1], standard_button_size, [x_axes(1) y_axes(4)]};
 agent_box = {[0 1 1], [0 1 1], standard_button_size, [x_axes(2) y_axes(2)]};
 patient_box = {[1 0 1], [1 0 1], standard_button_size, [x_axes(2) y_axes(3)]};
 
@@ -81,8 +81,8 @@ if TrialRecord.User.training_agent_patient
     end
 end
 
-all_boxes = [chasing_box; grooming_box; holding_box; ...                    % making a list with all the boxes
-    mounting_box; agent_box; patient_box];
+all_boxes = [chasing_box; grooming_box; mounting_box; ...                    % making a list with all the boxes
+    holding_box; agent_box; patient_box];
 all_targets = [all_boxes{1, 4}; all_boxes{2, 4}; all_boxes{3, 4}; ...       % isolating the coordinates from the boxes
     all_boxes{4, 4}; all_boxes{5, 4}; all_boxes{6, 4}];
 
@@ -221,26 +221,25 @@ end
 
 % % make reward scale with ( a fraction of ) progression number correlated
 % % with the goal for that day?
-% reward_factor = 0.25;
-% max_reward_dur = 800;
-% % disp('lucas');
-% min_reward_dur = 200;
-% % disp('sam');
-% reward_window = max_reward_dur - min_reward_dur;
-% % % expected_progression = 10; % reward goes from min to max over 10
-% % % progression numbers
-% variable_reward_portion = TrialRecord.User.progression_number/ ...          % here the variable portion is calculated based on a fraction of the complete task.
-%     (TrialRecord.User.max_c_progression_number*reward_factor) * reward_window;
+% max_reward = 800;
+% disp('penis');
+% min_reward = 500;
+% disp('penis');
+% reward_window = max_reward - min_reward;
+% progression_aim_this_training = 12; % reward goes from min to max over x progression numbers
+% variable_reward_portion = TrialRecord.User.progression_number* ...          % here the variable portion is calculated based on a fraction of the complete task.
+%     reward_window/progression_aim_this_training ;
 % % % % this is the same but with a set progression number as goal for that day
 % % % variable_reward_portion = TrialRecord.User.progression_number/ ...    
 % % %     (expected_progression) * reward_window;
-% 
-% min_reward_dur = 50;
-% if variable_reward_portion <= 50                                            % I want to stay below max reward
-%     reward_dur = min_reward_dur + variable_reward_portion;
-% else
-%     reward_dur = max_reward_dur;
+% disp('penis');
+% reward_dur = min_reward + variable_reward_portion;
+% if reward_dur > max_reward % stay below max reward
+%     reward_dur = max_reward;
 % end
+% 
+% reward_dur
+
 if TrialRecord.CurrentTrialNumber <= 10
     time_out = standard_time_out;
 else
@@ -251,6 +250,7 @@ else
         time_out = 7000;
     end
 end
+% time_out
 
 [y1, fs1] = audioread('test.wav');
 [y2, fs2] = audioread('test2.wav');
@@ -298,8 +298,8 @@ elseif TrialRecord.User.current_sum_categories == 1 && TrialRecord.User.agenting
 elseif TrialRecord.User.categorizing & TrialRecord.User.current_sum_categories ~= 1
     if (TrialRecord.User.chasing & touch.ChosenTarget == 1) | ...
             (TrialRecord.User.grooming & touch.ChosenTarget == 2) | ...
-            (TrialRecord.User.holding & touch.ChosenTarget == 3) | ...
-            (TrialRecord.User.mounting & touch.ChosenTarget == 4)
+            (TrialRecord.User.mounting & touch.ChosenTarget == 3) | ...
+            (TrialRecord.User.holding & touch.ChosenTarget == 4) 
         dashboard(2, 'success!!! <3 ');
         trialerror(0);
         goodmonkey(reward_dur);
