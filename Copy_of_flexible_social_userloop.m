@@ -15,9 +15,9 @@ persistent timing_filenames_retrieved
 TrialRecord.User.blocksize = 10;                                                              % The TrialRecord.User.blocksize is the number of animationsthe monkey has to complete.a block is the elementary unit, a block determines whether the progression number increases/decreases/stays the same.
                                                                             % block def: a set number of stimuli that have been showed for the first time
 TrialRecord.User.size_progression_factor = ...                              % the number of progression number steps needed to go from start size to end size, used for both category and agent patient
-    2;
-category_progression_factor = 4;                                            % number of progression number steps needed to add a category button
-agent_patient_progression_factor = 4;                                       % number of progression number steps needed to add a patient button
+    5;
+category_progression_factor = TrialRecord.User.size_progression_factor + 2; % number of progression number steps needed to add a category button
+agent_patient_progression_factor = TrialRecord.User.size_progression_factor + 2; % number of progression number steps needed to add a patient button
 progression_trials = TrialRecord.User.blocksize * TrialRecord.User.size_progression_factor;  % the number of trials needed to get to the final size
 consolidation_trials = TrialRecord.User.blocksize * ...
     (category_progression_factor-TrialRecord.User.size_progression_factor); % the number of trials to consolidate the current size progression 
@@ -26,7 +26,8 @@ start_progression_number = 0;                                               % th
 
 succes_threshold = 0.80;                                                    % if performance is bigger than or equal to this, progression number + 1
 fail_threshold = 0;                                                         % if performance is smaller than or equal to this, progression number - 1
-TrialRecord.User.max_c_progression_number = category_progression_factor * 4 - 1;                               % last button active + at final size
+TrialRecord.User.max_c_progression_number = category_progression_factor * 2 ...
+    + TrialRecord.User.size_progression_factor;                               % last button active + at final size
 % max_ap_progression_number =agent_patient_progression_factor * 1 + ...
 %     TrialRecord.User.size_progression_factor;
 min_c_progression_number = 0;
@@ -71,8 +72,6 @@ if TrialRecord.User.overall_active_completion == 1
         TrialRecord.User.agent_on * ([TrialRecord.User.initial_active_stim.a_fails] == 0), ...
         TrialRecord.User.patient_on * ([TrialRecord.User.initial_active_stim.p_fails] == 0)];
     no_first_time_correct = sum(boolean_first_time_correct, 'all');
-    boolean_first_time_correct
-    no_first_time_correct
     TrialRecord.User.performance = no_first_time_correct/ (TrialRecord.User.blocksize * (TrialRecord.User.agent_on+TrialRecord.User.patient_on+TrialRecord.User.category));
     TrialRecord.NextBlock = TrialRecord.CurrentBlock + 1;                   % move to the nect block after all of this
     if TrialRecord.User.performance >= succes_threshold && ...              % if performance is over the threshold, add a progression number
@@ -86,25 +85,6 @@ if TrialRecord.User.overall_active_completion == 1
             TrialRecord.User.progression_number - 1;
     end
 end
-
-% if mod(TrialRecord.CurrentTrialNumber, TrialRecord.User.blocksize) == 0 ...      % after previous block, do the following. does't work with blokcsize = 1
-%         && TrialRecord.CurrentTrialNumber ~= 0  %%%% work with completion of the active stimuli      
-%     trialerrors_block = TrialRecord.TrialErrors(end-TrialRecord.User.blocksize+1 : end);
-%     boolean_corrects_per_block = trialerrors_block == 0;
-%     TrialRecord.User.performance = mean(boolean_corrects_per_block);
-%     TrialRecord.NextBlock = TrialRecord.CurrentBlock + 1;                   % move to the nect block after all of this
-%     if TrialRecord.User.performance >= succes_threshold && ...              % if performance is over the threshold, add a progression number
-%             TrialRecord.User.progression_number < TrialRecord.User. ...
-%             max_c_progression_number                                        % but the progression number can not go above max number
-%         TrialRecord.User.progression_number = ... 
-%             TrialRecord.User.progression_number + 1;
-%     elseif TrialRecord.User.performance <= fail_threshold && ...            % if performance is under the threshold and progression number is not already at the min progression number, substract a progression number
-%             TrialRecord.User.progression_number > min_c_progression_number
-%         TrialRecord.User.progression_number = ... 
-%             TrialRecord.User.progression_number - 1;
-%     end
-% end
-
 
 % setting independant category and button progression based on progression
 % number

@@ -392,7 +392,6 @@ TrialRecord.User.overall_active_completion = mean([TrialRecord.User.initial_acti
 % + a_boolean_fails + [TrialRecord.User.structure.a_success] + p_boolean_fails + [TrialRecord.User.structure.p_success]) ... 
 % /(TrialRecord.User.agent_on+TrialRecord.User.patient_on+TrialRecord.User.category)) * length(TrialRecord.User.structure)/TrialRecord.User.blocksize;
 
-TrialRecord.User.overall_active_completion
 
 TrialRecord.User.completed_stimuli = sum([TrialRecord.User.initial_active_stim.c_completed] + [TrialRecord.User.initial_active_stim.a_completed] + [TrialRecord.User.initial_active_stim.p_completed], 'all');
 
