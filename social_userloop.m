@@ -10,22 +10,38 @@ persistent timing_filenames_retrieved
         timing_filenames_retrieved = true;
     return
     end
+%% initializing for first trial
+start_progression_number = 0;                                               % the progression number to start training with
+
+if TrialRecord.CurrentTrialNumber == 0
+    TrialRecord.User.performance = 0;
+    TrialRecord.User.progression_number = start_progression_number;
+    previous_sum_categories = 0;
+    TrialRecord.User.max_fails = 3;
+    TrialRecord.User.overall_active_completion = 0;
+else
+    previous_sum_categories = TrialRecord.User.current_sum_categories;      % calculations of previous sum categories
+end
 %% constants
 % progression
-TrialRecord.User.blocksize = 10;                                                              % The TrialRecord.User.blocksize is the number of animationsthe monkey has to complete.a block is the elementary unit, a block determines whether the progression number increases/decreases/stays the same.
+TrialRecord.User.blocksize = 5;                                                              % The TrialRecord.User.blocksize is the number of animationsthe monkey has to complete.a block is the elementary unit, a block determines whether the progression number increases/decreases/stays the same.
 %%% maybe later create a blocksize as a function of previous performance to quickly skip to his level when starting again.                                                                            % block def: a set number of stimuli that have been showed for the first time
-TrialRecord.User.size_progression_factor = ...                              % the number of progression number steps needed to go from start size to end size, used for both category and agent patient
-    5;
-category_progression_factor = TrialRecord.User.size_progression_factor + 2; % number of progression number steps needed to add a category button
+succes_threshold = 0.80;                                                    % if performance is bigger than or equal to this, progression number + 1
+fail_threshold = 0;                                                         % if performance is smaller than or equal to this, progression number - 1
+% previous_sum_categories  == 1 && TrialRecord.User.progression_number <= TrialRecord.User.size_progression_factor
+% if previous_sum_categories == 1 && ...
+%         TrialRecord.User.progression_number <= 2
+%     TrialRecord.User.size_progression_factor = 1;                              % the number of progression number steps needed to go from start size to end size, used for both category and agent patient
+%     category_progression_factor = TrialRecord.User.size_progression_factor + 1; % number of progression number steps needed to add a category button
+% else
+    TrialRecord.User.size_progression_factor = 5;                              % the number of progression number steps needed to go from start size to end size, used for both category and agent patient
+    category_progression_factor = TrialRecord.User.size_progression_factor + 2; % number of progression number steps needed to add a category button
+% end
 agent_patient_progression_factor = TrialRecord.User.size_progression_factor + 2; % number of progression number steps needed to add a patient button
 progression_trials = TrialRecord.User.blocksize * TrialRecord.User.size_progression_factor;  % the number of trials needed to get to the final size
 consolidation_trials = TrialRecord.User.blocksize * ...
     (category_progression_factor-TrialRecord.User.size_progression_factor); % the number of trials to consolidate the current size progression 
 
-start_progression_number = 19;                                               % the progression number to start training with
-
-succes_threshold = 0.80;                                                    % if performance is bigger than or equal to this, progression number + 1
-fail_threshold = 0;                                                         % if performance is smaller than or equal to this, progression number - 1
 TrialRecord.User.max_c_progression_number = category_progression_factor * 2 ...
     + TrialRecord.User.size_progression_factor;                               % last button active + at final size
 % max_ap_progression_number =agent_patient_progression_factor * 1 + ...
@@ -54,16 +70,6 @@ TrialRecord.User.grooming = false;
 TrialRecord.User.chasing = false;
 TrialRecord.User.holding = false;
 TrialRecord.User.mounting = false;
-%% initializing for first trial
-if TrialRecord.CurrentTrialNumber == 0
-    TrialRecord.User.performance = 0;
-    TrialRecord.User.progression_number = start_progression_number;
-    previous_sum_categories = 0;
-    TrialRecord.User.max_fails = 3;
-    TrialRecord.User.overall_active_completion = 0;
-else
-    previous_sum_categories = TrialRecord.User.current_sum_categories;      % calculations of previous sum categories
-end
 
 
 %% determining next block and difficulty based on a general progression number %%%%%% maybe create a vector with the length of trialerrors but displaying the stimulus sequence numbers, this way I can keep track of actual fails and just going on when failing because the number of repeats hits the limit
@@ -77,15 +83,20 @@ if TrialRecord.User.overall_active_completion == 1
     if TrialRecord.User.performance >= succes_threshold && ...              % if performance is over the threshold, add a progression number
             TrialRecord.User.progression_number < TrialRecord.User. ...
             max_c_progression_number                                        % but the progression number can not go above max number
-        TrialRecord.User.progression_number = ... 
-            TrialRecord.User.progression_number + 1;
+        if TrialRecord.User.progression_number <= TrialRecord.User.size_progression_factor
+            TrialRecord.User.progression_number = ... 
+                TrialRecord.User.progression_number + 2;
+        else
+            TrialRecord.User.progression_number = ... 
+                TrialRecord.User.progression_number + 1;
+        end
     elseif TrialRecord.User.performance <= fail_threshold && ...            % if performance is under the threshold and progression number is not already at the min progression number, substract a progression number
             TrialRecord.User.progression_number > min_c_progression_number
         TrialRecord.User.progression_number = ... 
             TrialRecord.User.progression_number - 1;
     end
 end
-
+TrialRecord.User.progression_number
 % setting independant category and button progression based on progression
 % number
 TrialRecord.User.category_progression = ...                                 % the category progression factor, which should be at least bigger than than the size progression factor in order 
@@ -153,10 +164,10 @@ TrialRecord.User.current_sum_categories = sum([TrialRecord.User.chasing_on, ... 
 % I want these variables to be fixed throughout the run
 if TrialRecord.CurrentTrialNumber == 0
     % dir() gives a struct of the contents of the path
-    chasing_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\stimuli\chasing');
-    grooming_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\stimuli\grooming');
-    mounting_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\stimuli\mounting');
-    holding_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\stimuli\holding');
+    chasing_struct = dir(strcat(pwd, '\stimuli\chasing'));
+    grooming_struct = dir(strcat(pwd, '\stimuli\grooming'));
+    mounting_struct = dir(strcat(pwd, '\stimuli\mounting'));
+    holding_struct = dir(strcat(pwd, '\stimuli\holding'));
     % isolating the name field
     TrialRecord.User.chasing_list = {chasing_struct.name};
     TrialRecord.User.grooming_list = {grooming_struct.name};
@@ -169,10 +180,10 @@ if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.holding_list(1:2) = [];
 
     % analogous for the frames
-    chasing_frame_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\frames\chasing');
-    grooming_frame_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\frames\grooming');
-    mounting_frame_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\frames\mounting');
-    holding_frame_struct = dir('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\frames\holding');
+    chasing_frame_struct = dir(strcat(pwd, '\frames\chasing'));
+    grooming_frame_struct = dir(strcat(pwd, '\frames\grooming'));
+    mounting_frame_struct = dir(strcat(pwd, '\frames\mounting'));
+    holding_frame_struct = dir(strcat(pwd, '\frames\holding'));
     TrialRecord.User.chasing_frame_list = {chasing_frame_struct.name};
     TrialRecord.User.grooming_frame_list = {grooming_frame_struct.name};
     TrialRecord.User.mounting_frame_list = {mounting_frame_struct.name};
@@ -390,9 +401,9 @@ else
     end
 end
 
-TrialRecord.User.movie = strcat('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\stimuli\', ... 
+TrialRecord.User.movie = strcat(pwd, '\stimuli\', ... 
     TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).folder, '\', TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).stimuli);                                                  % complete path of the animation
-TrialRecord.User.frame = strcat('C:\Users\samco\Documents\GitHub\social_interactions_adaptive\social_interactions_adaptive\frames\', ... 
+TrialRecord.User.frame = strcat(pwd,'\frames\', ... 
     TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).folder, '\', TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).frames);                    % and frame
 
 
