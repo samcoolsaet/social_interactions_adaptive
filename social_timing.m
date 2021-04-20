@@ -7,20 +7,34 @@ dashboard(1, string(TrialRecord.User.progression_number));
 touch_threshold = 2;
 standard_button_size = 2;                                                   % final button size
 button_size_difference = 1.5;                                               % the range from beginning button size to final size
-x_axes = [-12 12];
-y_axes = [-10 -3.33 3.33 10];
+% x_axes = [-12 12];
+% y_axes = [-10 -3.33 3.33 10];
 movie_duration = 3000;
 answer_time = 5000;
 standard_time_out = 3000;
 
 %  init boxes
+% engaging_box = { [1 1 1], [1 1 1], standard_button_size, [10 0] };
+% chasing_box = {[1 0 0], [1 0 0], standard_button_size, [x_axes(1) y_axes(1)]};
+% grooming_box = {[0 1 0], [0 1 0], standard_button_size, [x_axes(1) y_axes(2)]};
+% mounting_box = {[1 1 0], [1 1 0], standard_button_size, [x_axes(1) y_axes(3)]};
+% holding_box = {[0 0 1], [0 0 1], standard_button_size, [x_axes(1) y_axes(4)]};
+% agent_box = {[0 1 1], [0 1 1], standard_button_size, [x_axes(2) y_axes(2)]};
+% patient_box = {[1 0 1], [1 0 1], standard_button_size, [x_axes(2) y_axes(3)]};
+
+x_spacing = 3;
+y_spacing = 3.33;
+x_center_points = [-13 12];
+% y_center_points = 0;
+y_center_points = floor(TrialRecord.User.current_sum_categories/2)*(-y_spacing)+3*y_spacing;
+
 engaging_box = { [1 1 1], [1 1 1], standard_button_size, [10 0] };
-chasing_box = {[1 0 0], [1 0 0], standard_button_size, [x_axes(1) y_axes(1)]};
-grooming_box = {[0 1 0], [0 1 0], standard_button_size, [x_axes(1) y_axes(2)]};
-mounting_box = {[1 1 0], [1 1 0], standard_button_size, [x_axes(1) y_axes(3)]};
-holding_box = {[0 0 1], [0 0 1], standard_button_size, [x_axes(1) y_axes(4)]};
-agent_box = {[0 1 1], [0 1 1], standard_button_size, [x_axes(2) y_axes(2)]};
-patient_box = {[1 0 1], [1 0 1], standard_button_size, [x_axes(2) y_axes(3)]};
+chasing_box = {[1 0 0], [1 0 0], standard_button_size, [x_center_points(1)-x_spacing y_center_points-3*y_spacing]};
+grooming_box = {[0 1 0], [0 1 0], standard_button_size, [x_center_points(1)+x_spacing y_center_points-3*y_spacing]};
+mounting_box = {[1 1 0], [1 1 0], standard_button_size, [x_center_points(1)-x_spacing y_center_points-y_spacing]};
+holding_box = {[0 0 1], [0 0 1], standard_button_size, [x_center_points(1)+x_spacing y_center_points-y_spacing]};
+agent_box = {[0 1 1], [0 1 1], standard_button_size, [x_center_points(2) y_center_points-y_spacing]};
+patient_box = {[1 0 1], [1 0 1], standard_button_size, [x_center_points(2) y_center_points+y_spacing]};
 
 %% sizing buttons
 % determining correct button size in case of training
@@ -209,6 +223,7 @@ end
 
 scene3 = create_scene(con3);
 fliptime = run_scene(scene3, 10);
+% % make event code line
 
 set_bgcolor([]);        % change it back to the original color
 idle(0);
@@ -222,13 +237,14 @@ end
 
 % make reward scale with ( a fraction of ) progression number correlated
 % with the goal for that day?
-max_reward = 800;
-min_reward = 500;
+random_portion = randi(100, 1);
+max_reward = 500;
+min_reward = 200;
 reward_window = max_reward - min_reward;
 progression_aim_this_training = 12;                                         % reward goes from min to max over x progression numbers
 variable_reward_portion = TrialRecord.User.progression_number* ...          % here the variable portion is calculated based on a fraction of the complete task.
     reward_window/progression_aim_this_training ;
-reward_dur1 = min_reward + variable_reward_portion;
+reward_dur1 = min_reward + variable_reward_portion + random_portion;
 if reward_dur1 > max_reward                                                  % stay below max reward
     reward_dur1 = max_reward;
 end

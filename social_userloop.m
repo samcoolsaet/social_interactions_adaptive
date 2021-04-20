@@ -28,16 +28,10 @@ TrialRecord.User.blocksize = 5;                                                 
 %%% maybe later create a blocksize as a function of previous performance to quickly skip to his level when starting again.                                                                            % block def: a set number of stimuli that have been showed for the first time
 succes_threshold = 0.80;                                                    % if performance is bigger than or equal to this, progression number + 1
 fail_threshold = 0;                                                         % if performance is smaller than or equal to this, progression number - 1
-% previous_sum_categories  == 1 && TrialRecord.User.progression_number <= TrialRecord.User.size_progression_factor
-% if previous_sum_categories == 1 && ...
-%         TrialRecord.User.progression_number <= 2
-%     TrialRecord.User.size_progression_factor = 1;                              % the number of progression number steps needed to go from start size to end size, used for both category and agent patient
-%     category_progression_factor = TrialRecord.User.size_progression_factor + 1; % number of progression number steps needed to add a category button
-% else
-    TrialRecord.User.size_progression_factor = 5;                              % the number of progression number steps needed to go from start size to end size, used for both category and agent patient
-    category_progression_factor = TrialRecord.User.size_progression_factor + 2; % number of progression number steps needed to add a category button
-% end
+TrialRecord.User.size_progression_factor = 5;                              % the number of progression number steps needed to go from start size to end size, used for both category and agent patient
+category_progression_factor = TrialRecord.User.size_progression_factor + 2; % number of progression number steps needed to add a category button
 agent_patient_progression_factor = TrialRecord.User.size_progression_factor + 2; % number of progression number steps needed to add a patient button
+
 progression_trials = TrialRecord.User.blocksize * TrialRecord.User.size_progression_factor;  % the number of trials needed to get to the final size
 consolidation_trials = TrialRecord.User.blocksize * ...
     (category_progression_factor-TrialRecord.User.size_progression_factor); % the number of trials to consolidate the current size progression 
@@ -96,7 +90,6 @@ if TrialRecord.User.overall_active_completion == 1
             TrialRecord.User.progression_number - 1;
     end
 end
-TrialRecord.User.progression_number
 % setting independant category and button progression based on progression
 % number
 TrialRecord.User.category_progression = ...                                 % the category progression factor, which should be at least bigger than than the size progression factor in order 
