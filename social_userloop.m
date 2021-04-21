@@ -80,6 +80,8 @@ if TrialRecord.User.overall_active_completion == 1
         if TrialRecord.User.progression_number <= TrialRecord.User.size_progression_factor
             TrialRecord.User.progression_number = ... 
                 TrialRecord.User.progression_number + 2;
+%             maybe i can do something: like progression numbers added =
+%             performance * some fixed number
         else
             TrialRecord.User.progression_number = ... 
                 TrialRecord.User.progression_number + 1;
