@@ -381,11 +381,11 @@ end
 
 % for initial_active_stim
 c_boolean_fails = [TrialRecord.User.initial_active_stim.c_fails] == TrialRecord.User.max_fails;
-c_structure_completion = mean([TrialRecord.User.initial_active_stim.c_completed]);
+TrialRecord.User.c_structure_completion = mean([TrialRecord.User.initial_active_stim.c_completed]);
 a_boolean_fails = [TrialRecord.User.initial_active_stim.a_fails] == TrialRecord.User.max_fails;
-a_structure_completion = mean([TrialRecord.User.initial_active_stim.a_completed]);
+TrialRecord.User.a_structure_completion = mean([TrialRecord.User.initial_active_stim.a_completed]);
 p_boolean_fails = [TrialRecord.User.initial_active_stim.p_fails] == TrialRecord.User.max_fails;
-p_structure_completion = mean([TrialRecord.User.initial_active_stim.p_completed]);
+TrialRecord.User.p_structure_completion = mean([TrialRecord.User.initial_active_stim.p_completed]);
 
 % TrialRecord.User.overall_completion = mean(c_boolean_fails + [TrialRecord.User.initial_active_stim.c_success] ...
 % + a_boolean_fails + [TrialRecord.User.initial_active_stim.a_success] + p_boolean_fails + [TrialRecord.User.initial_active_stim.p_success]) ... 

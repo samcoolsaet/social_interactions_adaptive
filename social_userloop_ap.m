@@ -271,11 +271,15 @@ index2 = 1;
 if ~TrialRecord.User.training_agent_patient %% i seeee, so i still initiate the question and then he tries to make the active stim. zhat happens is that he initiates the question number en the all of the init active stims for that question mighht be completed, but the other ones are not. so I end up with an ampty active stim
     switch question
         case 1
-            while index2 ~= length(TrialRecord.User.initial_active_stim)+1
-                if TrialRecord.User.initial_active_stim(index2).c_fails <= TrialRecord.User.max_fails && TrialRecord.User.initial_active_stim(index2).c_success ~= 1
-                    TrialRecord.User.active_stim(end+1) = TrialRecord.User.initial_active_stim(index2);
+            if TrialRecord.User.c_structure_completion
+                question = question + 1;
+            else
+                while index2 ~= length(TrialRecord.User.initial_active_stim)+1
+                    if TrialRecord.User.initial_active_stim(index2).c_fails <= TrialRecord.User.max_fails && TrialRecord.User.initial_active_stim(index2).c_success ~= 1
+                        TrialRecord.User.active_stim(end+1) = TrialRecord.User.initial_active_stim(index2);
+                    end
+                    index2 = index2 +1;
                 end
-                index2 = index2 +1;
             end
         case 2
             while index2 ~= length(TrialRecord.User.initial_active_stim)+1
