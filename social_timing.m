@@ -1,18 +1,22 @@
 hotkey('x', 'escape_screen(); assignin(''caller'',''continue_'',false);');
 hotkey('r', 'goodmonkey(reward_dur, ''juiceline'', MLConfig.RewardFuncArgs.JuiceLine, ''eventmarker'', 14, ''nonblocking'', 1);');   % manual reward
 hotkey('p', 'TrialRecord.User.progression_number = TrialRecord.User.progression_number + 1;');
+hotkey('o', 'TrialRecord.User.progression_number = TrialRecord.User.progression_number + (TrialRecord.User.size_progression_factor - TrialRecord.User.size_progression)+1;');
+hotkey('l', 'TrialRecord.User.progression_number = TrialRecord.User.progression_number - TrialRecord.User.size_progression;');
 hotkey('m', 'TrialRecord.User.progression_number = TrialRecord.User.progression_number - 1; dashboard(1, string(TrialRecord.User.progression_number));');
-dashboard(1, string(TrialRecord.User.progression_number));
 bhv_code(1, 'run_engagement_scene', 2, 'run_video', 3, 'run_answer_scene', 5, 'end_aswer_scene');
 %% constants
 touch_threshold = 2;
 standard_button_size = 2;                                                   % final button size
-button_size_difference = 1.5;                                               % the range from beginning button size to final size
+correct_button_size_difference = 3;                                               % the range from beginning button size to final size
+wrong_button_size_difference = 1.75;
 % x_axes = [-12 12];
 % y_axes = [-10 -3.33 3.33 10];
 movie_duration = 3000;
 answer_time = 8000;
 standard_time_out = 3000;
+engagement_duration = 5000;
+repeating = true;
 
 %  init boxes
 % engaging_box = { [1 1 1], [1 1 1], standard_button_size, [10 0] };
@@ -39,11 +43,13 @@ patient_box = {[1 0 1], [1 0 1], standard_button_size, [x_center_points(2) y_cen
 
 %% sizing buttons
 % determining correct button size in case of training
-button_size_step = (1 - TrialRecord.User.size_progression/...               % the step in wich the size decreases, size progression is linked in a 1 to 1 basis with the progression number. So play with the blocksize in order to change #trials per size
-    TrialRecord.User.size_progression_factor) * button_size_difference;
-if button_size_step > 0                                                     % if the step is larger than 0
-    correct_button_size = 2 + button_size_step;                             % add the button size step to the standard size
-    wrong_button_size = 2 - button_size_step;                               % subtract the size step from the standard size
+correct_button_size_step = (1 - TrialRecord.User.size_progression/...               % the step in wich the size decreases, size progression is linked in a 1 to 1 basis with the progression number. So play with the blocksize in order to change #trials per size
+    TrialRecord.User.size_progression_factor) * correct_button_size_difference;
+wrong_button_size_step = (1 - TrialRecord.User.size_progression/...               % the step in wich the size decreases, size progression is linked in a 1 to 1 basis with the progression number. So play with the blocksize in order to change #trials per size
+    TrialRecord.User.size_progression_factor) * wrong_button_size_difference;
+if correct_button_size_step > 0                                                     % if the step is larger than 0
+    correct_button_size = 2 + correct_button_size_step;                             % add the button size step to the standard size
+    wrong_button_size = 2 - wrong_button_size_step;                               % subtract the size step from the standard size
 else
     correct_button_size = standard_button_size;                             % els, it means that maximum progression through the size difference is reached
     wrong_button_size = standard_button_size;                               % thus the button size is the final button size
@@ -62,20 +68,26 @@ if TrialRecord.User.training_categorization                                 % if
         case 2                         % analogous to the chasing example
             if TrialRecord.User.grooming
                 grooming_box(3) = {correct_button_size};
+                chasing_box(3) = {wrong_button_size};
             else
                 grooming_box(3) = {wrong_button_size};
             end
         case 3
-            if TrialRecord.User.holding
-                holding_box(3) = {correct_button_size};
-            else
-                holding_box(3) = {wrong_button_size};
-            end
-        case 4
             if TrialRecord.User.mounting
                 mounting_box(3) = {correct_button_size};
+                chasing_box(3) = {wrong_button_size};
+                grooming_box(3) = {wrong_button_size};
             else
                 mounting_box(3) = {wrong_button_size};
+            end
+        case 4
+            if TrialRecord.User.holding
+                holding_box(3) = {correct_button_size};
+                chasing_box(3) = {wrong_button_size};
+                grooming_box(3) = {wrong_button_size};
+                mounting_box(3) = {wrong_button_size};
+            else
+                holding_box(3) = {wrong_button_size};
             end
     end
 end
@@ -90,8 +102,10 @@ if TrialRecord.User.training_agent_patient
         case 2
             if TrialRecord.User.patienting
                 patient_box(3) = {correct_button_size};
+                agent_box(3) = {wrong_button_size};
             else
                 patient_box(3) = {wrong_button_size};
+                agent_box(3) = {correct_button_size};
             end
     end
 end
@@ -149,7 +163,7 @@ elseif TrialRecord.User.agenting || TrialRecord.User.patienting
     if TrialRecord.User.current_sum_categories == 1
         touch.Target = all_targets(TrialRecord.CurrentCondition, :);
     else
-        touch.Target = all_targets(5:6, :); % hier mag ik maar 1 input geven als progression number 0 is, want singletarget.
+        touch.Target = all_targets(5:6, :);
     end
 end
 touch.Threshold = touch_threshold;
@@ -162,6 +176,8 @@ img.List = { TrialRecord.User.frame, [0 0], 0, 1.25, 90 };
 %% constructing scenes
 % setting timecounter for duration of animation in first scene and time to
 % answer
+tc_engagement = TimeCounter(fix);
+tc_engagement.Duration = engagement_duration;
 tc_movie = TimeCounter(null_);
 tc_movie.Duration = movie_duration;
 tc_answer = TimeCounter(touch);
@@ -172,7 +188,9 @@ cam = WebcamMonitor(null_);
 cam.CamNumber = 1;
 
 % merging touch and visual for engagement button
-con1 = Concurrent(fix);
+ac = OrAdapter(fix);
+ac.add(tc_engagement);
+con1 = Concurrent(ac);
 con1.add(engage_box);
 con1.add(cam);
 
@@ -201,13 +219,13 @@ con3.add(cam);
 % run engagement scene
 scene1 = create_scene(con1);
 run_scene(scene1, 1);
+if tc_engagement.Success
+    dashboard(1, 'engagement scene time limit');
+    trialerror(8);
+    return
+end
 
 % run animation scene
-
-% % tf = istouching; %% maybe ad an adapter to this scene to learn Luca that
-% % he should release the button? Give him some idle time to release.
-% tf = istouching;
-% if ~tf
 scene2 = create_scene(con2);
 run_scene(scene2, 2);
 
@@ -384,6 +402,13 @@ end
 if TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).p_success == 1 ...
         || TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).c_fails == TrialRecord.User.max_fails
     TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).p_completed = 1;
+end
+
+% setting a repeating variable for direct repeats zhen not completed
+if repeating && ~TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).c_completed
+    TrialRecord.User.repeat = true;
+else
+    TrialRecord.User.repeat = false;    
 end
 
 % for initial_active_stim
