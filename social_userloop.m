@@ -24,10 +24,10 @@ else
 end
 %% constants
 % progression
-TrialRecord.User.blocksize = 5;                                                              % The TrialRecord.User.blocksize is the number of animationsthe monkey has to complete.a block is the elementary unit, a block determines whether the progression number increases/decreases/stays the same.
+TrialRecord.User.blocksize = 10;                                                              % The TrialRecord.User.blocksize is the number of animationsthe monkey has to complete.a block is the elementary unit, a block determines whether the progression number increases/decreases/stays the same.
 %%% maybe later create a blocksize as a function of previous performance to quickly skip to his level when starting again.                                                                            % block def: a set number of stimuli that have been showed for the first time
 succes_threshold = 0.80;                                                    % if performance is bigger than or equal to this, progression number + 1
-fail_threshold = 0;                                                         % if performance is smaller than or equal to this, progression number - 1
+fail_threshold = 0.10;                                                         % if performance is smaller than or equal to this, progression number - 1
 TrialRecord.User.size_progression_factor = 5;                              % the number of progression number steps needed to go from start size to end size, used for both category and agent patient
 category_progression_factor = TrialRecord.User.size_progression_factor + 2; % number of progression number steps needed to add a category button
 agent_patient_progression_factor = TrialRecord.User.size_progression_factor + 2; % number of progression number steps needed to add a patient button

@@ -11,7 +11,7 @@ button_size_difference = 1.5;                                               % th
 % x_axes = [-12 12];
 % y_axes = [-10 -3.33 3.33 10];
 movie_duration = 3000;
-answer_time = 5000;
+answer_time = 8000;
 standard_time_out = 3000;
 
 %  init boxes
@@ -250,6 +250,7 @@ if reward_dur1 > max_reward                                                  % s
     reward_dur1 = max_reward;
 end
 reward_dur1 = reward_dur1 + random_portion;
+reward_dur1
 
 if TrialRecord.CurrentTrialNumber <= 10
     time_out = standard_time_out;
