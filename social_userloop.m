@@ -11,36 +11,37 @@ persistent timing_filenames_retrieved
     return
     end
 %% initializing for first trial
-start_progression_number = 0;                                               % the progression number to start training with
+TrialRecord.User.start_progression_number = 11;                                               % the progression number to start training with
 
 if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.performance = 0;
-    TrialRecord.User.progression_number = start_progression_number;
+    TrialRecord.User.progression_number = TrialRecord.User.start_progression_number;
     previous_sum_categories = 0;
     TrialRecord.User.max_fails = 3;
     TrialRecord.User.overall_active_completion = 0;
+    TrialRecord.User.repeat = 0;
 else
     previous_sum_categories = TrialRecord.User.current_sum_categories;      % calculations of previous sum categories
 end
 %% constants
 % progression
-TrialRecord.User.blocksize = 10;                                                              % The TrialRecord.User.blocksize is the number of animationsthe monkey has to complete.a block is the elementary unit, a block determines whether the progression number increases/decreases/stays the same.
+TrialRecord.User.blocksize = 5;                                                              % The TrialRecord.User.blocksize is the number of animationsthe monkey has to complete.a block is the elementary unit, a block determines whether the progression number increases/decreases/stays the same.
 %%% maybe later create a blocksize as a function of previous performance to quickly skip to his level when starting again.                                                                            % block def: a set number of stimuli that have been showed for the first time
 succes_threshold = 0.80;                                                    % if performance is bigger than or equal to this, progression number + 1
-fail_threshold = 0.10;                                                         % if performance is smaller than or equal to this, progression number - 1
-TrialRecord.User.size_progression_factor = 5;                              % the number of progression number steps needed to go from start size to end size, used for both category and agent patient
-category_progression_factor = TrialRecord.User.size_progression_factor + 2; % number of progression number steps needed to add a category button
+fail_threshold = 0;                                                         % if performance is smaller than or equal to this, progression number - 1
+TrialRecord.User.size_progression_factor = 10;                              % the number of progression number steps needed to go from start size to end size, used for both category and agent patient
+category_progression_factor = TrialRecord.User.size_progression_factor + 1; % number of progression number steps needed to add a category button
 agent_patient_progression_factor = TrialRecord.User.size_progression_factor + 2; % number of progression number steps needed to add a patient button
 
-progression_trials = TrialRecord.User.blocksize * TrialRecord.User.size_progression_factor;  % the number of trials needed to get to the final size
-consolidation_trials = TrialRecord.User.blocksize * ...
-    (category_progression_factor-TrialRecord.User.size_progression_factor); % the number of trials to consolidate the current size progression 
+% progression_trials = TrialRecord.User.blocksize * TrialRecord.User.size_progression_factor;  % the number of trials needed to get to the final size
+% consolidation_trials = TrialRecord.User.blocksize * ...
+%     (category_progression_factor-TrialRecord.User.size_progression_factor); % the number of trials to consolidate the current size progression 
 
 TrialRecord.User.max_c_progression_number = category_progression_factor * 2 ...
     + TrialRecord.User.size_progression_factor;                               % last button active + at final size
 % max_ap_progression_number =agent_patient_progression_factor * 1 + ...
 %     TrialRecord.User.size_progression_factor;
-min_c_progression_number = 0;
+min_c_progression_number = 11;
 % max_ap_progression_number =agent_patient_progression_factor * 1 + ...
 %     TrialRecord.User.size_progression_factor;
 
@@ -67,16 +68,13 @@ TrialRecord.User.mounting = false;
 
 
 %% determining next block and difficulty based on a general progression number %%%%%% maybe create a vector with the length of trialerrors but displaying the stimulus sequence numbers, this way I can keep track of actual fails and just going on when failing because the number of repeats hits the limit
-if TrialRecord.User.overall_active_completion == 1      
+if TrialRecord.User.overall_active_completion >= 1      
     boolean_first_time_correct = [TrialRecord.User.category * ([TrialRecord.User.initial_active_stim.c_fails] == 0),...
         TrialRecord.User.agent_on * ([TrialRecord.User.initial_active_stim.a_fails] == 0), ...
         TrialRecord.User.patient_on * ([TrialRecord.User.initial_active_stim.p_fails] == 0)];
     no_first_time_correct = sum(boolean_first_time_correct, 'all');
     TrialRecord.User.performance = no_first_time_correct/ (TrialRecord.User.blocksize * (TrialRecord.User.agent_on+TrialRecord.User.patient_on+TrialRecord.User.category));
-    TrialRecord.NextBlock = TrialRecord.CurrentBlock + 1;                   % move to the nect block after all of this
-    if TrialRecord.User.performance >= succes_threshold && ...              % if performance is over the threshold, add a progression number
-            TrialRecord.User.progression_number < TrialRecord.User. ...
-            max_c_progression_number                                        % but the progression number can not go above max number
+    if TrialRecord.User.performance >= succes_threshold                     % if performance is over the threshold, add a progression number
         if TrialRecord.User.progression_number <= TrialRecord.User.size_progression_factor
             TrialRecord.User.progression_number = ... 
                 TrialRecord.User.progression_number + 2;
@@ -86,12 +84,17 @@ if TrialRecord.User.overall_active_completion == 1
             TrialRecord.User.progression_number = ... 
                 TrialRecord.User.progression_number + 1;
         end
-    elseif TrialRecord.User.performance <= fail_threshold && ...            % if performance is under the threshold and progression number is not already at the min progression number, substract a progression number
-            TrialRecord.User.progression_number > min_c_progression_number
+    elseif TrialRecord.User.performance <= fail_threshold                   % if performance is under the threshold and progression number is not already at the min progression number, substract a progression number
         TrialRecord.User.progression_number = ... 
             TrialRecord.User.progression_number - 1;
     end
 end
+if TrialRecord.User.progression_number > TrialRecord.User.max_c_progression_number
+    TrialRecord.User.progression_number = TrialRecord.User.max_c_progression_number;
+elseif TrialRecord.User.progression_number < min_c_progression_number
+    TrialRecord.User.progression_number = min_c_progression_number;
+end
+TrialRecord.NextBlock = TrialRecord.User.progression_number + 1;            
 % setting independant category and button progression based on progression
 % number
 TrialRecord.User.category_progression = ...                                 % the category progression factor, which should be at least bigger than than the size progression factor in order 
@@ -210,7 +213,7 @@ end
 
 
 if TrialRecord.User.current_sum_categories ~= previous_sum_categories ...
-        || TrialRecord.User.overall_active_completion == 1
+        || TrialRecord.User.overall_active_completion >= 1
     TrialRecord.User.structure = struct('stimuli', {}, 'frames', {}, 'c_fails', {}, ... 
         'c_success', {},'c_completed', {}, 'a_fails', {}, 'a_success', {}, ...
         'a_completed', {}, 'p_fails', {}, 'p_success', {}, 'p_completed', {}, 'folder', {});
@@ -267,21 +270,24 @@ if ~TrialRecord.User.training_agent_patient
     switch question
         case 1
             while index2 ~= length(TrialRecord.User.initial_active_stim)+1
-                if TrialRecord.User.initial_active_stim(index2).c_fails <= TrialRecord.User.max_fails && TrialRecord.User.initial_active_stim(index2).c_success ~= 1
+                if (TrialRecord.User.initial_active_stim(index2).c_fails <= ...
+                        TrialRecord.User.max_fails) && (TrialRecord.User.initial_active_stim(index2).c_success ~= 1)
                     TrialRecord.User.active_stim(end+1) = TrialRecord.User.initial_active_stim(index2);
                 end
                 index2 = index2 +1;
             end
         case 2
             while index2 ~= length(stimulus_list)+1
-                if TrialRecord.User.initial_active_stim(index2).a_fails <= TrialRecord.User.max_fails && TrialRecord.User.initial_active_stim(index2).a_success ~= 1
+                if (TrialRecord.User.initial_active_stim(index2).a_fails <= ...
+                        TrialRecord.User.max_fails) && (TrialRecord.User.initial_active_stim(index2).a_success ~= 1)
                     TrialRecord.User.active_stim(end+1) = TrialRecord.User.initial_active_stim(index2);
                 end
                 index2 = index2 +1;
             end
         case 3
             while index2 ~= length(stimulus_list)+1
-                if TrialRecord.User.initial_active_stim(index2).p_fails <= TrialRecord.User.max_fails && TrialRecord.User.initial_active_stim(index2).p_success ~= 1
+                if (TrialRecord.User.initial_active_stim(index2).p_fails <= TrialRecord.User.max_fails) && ...
+                        (TrialRecord.User.initial_active_stim(index2).p_success ~= 1)
                     TrialRecord.User.active_stim(end+1) = TrialRecord.User.initial_active_stim(index2);
                 end
                 index2 = index2 +1;
@@ -291,14 +297,14 @@ else
     switch question
         case 1
             while index2 ~= length(stimulus_list)+1
-                if TrialRecord.User.initial_active_stim(index2).a_fails <= TrialRecord.User.max_fails && TrialRecord.User.initial_active_stim(index2).a_success ~= 1
+                if (TrialRecord.User.initial_active_stim(index2).a_fails <= TrialRecord.User.max_fails) && (TrialRecord.User.initial_active_stim(index2).a_success ~= 1)
                     TrialRecord.User.active_stim(end+1) = TrialRecord.User.initial_active_stim(index2);
                 end
                 index2 = index2 +1;
             end
         case 2
             while index2 ~= length(stimulus_list)+1
-                if TrialRecord.User.initial_active_stim(index2).p_fails <= TrialRecord.User.max_fails && TrialRecord.User.initial_active_stim(index2).p_success ~= 1
+                if (TrialRecord.User.initial_active_stim(index2).p_fails <= TrialRecord.User.max_fails) && (TrialRecord.User.initial_active_stim(index2).p_success ~= 1)
                     TrialRecord.User.active_stim(end+1) = TrialRecord.User.initial_active_stim(index2);
                 end
                 index2 = index2 +1;
@@ -307,10 +313,13 @@ else
 end
 
 chosen_stim_index_active = randperm(length(TrialRecord.User.active_stim), 1);
-stimulus_chosen_in_active = TrialRecord.User.active_stim(chosen_stim_index_active).stimuli;
+if ~TrialRecord.User.repeat
+    TrialRecord.User.stimulus_chosen_in_active = TrialRecord.User.active_stim(chosen_stim_index_active).stimuli;
+end
+
 i = 1;
 while i ~= length(TrialRecord.User.structure)+1
-    if strcmp(stimulus_chosen_in_active, TrialRecord.User.structure(i).stimuli)
+    if strcmp(TrialRecord.User.stimulus_chosen_in_active, TrialRecord.User.structure(i).stimuli)
         TrialRecord.User.stimulus_chosen_in_structure_index = i;
     end
     i = i + 1;
@@ -321,21 +330,21 @@ if ~TrialRecord.User.training_agent_patient
     switch question
         case 1
             while i ~= length(TrialRecord.User.initial_active_stim)+1
-                if strcmp(stimulus_chosen_in_active, TrialRecord.User.initial_active_stim(i).stimuli) && TrialRecord.User.initial_active_stim(i).c_completed == 0
+                if strcmp(TrialRecord.User.stimulus_chosen_in_active, TrialRecord.User.initial_active_stim(i).stimuli) && TrialRecord.User.initial_active_stim(i).c_completed == 0
                     TrialRecord.User.stimulus_chosen_in_initial_index = i;
                 end
                 i = i + 1;
             end
         case 2            
             while i ~= length(TrialRecord.User.initial_active_stim)+1
-                if strcmp(stimulus_chosen_in_active, TrialRecord.User.initial_active_stim(i).stimuli) && TrialRecord.User.initial_active_stim(i).a_completed == 0
+                if strcmp(TrialRecord.User.stimulus_chosen_in_active, TrialRecord.User.initial_active_stim(i).stimuli) && TrialRecord.User.initial_active_stim(i).a_completed == 0
                     TrialRecord.User.stimulus_chosen_in_initial_index = i;
                 end
                 i = i + 1;
             end
         case 3
             while i ~= length(TrialRecord.User.initial_active_stim)+1
-                if strcmp(stimulus_chosen_in_active, TrialRecord.User.initial_active_stim(i).stimuli) && TrialRecord.User.initial_active_stim(i).p_completed == 0
+                if strcmp(TrialRecord.User.stimulus_chosen_in_active, TrialRecord.User.initial_active_stim(i).stimuli) && TrialRecord.User.initial_active_stim(i).p_completed == 0
                     TrialRecord.User.stimulus_chosen_in_initial_index = i;
                 end
                 i = i + 1;
@@ -345,14 +354,14 @@ else
     switch question
         case 1
             while i ~= length(TrialRecord.User.initial_active_stim)+1
-                if strcmp(stimulus_chosen_in_active, TrialRecord.User.initial_active_stim(i).stimuli) && TrialRecord.User.initial_active_stim(i).a_completed == 0
+                if strcmp(TrialRecord.User.stimulus_chosen_in_active, TrialRecord.User.initial_active_stim(i).stimuli) && TrialRecord.User.initial_active_stim(i).a_completed == 0
                     TrialRecord.User.stimulus_chosen_in_initial_index = i;
                 end
                 i = i + 1;
             end
         case 2
             while i ~= length(TrialRecord.User.initial_active_stim)+1
-                if strcmp(stimulus_chosen_in_active, TrialRecord.User.initial_active_stim(i).stimuli) && TrialRecord.User.initial_active_stim(i).p_completed == 0
+                if strcmp(TrialRecord.User.stimulus_chosen_in_active, TrialRecord.User.initial_active_stim(i).stimuli) && TrialRecord.User.initial_active_stim(i).p_completed == 0
                     TrialRecord.User.stimulus_chosen_in_initial_index = i;
                 end
                 i = i + 1;
