@@ -1,3 +1,5 @@
+[y3, fs3] = audioread('alarm.wav');
+hotkey('k','sound(y3, fs3);');
 hotkey('x', 'escape_screen(); assignin(''caller'',''continue_'',false);');
 hotkey('r', 'goodmonkey(reward_dur, ''juiceline'', MLConfig.RewardFuncArgs.JuiceLine, ''eventmarker'', 14, ''nonblocking'', 1);');   % manual reward
 hotkey('p', 'TrialRecord.User.progression_number = TrialRecord.User.progression_number + 1;');
@@ -8,7 +10,7 @@ bhv_code(1, 'run_engagement_scene', 2, 'run_video', 3, 'run_answer_scene', 5, 'e
 %% constants
 touch_threshold = 2;
 standard_button_size = 2;                                                   % final button size
-correct_button_size_difference = 3;                                               % the range from beginning button size to final size
+correct_button_size_difference = 3;                                         % the range from beginning button size to final size
 wrong_button_size_difference = 1.75;
 x_axes = [-12 12];
 y_axes = [-10 -3.33 3.33 10];
@@ -259,7 +261,7 @@ end
 random_portion = randi(100, 1);
 max_reward = 400;
 min_reward = 200;
-progression_goal = (TrialRecord.User.size_progression_factor +2) - TrialRecord.User.start_progression_number;
+progression_goal = (2*TrialRecord.User.size_progression_factor +2) - TrialRecord.User.start_progression_number;
 progression_aim_this_training = TrialRecord.User.progression_number - TrialRecord.User.start_progression_number;                                         % reward goes from min to max over x progression numbers
 reward_window = max_reward - min_reward;
 variable_reward_portion = progression_aim_this_training* ...          % here the variable portion is calculated based on a fraction of the complete task.
@@ -274,6 +276,8 @@ if TrialRecord.User.current_sum_categories == TrialRecord.CurrentCondition
     reward_dur1 = reward_dur1 * 2;
 end
 reward_dur1 = reward_dur1 + random_portion;
+progression_goal
+progression_aim_this_training
 reward_dur1
 
 if TrialRecord.CurrentTrialNumber <= 10
@@ -287,17 +291,18 @@ else
     end
 end
 
-[y1, fs1] = audioread('test.wav');
-[y2, fs2] = audioread('test2.wav');
+[y1, fs1] = audioread('right.wav');
+[y2, fs2] = audioread('wrong.wav');
 if TrialRecord.User.current_sum_categories == 1 && TrialRecord.User.categorizing
     if touch.Success
         dashboard(2, 'success!!! <3 ');
         trialerror(0);
+        sound(y1, fs1);
         goodmonkey(reward_dur1);
         idle(0, [0 1 0], 5);
-        sound(y1, fs1);
         TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).c_success = TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).c_success + 1; %%%% dit ook nog voor de rest doen
         TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).c_success = TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).c_success + 1;
+        reward_scene = true; %%%%% na meeeeting hierop terug komen, ik kan op het einde extra scene maken met tc.duratien = 1000 om luca te zien drinken.
     elseif tc_answer.Success
         dashboard(2, 'no response');
         trialerror(1);
@@ -310,16 +315,16 @@ elseif TrialRecord.User.current_sum_categories == 1 && TrialRecord.User.agenting
     if touch.Success
         dashboard(2, 'success!!! <3 ');
         trialerror(0);
+        sound(y1, fs1);
         goodmonkey(reward_dur1);
         idle(0, [0 1 0], 5);
-        sound(y1, fs1);
         TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).a_success = TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).a_success + 1; %%%% dit ook nog voor de rest doen
         TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).a_success = TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).a_success + 1;
     elseif tc_answer.Success
         dashboard(2, 'no response');
         trialerror(1);
-        idle(time_out, [1 0 0], 5);
         sound(y2, fs2);
+        idle(time_out, [1 0 0], 5);
         TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).a_fails = TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).a_fails + 1; %%%% dit ook nog voor de rest doen
         TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).a_fails = TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).a_fails + 1;
         if tc_answer.Success
@@ -337,16 +342,16 @@ elseif TrialRecord.User.categorizing & TrialRecord.User.current_sum_categories ~
             (TrialRecord.User.holding & touch.ChosenTarget == 4) 
         dashboard(2, 'success!!! <3 ');
         trialerror(0);
+        sound(y1, fs1);
         goodmonkey(reward_dur1);
         idle(0, [0 1 0], 5);
-        sound(y1, fs1);
         TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).c_success = TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).c_success + 1; %%%% dit ook nog voor de rest doen
         TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).c_success = TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).c_success + 1;
     else
         TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).c_fails = TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).c_fails + 1; %%%% dit ook nog voor de rest doen        
         TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).c_fails = TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).c_fails + 1;
-        idle(time_out, [1 0 0], 5);
         sound(y2, fs2);
+        idle(time_out, [1 0 0], 5);
         if tc_answer.Success
             dashboard(2, 'no response');
             trialerror(1);
@@ -358,16 +363,16 @@ elseif TrialRecord.User.categorizing & TrialRecord.User.current_sum_categories ~
 elseif TrialRecord.User.agenting & touch.ChosenTarget == 1
     dashboard(2, 'success!!! <3 ');
     trialerror(0);
+    sound(y1, fs1);
     goodmonkey(reward_dur1);
     idle(0, [0 1 0], 5);
-    sound(y1, fs1);
     TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).a_success = TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).a_success + 1; %%%% dit ook nog voor de rest doen
     TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).a_success = TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).a_success + 1;
 elseif TrialRecord.User.agenting & touch.ChosenTarget ~= 1
     TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).a_fails = TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).a_fails + 1; %%%% dit ook nog voor de rest doen    
     TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).a_fails = TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).a_fails + 1;
-    idle(time_out, [1 0 0], 5);
     sound(y2, fs2);
+    idle(time_out, [1 0 0], 5);
     if tc_answer.Success
         dashboard(2, 'no response');
         trialerror(1);
@@ -378,16 +383,16 @@ elseif TrialRecord.User.agenting & touch.ChosenTarget ~= 1
 elseif TrialRecord.User.patienting & touch.ChosenTarget == 2
     dashboard(2, 'success!!! <3 ');
     trialerror(0)
+    sound(y1, fs1);
     goodmonkey(reward_dur1);
     idle(0, [0 1 0], 5);
-    sound(y1, fs1);
     TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).p_success = TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).p_success + 1; %%%% dit ook nog voor de rest doen
     TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).p_success = TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).p_success + 1;
 elseif TrialRecord.User.patienting & touch.ChosenTarget ~= 2
     TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).p_fails = TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).p_fails + 1; %%%% dit ook nog voor de rest doen       
     TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).p_fails = TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).p_fails + 1;
-    idle(time_out, [1 0 0], 5);
     sound(y2, fs2);
+    idle(time_out, [1 0 0], 5);
     if tc_answer.Success
         dashboard(2, 'no response');
         trialerror(1);

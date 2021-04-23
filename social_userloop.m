@@ -270,14 +270,16 @@ if ~TrialRecord.User.training_agent_patient
     switch question
         case 1
             while index2 ~= length(TrialRecord.User.initial_active_stim)+1
-                if TrialRecord.User.initial_active_stim(index2).c_fails <= TrialRecord.User.max_fails && TrialRecord.User.initial_active_stim(index2).c_success ~= 1
+                if TrialRecord.User.initial_active_stim(index2).c_fails <= ...
+                        TrialRecord.User.max_fails && TrialRecord.User.initial_active_stim(index2).c_success ~= 1
                     TrialRecord.User.active_stim(end+1) = TrialRecord.User.initial_active_stim(index2);
                 end
                 index2 = index2 +1;
             end
         case 2
             while index2 ~= length(stimulus_list)+1
-                if TrialRecord.User.initial_active_stim(index2).a_fails <= TrialRecord.User.max_fails && TrialRecord.User.initial_active_stim(index2).a_success ~= 1
+                if TrialRecord.User.initial_active_stim(index2).a_fails <= ...
+                        TrialRecord.User.max_fails && TrialRecord.User.initial_active_stim(index2).a_success ~= 1
                     TrialRecord.User.active_stim(end+1) = TrialRecord.User.initial_active_stim(index2);
                 end
                 index2 = index2 +1;
