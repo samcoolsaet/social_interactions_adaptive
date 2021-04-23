@@ -11,11 +11,11 @@ persistent timing_filenames_retrieved
     return
     end
 %% initializing for first trial
-start_progression_number = 11;                                               % the progression number to start training with
+TrialRecord.User.start_progression_number = 11;                                               % the progression number to start training with
 
 if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.performance = 0;
-    TrialRecord.User.progression_number = start_progression_number;
+    TrialRecord.User.progression_number = TrialRecord.User.start_progression_number;
     previous_sum_categories = 0;
     TrialRecord.User.max_fails = 3;
     TrialRecord.User.overall_active_completion = 0;
@@ -28,7 +28,7 @@ end
 TrialRecord.User.blocksize = 5;                                                              % The TrialRecord.User.blocksize is the number of animationsthe monkey has to complete.a block is the elementary unit, a block determines whether the progression number increases/decreases/stays the same.
 %%% maybe later create a blocksize as a function of previous performance to quickly skip to his level when starting again.                                                                            % block def: a set number of stimuli that have been showed for the first time
 succes_threshold = 0.80;                                                    % if performance is bigger than or equal to this, progression number + 1
-fail_threshold = 0.10;                                                         % if performance is smaller than or equal to this, progression number - 1
+fail_threshold = 0;                                                         % if performance is smaller than or equal to this, progression number - 1
 TrialRecord.User.size_progression_factor = 10;                              % the number of progression number steps needed to go from start size to end size, used for both category and agent patient
 category_progression_factor = TrialRecord.User.size_progression_factor + 1; % number of progression number steps needed to add a category button
 agent_patient_progression_factor = TrialRecord.User.size_progression_factor + 2; % number of progression number steps needed to add a patient button
