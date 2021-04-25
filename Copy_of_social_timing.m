@@ -19,6 +19,7 @@ answer_time = 8000;
 standard_time_out = 5000;
 engagement_duration = 8000;
 repeating = true;
+TrialRecord.User.repeat = false;
 
 %  init boxes
 engaging_box = { [1 1 1], [1 1 1], standard_button_size, [10 0] };
@@ -396,6 +397,9 @@ elseif TrialRecord.User.patienting & touch.ChosenTarget ~= 2
     end
 end
 
+reward_scene = BackgroundGolorChanger(null_);
+reward_scene.List = 
+
 if TrialRecord.User.structure(TrialRecord.User.struct_index).c_success == 1 ...
         || TrialRecord.User.structure(TrialRecord.User.struct_index).c_fails >= TrialRecord.User.max_fails
     TrialRecord.User.struct(TrialRecord.User.struct_index).c_completed = 1;
@@ -409,39 +413,32 @@ if TrialRecord.User.structure(TrialRecord.User.struct_index).p_success == 1 ...
     TrialRecord.User.structure(TrialRecord.User.struct_index).p_completed = 1;
 end
 
-% setting a repeating variable for direct repeats zhen not completed
-if repeating && ~TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).c_completed
-    TrialRecord.User.repeat = true;
-else
-    TrialRecord.User.repeat = false;    
+% setting a repeating variable for direct repeats when not completed
+if repeating
+    if TrialRecord.CurrentCondition < 5 && ~TrialRecord.User.structure(TrialRecord.User.struct_index).c_completed
+        TrialRecord.User.repeat = true;  
+    elseif TrialRecord.CurrentCondition == 5 && ~TrialRecord.User.structure(TrialRecord.User.struct_index).a_completed
+        TrialRecord.User.repeat = true;  
+    elseif TrialRecord.CurrentCondition == 6 && ~TrialRecord.User.structure(TrialRecord.User.struct_index).p_completed
+        TrialRecord.User.repeat = true;
+    else
+        disp('this trial should not be repeated');
+    end
 end
+    
 
 % for initial_active_stim
-c_boolean_fails = [TrialRecord.User.initial_active_stim.c_fails] >= TrialRecord.User.max_fails;
 c_structure_completion = mean([TrialRecord.User.initial_active_stim.c_completed]);
-a_boolean_fails = [TrialRecord.User.initial_active_stim.a_fails] >= TrialRecord.User.max_fails;
 a_structure_completion = mean([TrialRecord.User.initial_active_stim.a_completed]);
-p_boolean_fails = [TrialRecord.User.initial_active_stim.p_fails] >= TrialRecord.User.max_fails;
 p_structure_completion = mean([TrialRecord.User.initial_active_stim.p_completed]);
 
-% TrialRecord.User.overall_completion = mean(c_boolean_fails + [TrialRecord.User.initial_active_stim.c_success] ...
-% + a_boolean_fails + [TrialRecord.User.initial_active_stim.a_success] + p_boolean_fails + [TrialRecord.User.initial_active_stim.p_success]) ... 
-% /(TrialRecord.User.agent_on+TrialRecord.User.patient_on+TrialRecord.User.category);
-TrialRecord.User.init_active_stim_completion = mean([TrialRecord.User.initial_active_stim.c_completed] + ...
-    [TrialRecord.User.initial_active_stim.a_completed] + [TrialRecord.User.initial_active_stim.p_completed])/...
+TrialRecord.User.structure_completion = mean([TrialRecord.User.structure.c_completed] + ...
+    [TrialRecord.User.structure.a_completed] + [TrialRecord.User.structure.p_completed])/...
     (TrialRecord.User.agent_on+TrialRecord.User.patient_on+TrialRecord.User.category);
 
-% TrialRecord.User.active_stim_completion = (mean(c_boolean_fails + [TrialRecord.User.structure.c_success] ...
-% + a_boolean_fails + [TrialRecord.User.structure.a_success] + p_boolean_fails + [TrialRecord.User.structure.p_success]) ... 
-% /(TrialRecord.User.agent_on+TrialRecord.User.patient_on+TrialRecord.User.category)) * length(TrialRecord.User.structure)/TrialRecord.User.blocksize;
 
+TrialRecord.User.completed_stimuli = sum([TrialRecord.User.structure.c_completed] + [TrialRecord.User.structure.a_completed] + [TrialRecord.User.structure.p_completed], 'all');
 
-TrialRecord.User.completed_stimuli = sum([TrialRecord.User.initial_active_stim.c_completed] + [TrialRecord.User.initial_active_stim.a_completed] + [TrialRecord.User.initial_active_stim.p_completed], 'all');
-
-%%%%%%%%%%%%%%%%%
-% add parameters to the bhv2 files with function from monkeylogic
-% size progressie, category or agent patient prgression, performance, time
-% to answer, stimulus name.
 bhv_variable('size_progression', TrialRecord.User.size_progression,...
     'category_progression', TrialRecord.User.category_progression,...
     'performance_previous_block', TrialRecord.User.performance,...
@@ -450,6 +447,4 @@ bhv_variable('size_progression', TrialRecord.User.size_progression,...
     'answer_time', answer_time, ...
     'init_active_stim_completion', TrialRecord.User.init_active_stim_completion, ...
     'completed_stim', TrialRecord.User.completed_stimuli);
-% if TrialRecord.User.overall_completion == 1
-    bhv_variable('init_active_stim', TrialRecord.User.initial_active_stim);
-% end
+
