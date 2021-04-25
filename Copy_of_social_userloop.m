@@ -252,97 +252,45 @@ if ~TrialRecord.User.repeat
             case 1
                 indexes_c_incomplete = find(TrialRecord.User.structure.c_completed==0);
                 index_index = randperm(length(indexes_c_incomplete), 1);
-                struct_index = indexes_c_incomplete(index_index);
+                TrialRecord.User.struct_index = indexes_c_incomplete(index_index);
             case 2
                 indexes_a_incomplete = find(TrialRecord.User.structure.a_completed==0);
                 index_index = randperm(length(indexes_a_incomplete), 1);
-                struct_index = indexes_a_incomplete(index_index);
+                TrialRecord.User.struct_index = indexes_a_incomplete(index_index);
             case 3
                 indexes_p_incomplete = find(TrialRecord.User.structure.p_completed==0);
                 index_index = randperm(length(indexes_p_incomplete), 1);
-                struct_index = indexes_p_incomplete(index_index);
+                TrialRecord.User.struct_index = indexes_p_incomplete(index_index);
         end
     else
         switch question
             case 1
                 indexes_a_incomplete = find(TrialRecord.User.structure.a_completed==0);
                 index_index = randperm(length(indexes_a_incomplete), 1);
-                struct_index = indexes_a_incomplete(index_index);
+                TrialRecord.User.struct_index = indexes_a_incomplete(index_index);
             case 2
                 indexes_p_incomplete = find(TrialRecord.User.structure.p_completed==0);
                 index_index = randperm(length(indexes_p_incomplete), 1);
-                struct_index = indexes_p_incomplete(index_index);
+                TrialRecord.User.struct_index = indexes_p_incomplete(index_index);
         end
     end
-end
-
-
-i = 1;
-while i ~= length(TrialRecord.User.structure)+1
-    if strcmp(TrialRecord.User.stimulus_chosen_in_active, TrialRecord.User.structure(i).stimuli)
-        TrialRecord.User.stimulus_chosen_in_structure_index = i;
-    end
-    i = i + 1;
-end
-
-i = 1;
-if ~TrialRecord.User.training_agent_patient
-    switch question
-        case 1
-            while i ~= length(TrialRecord.User.initial_active_stim)+1
-                if strcmp(TrialRecord.User.stimulus_chosen_in_active, TrialRecord.User.initial_active_stim(i).stimuli) && TrialRecord.User.initial_active_stim(i).c_completed == 0
-                    TrialRecord.User.stimulus_chosen_in_initial_index = i;
-                end
-                i = i + 1;
-            end
-        case 2            
-            while i ~= length(TrialRecord.User.initial_active_stim)+1
-                if strcmp(TrialRecord.User.stimulus_chosen_in_active, TrialRecord.User.initial_active_stim(i).stimuli) && TrialRecord.User.initial_active_stim(i).a_completed == 0
-                    TrialRecord.User.stimulus_chosen_in_initial_index = i;
-                end
-                i = i + 1;
-            end
-        case 3
-            while i ~= length(TrialRecord.User.initial_active_stim)+1
-                if strcmp(TrialRecord.User.stimulus_chosen_in_active, TrialRecord.User.initial_active_stim(i).stimuli) && TrialRecord.User.initial_active_stim(i).p_completed == 0
-                    TrialRecord.User.stimulus_chosen_in_initial_index = i;
-                end
-                i = i + 1;
-            end
-    end
 else
-    switch question
-        case 1
-            while i ~= length(TrialRecord.User.initial_active_stim)+1
-                if strcmp(TrialRecord.User.stimulus_chosen_in_active, TrialRecord.User.initial_active_stim(i).stimuli) && TrialRecord.User.initial_active_stim(i).a_completed == 0
-                    TrialRecord.User.stimulus_chosen_in_initial_index = i;
-                end
-                i = i + 1;
-            end
-        case 2
-            while i ~= length(TrialRecord.User.initial_active_stim)+1
-                if strcmp(TrialRecord.User.stimulus_chosen_in_active, TrialRecord.User.initial_active_stim(i).stimuli) && TrialRecord.User.initial_active_stim(i).p_completed == 0
-                    TrialRecord.User.stimulus_chosen_in_initial_index = i;
-                end
-                i = i + 1;
-            end
-    end
+    disp('repeat');
 end
-
 
 if ~TrialRecord.User.training_agent_patient
     switch question
         case 1
-            if strncmpi('chas', TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).stimuli, 4)    % check for title of the animation to determine actual category
+            if strncmpi('chas', TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli, 4)    % check for title of the animation to determine actual category
                 TrialRecord.User.chasing = true;
                 TrialRecord.NextCondition = 1;
-            elseif strncmpi('groom', TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).stimuli, 5)
+            elseif strncmpi('groom', TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli, 5)
                 TrialRecord.User.grooming = true;
                 TrialRecord.NextCondition = 2;
-            elseif strncmpi('mount', TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).stimuli, 5)
+            elseif strncmpi('mount', TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli, 5)
                 TrialRecord.User.mounting = true;
                 TrialRecord.NextCondition = 3;
-            elseif strncmpi('hold', TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).stimuli, 4)
+            elseif strncmpi('hold', TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli, 4)
                 TrialRecord.User.holding = true;
                 TrialRecord.NextCondition = 4;
             end
@@ -366,9 +314,9 @@ else
 end
 
 TrialRecord.User.movie = strcat(pwd, '\stimuli\', ... 
-    TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).folder, '\', TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).stimuli);                                                  % complete path of the animation
+    TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli);                                                  % complete path of the animation
 TrialRecord.User.frame = strcat(pwd,'\frames\', ... 
-    TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).folder, '\', TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).frames);                    % and frame
+    TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', TrialRecord.User.structure(TrialRecord.User.struct_index).frames);                    % and frame
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for frame...
