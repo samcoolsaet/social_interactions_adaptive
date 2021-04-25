@@ -68,22 +68,18 @@ TrialRecord.User.mounting = false;
 
 
 %% determining next block and difficulty based on a general progression number %%%%%% maybe create a vector with the length of trialerrors but displaying the stimulus sequence numbers, this way I can keep track of actual fails and just going on when failing because the number of repeats hits the limit
-if TrialRecord.User.overall_active_completion == 1      
-    boolean_first_time_correct = [TrialRecord.User.category * ([TrialRecord.User.initial_active_stim.c_fails] == 0),...
-        TrialRecord.User.agent_on * ([TrialRecord.User.initial_active_stim.a_fails] == 0), ...
-        TrialRecord.User.patient_on * ([TrialRecord.User.initial_active_stim.p_fails] == 0)];
-    no_first_time_correct = sum(boolean_first_time_correct, 'all');
-    TrialRecord.User.performance = no_first_time_correct/ (TrialRecord.User.blocksize * (TrialRecord.User.agent_on+TrialRecord.User.patient_on+TrialRecord.User.category));
+if TrialRecord.User.completed_stimuli == TrialRecord.User.blocksize     
+    indexes_used_c_stimuli = find(TrialRecord.User.structure.c_completed==1);
+    indexes_used_a_stimuli = find(TrialRecord.User.structure.a_completed==1);
+    indexes_used_p_stimuli = find(TrialRecord.User.structure.p_completed==1);
+    fails = [TrialRecord.User.structure(indexes_used_c_stimuli).c_fails...
+        TrialRecord.User.structure(indexes_used_a_stimuli).a_fails...
+        TrialRecord.User.structure(indexes_used_p_stimuli).p_fails];
+    corrects = (fails == 0);
+    TrialRecord.User.performance = mean(corrects);
     if TrialRecord.User.performance >= succes_threshold                     % if performance is over the threshold, add a progression number
-        if TrialRecord.User.progression_number <= TrialRecord.User.size_progression_factor
-            TrialRecord.User.progression_number = ... 
-                TrialRecord.User.progression_number + 2;
-%             maybe i can do something: like progression numbers added =
-%             performance * some fixed number
-        else
             TrialRecord.User.progression_number = ... 
                 TrialRecord.User.progression_number + 1;
-        end
     elseif TrialRecord.User.performance <= fail_threshold                   % if performance is under the threshold and progression number is not already at the min progression number, substract a progression number
         TrialRecord.User.progression_number = ... 
             TrialRecord.User.progression_number - 1;
@@ -278,6 +274,7 @@ else
     disp('repeat');
 end
 
+previous_condition = TrialRecord.CurrentCondition;
 if ~TrialRecord.User.training_agent_patient
     switch question
         case 1
@@ -313,10 +310,26 @@ else
     end
 end
 
+if ~TrialRecord.User.repeat
+    if previous_condition == TrialRecord.User.current_condition
+        TrialRecord.User.same_condition = TrialRecord.User.same_condition + 1;
+    else
+        TrialRecord.User.same_condition = 0;
+    end
+end
+if TrialRecord.User.same_condition == 2
+    return social_userloop(); % ask Lucas, he might know this :D
+else
+    disp('no return')
+end
+
+
 TrialRecord.User.movie = strcat(pwd, '\stimuli\', ... 
-    TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli);                                                  % complete path of the animation
+    TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', ...
+    TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli);                                                  % complete path of the animation
 TrialRecord.User.frame = strcat(pwd,'\frames\', ... 
-    TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', TrialRecord.User.structure(TrialRecord.User.struct_index).frames);                    % and frame
+    TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', ...
+    TrialRecord.User.structure(TrialRecord.User.struct_index).frames);                    % and frame
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for frame...

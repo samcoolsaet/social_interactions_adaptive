@@ -185,8 +185,6 @@ tc_movie = TimeCounter(null_);
 tc_movie.Duration = movie_duration;
 tc_answer = TimeCounter(touch);
 tc_answer.Duration = answer_time;
-% tc_reward_scene = TimeCounter(null_);
-% tc_reward_scene.Duration = 1000;
 
 % webcam
 cam = WebcamMonitor(null_);
@@ -275,13 +273,8 @@ if reward_dur1 > max_reward                                                  % s
 elseif reward_dur1 < min_reward
     reward_dur1 = min_reward;
 end
-if TrialRecord.User.current_sum_categories == TrialRecord.CurrentCondition
-    reward_dur1 = reward_dur1 * 2;
-end
+
 reward_dur1 = reward_dur1 + random_portion;
-progression_goal
-progression_aim_this_training
-reward_dur1
 
 if TrialRecord.CurrentTrialNumber <= 10
     time_out = standard_time_out;
@@ -300,34 +293,25 @@ if TrialRecord.User.current_sum_categories == 1 && TrialRecord.User.categorizing
     if touch.Success
         dashboard(2, 'success!!! <3 ');
         trialerror(0);
-        sound(y1, fs1);
-        goodmonkey(reward_dur1);
-        % maybe just make switch for reward scene like reward = true; ?
-        idle(0, [0 1 0], 5);
         TrialRecord.User.structure(TrialRecord.User.struct_index).c_success = TrialRecord.User.structure(TrialRecord.User.struct_index).c_success + 1; %%%% dit ook nog voor de rest doen
-        reward_scene = true; %%%%% na meeeeting hierop terug komen, ik kan op het einde extra scene maken met tc.duratien = 1000 om luca te zien drinken.
+        reward = true;
     elseif tc_answer.Success
         dashboard(2, 'no response');
         trialerror(1);
-        sound(y2, fs2);
-        idle(time_out, [1 0 0], 5);
         TrialRecord.User.structure(TrialRecord.User.struct_index).c_fails = TrialRecord.User.structure(TrialRecord.User.struct_index).c_fails + 1; %%%% dit ook nog voor de rest doen
+        reward = false;
     end
 elseif TrialRecord.User.current_sum_categories == 1 && TrialRecord.User.agenting_patienting
     if touch.Success
         dashboard(2, 'success!!! <3 ');
         trialerror(0);
-        sound(y1, fs1);
-        goodmonkey(reward_dur1);
-        idle(0, [0 1 0], 5);
         TrialRecord.User.structure(TrialRecord.User.struct_index).a_success = TrialRecord.User.structure(TrialRecord.User.struct_index).a_success + 1; %%%% dit ook nog voor de rest doen
-        reward_scene = true;
+        reward = true;
     elseif tc_answer.Success
         dashboard(2, 'no response');
         trialerror(1);
-        sound(y2, fs2);
-        idle(time_out, [1 0 0], 5);
         TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails = TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails + 1; %%%% dit ook nog voor de rest doen
+        reward = false;
         if tc_answer.Success
             dashboard(2, 'no response');
             trialerror(1);
@@ -343,14 +327,13 @@ elseif TrialRecord.User.categorizing & TrialRecord.User.current_sum_categories ~
             (TrialRecord.User.holding & touch.ChosenTarget == 4) 
         dashboard(2, 'success!!! <3 ');
         trialerror(0);
-        sound(y1, fs1);
-        goodmonkey(reward_dur1);
-        idle(0, [0 1 0], 5);
         TrialRecord.User.structure(TrialRecord.User.struct_index).c_success = TrialRecord.User.structure(TrialRecord.User.struct_index).c_success + 1; %%%% dit ook nog voor de rest doen
+        reward = true;
     else
         TrialRecord.User.structure(TrialRecord.User.struct_index).c_fails = TrialRecord.User.structure(TrialRecord.User.struct_index).c_fails + 1; %%%% dit ook nog voor de rest doen        
         sound(y2, fs2);
         idle(time_out, [1 0 0], 5);
+        reward = false;
         if tc_answer.Success
             dashboard(2, 'no response');
             trialerror(1);
@@ -362,14 +345,11 @@ elseif TrialRecord.User.categorizing & TrialRecord.User.current_sum_categories ~
 elseif TrialRecord.User.agenting & touch.ChosenTarget == 1
     dashboard(2, 'success!!! <3 ');
     trialerror(0);
-    sound(y1, fs1);
-    goodmonkey(reward_dur1);
-    idle(0, [0 1 0], 5);
     TrialRecord.User.structure(TrialRecord.User.struct_index).a_success = TrialRecord.User.structure(TrialRecord.User.struct_index).a_success + 1; %%%% dit ook nog voor de rest doen
+    reward = true;
 elseif TrialRecord.User.agenting & touch.ChosenTarget ~= 1
     TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails = TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails + 1; %%%% dit ook nog voor de rest doen    
-    sound(y2, fs2);
-    idle(time_out, [1 0 0], 5);
+    reward = false;    
     if tc_answer.Success
         dashboard(2, 'no response');
         trialerror(1);
@@ -380,14 +360,11 @@ elseif TrialRecord.User.agenting & touch.ChosenTarget ~= 1
 elseif TrialRecord.User.patienting & touch.ChosenTarget == 2
     dashboard(2, 'success!!! <3 ');
     trialerror(0)
-    sound(y1, fs1);
-    goodmonkey(reward_dur1);
-    idle(0, [0 1 0], 5);
     TrialRecord.User.structure(TrialRecord.User.struct_index).p_success = TrialRecord.User.structure(TrialRecord.User.struct_index).p_success + 1; %%%% dit ook nog voor de rest doen
+    reward = false;
 elseif TrialRecord.User.patienting & touch.ChosenTarget ~= 2
     TrialRecord.User.structure(TrialRecord.User.struct_index).p_fails = TrialRecord.User.structure(TrialRecord.User.struct_index).p_fails + 1; %%%% dit ook nog voor de rest doen       
-    sound(y2, fs2);
-    idle(time_out, [1 0 0], 5);
+    reward = false;
     if tc_answer.Success
         dashboard(2, 'no response');
         trialerror(1);
@@ -397,8 +374,20 @@ elseif TrialRecord.User.patienting & touch.ChosenTarget ~= 2
     end
 end
 
-reward_scene = BackgroundGolorChanger(null_);
-reward_scene.List = 
+if reward
+    sound(y1, fs1);
+    goodmonkey(reward_dur1);
+    background = [0 1 0 1000];
+else
+    sound(y2, fs2);
+    background = [1 0 0 time_out];
+end
+reward = BackgroundGolorChanger(null_);
+reward.List = background;
+con4 = Concurrent(reward);
+con4.add(cam);
+scene4 = create_scene(con4);
+run_scene(scene4);
 
 if TrialRecord.User.structure(TrialRecord.User.struct_index).c_success == 1 ...
         || TrialRecord.User.structure(TrialRecord.User.struct_index).c_fails >= TrialRecord.User.max_fails
