@@ -41,7 +41,7 @@ TrialRecord.User.max_c_progression_number = category_progression_factor * 2 ...
     + TrialRecord.User.size_progression_factor;                               % last button active + at final size
 % max_ap_progression_number =agent_patient_progression_factor * 1 + ...
 %     TrialRecord.User.size_progression_factor;
-min_c_progression_number = 0;
+min_c_progression_number = 11;
 % max_ap_progression_number =agent_patient_progression_factor * 1 + ...
 %     TrialRecord.User.size_progression_factor;
 
@@ -68,7 +68,7 @@ TrialRecord.User.mounting = false;
 
 
 %% determining next block and difficulty based on a general progression number %%%%%% maybe create a vector with the length of trialerrors but displaying the stimulus sequence numbers, this way I can keep track of actual fails and just going on when failing because the number of repeats hits the limit
-if TrialRecord.User.overall_active_completion == 1      
+if TrialRecord.User.overall_active_completion >= 1      
     boolean_first_time_correct = [TrialRecord.User.category * ([TrialRecord.User.initial_active_stim.c_fails] == 0),...
         TrialRecord.User.agent_on * ([TrialRecord.User.initial_active_stim.a_fails] == 0), ...
         TrialRecord.User.patient_on * ([TrialRecord.User.initial_active_stim.p_fails] == 0)];
@@ -89,12 +89,12 @@ if TrialRecord.User.overall_active_completion == 1
             TrialRecord.User.progression_number - 1;
     end
 end
-TrialRecord.NextBlock = TrialRecord.User.progression_number + 1;            
 if TrialRecord.User.progression_number > TrialRecord.User.max_c_progression_number
     TrialRecord.User.progression_number = TrialRecord.User.max_c_progression_number;
 elseif TrialRecord.User.progression_number < min_c_progression_number
     TrialRecord.User.progression_number = min_c_progression_number;
 end
+TrialRecord.NextBlock = TrialRecord.User.progression_number + 1;            
 % setting independant category and button progression based on progression
 % number
 TrialRecord.User.category_progression = ...                                 % the category progression factor, which should be at least bigger than than the size progression factor in order 
@@ -213,7 +213,7 @@ end
 
 
 if TrialRecord.User.current_sum_categories ~= previous_sum_categories ...
-        || TrialRecord.User.overall_active_completion == 1
+        || TrialRecord.User.overall_active_completion >= 1
     TrialRecord.User.structure = struct('stimuli', {}, 'frames', {}, 'c_fails', {}, ... 
         'c_success', {},'c_completed', {}, 'a_fails', {}, 'a_success', {}, ...
         'a_completed', {}, 'p_fails', {}, 'p_success', {}, 'p_completed', {}, 'folder', {});
@@ -270,23 +270,24 @@ if ~TrialRecord.User.training_agent_patient
     switch question
         case 1
             while index2 ~= length(TrialRecord.User.initial_active_stim)+1
-                if TrialRecord.User.initial_active_stim(index2).c_fails <= ...
-                        TrialRecord.User.max_fails && TrialRecord.User.initial_active_stim(index2).c_success ~= 1
+                if (TrialRecord.User.initial_active_stim(index2).c_fails <= ...
+                        TrialRecord.User.max_fails) && (TrialRecord.User.initial_active_stim(index2).c_success ~= 1)
                     TrialRecord.User.active_stim(end+1) = TrialRecord.User.initial_active_stim(index2);
                 end
                 index2 = index2 +1;
             end
         case 2
             while index2 ~= length(stimulus_list)+1
-                if TrialRecord.User.initial_active_stim(index2).a_fails <= ...
-                        TrialRecord.User.max_fails && TrialRecord.User.initial_active_stim(index2).a_success ~= 1
+                if (TrialRecord.User.initial_active_stim(index2).a_fails <= ...
+                        TrialRecord.User.max_fails) && (TrialRecord.User.initial_active_stim(index2).a_success ~= 1)
                     TrialRecord.User.active_stim(end+1) = TrialRecord.User.initial_active_stim(index2);
                 end
                 index2 = index2 +1;
             end
         case 3
             while index2 ~= length(stimulus_list)+1
-                if TrialRecord.User.initial_active_stim(index2).p_fails <= TrialRecord.User.max_fails && TrialRecord.User.initial_active_stim(index2).p_success ~= 1
+                if (TrialRecord.User.initial_active_stim(index2).p_fails <= TrialRecord.User.max_fails) && ...
+                        (TrialRecord.User.initial_active_stim(index2).p_success ~= 1)
                     TrialRecord.User.active_stim(end+1) = TrialRecord.User.initial_active_stim(index2);
                 end
                 index2 = index2 +1;
@@ -296,14 +297,14 @@ else
     switch question
         case 1
             while index2 ~= length(stimulus_list)+1
-                if TrialRecord.User.initial_active_stim(index2).a_fails <= TrialRecord.User.max_fails && TrialRecord.User.initial_active_stim(index2).a_success ~= 1
+                if (TrialRecord.User.initial_active_stim(index2).a_fails <= TrialRecord.User.max_fails) && (TrialRecord.User.initial_active_stim(index2).a_success ~= 1)
                     TrialRecord.User.active_stim(end+1) = TrialRecord.User.initial_active_stim(index2);
                 end
                 index2 = index2 +1;
             end
         case 2
             while index2 ~= length(stimulus_list)+1
-                if TrialRecord.User.initial_active_stim(index2).p_fails <= TrialRecord.User.max_fails && TrialRecord.User.initial_active_stim(index2).p_success ~= 1
+                if (TrialRecord.User.initial_active_stim(index2).p_fails <= TrialRecord.User.max_fails) && (TrialRecord.User.initial_active_stim(index2).p_success ~= 1)
                     TrialRecord.User.active_stim(end+1) = TrialRecord.User.initial_active_stim(index2);
                 end
                 index2 = index2 +1;

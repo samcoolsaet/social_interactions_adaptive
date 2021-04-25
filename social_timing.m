@@ -184,6 +184,8 @@ tc_movie = TimeCounter(null_);
 tc_movie.Duration = movie_duration;
 tc_answer = TimeCounter(touch);
 tc_answer.Duration = answer_time;
+% tc_reward_scene = TimeCounter(null_);
+% tc_reward_scene.Duration = 1000;
 
 % webcam
 cam = WebcamMonitor(null_);
@@ -320,6 +322,7 @@ elseif TrialRecord.User.current_sum_categories == 1 && TrialRecord.User.agenting
         idle(0, [0 1 0], 5);
         TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).a_success = TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).a_success + 1; %%%% dit ook nog voor de rest doen
         TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).a_success = TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).a_success + 1;
+        reward_scene = true;
     elseif tc_answer.Success
         dashboard(2, 'no response');
         trialerror(1);
@@ -403,15 +406,15 @@ elseif TrialRecord.User.patienting & touch.ChosenTarget ~= 2
 end
 
 if TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).c_success == 1 ...
-        || TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).c_fails == TrialRecord.User.max_fails
+        || TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).c_fails >= TrialRecord.User.max_fails
     TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).c_completed = 1;
 end
 if TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).a_success == 1 ...
-        || TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).a_fails == TrialRecord.User.max_fails
+        || TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).a_fails >= TrialRecord.User.max_fails
     TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).a_completed = 1;
 end
 if TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).p_success == 1 ...
-        || TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).c_fails == TrialRecord.User.max_fails
+        || TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).p_fails >= TrialRecord.User.max_fails
     TrialRecord.User.initial_active_stim(TrialRecord.User.stimulus_chosen_in_initial_index).p_completed = 1;
 end
 
@@ -423,17 +426,19 @@ else
 end
 
 % for initial_active_stim
-c_boolean_fails = [TrialRecord.User.initial_active_stim.c_fails] == TrialRecord.User.max_fails;
+c_boolean_fails = [TrialRecord.User.initial_active_stim.c_fails] >= TrialRecord.User.max_fails;
 c_structure_completion = mean([TrialRecord.User.initial_active_stim.c_completed]);
-a_boolean_fails = [TrialRecord.User.initial_active_stim.a_fails] == TrialRecord.User.max_fails;
+a_boolean_fails = [TrialRecord.User.initial_active_stim.a_fails] >= TrialRecord.User.max_fails;
 a_structure_completion = mean([TrialRecord.User.initial_active_stim.a_completed]);
-p_boolean_fails = [TrialRecord.User.initial_active_stim.p_fails] == TrialRecord.User.max_fails;
+p_boolean_fails = [TrialRecord.User.initial_active_stim.p_fails] >= TrialRecord.User.max_fails;
 p_structure_completion = mean([TrialRecord.User.initial_active_stim.p_completed]);
 
 % TrialRecord.User.overall_completion = mean(c_boolean_fails + [TrialRecord.User.initial_active_stim.c_success] ...
 % + a_boolean_fails + [TrialRecord.User.initial_active_stim.a_success] + p_boolean_fails + [TrialRecord.User.initial_active_stim.p_success]) ... 
 % /(TrialRecord.User.agent_on+TrialRecord.User.patient_on+TrialRecord.User.category);
-TrialRecord.User.overall_active_completion = mean([TrialRecord.User.initial_active_stim.c_completed] + [TrialRecord.User.initial_active_stim.a_completed] + [TrialRecord.User.initial_active_stim.p_completed])/(TrialRecord.User.agent_on+TrialRecord.User.patient_on+TrialRecord.User.category);
+TrialRecord.User.init_active_stim_completion = mean([TrialRecord.User.initial_active_stim.c_completed] + ...
+    [TrialRecord.User.initial_active_stim.a_completed] + [TrialRecord.User.initial_active_stim.p_completed])/...
+    (TrialRecord.User.agent_on+TrialRecord.User.patient_on+TrialRecord.User.category);
 
 % TrialRecord.User.active_stim_completion = (mean(c_boolean_fails + [TrialRecord.User.structure.c_success] ...
 % + a_boolean_fails + [TrialRecord.User.structure.a_success] + p_boolean_fails + [TrialRecord.User.structure.p_success]) ... 
@@ -452,7 +457,7 @@ bhv_variable('size_progression', TrialRecord.User.size_progression,...
     'progression_number', TrialRecord.User.progression_number,...
     'stimulus_name', TrialRecord.User.structure(TrialRecord.User.stimulus_chosen_in_structure_index).stimuli,...
     'answer_time', answer_time, ...
-    'init_active_stim_completion', TrialRecord.User.overall_active_completion, ...
+    'init_active_stim_completion', TrialRecord.User.init_active_stim_completion, ...
     'completed_stim', TrialRecord.User.completed_stimuli);
 % if TrialRecord.User.overall_completion == 1
     bhv_variable('init_active_stim', TrialRecord.User.initial_active_stim);
