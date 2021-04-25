@@ -213,7 +213,7 @@ end
 
 
 if TrialRecord.User.current_sum_categories ~= previous_sum_categories ...
-        || TrialRecord.User.overall_active_completion == 1
+        || TrialRecord.User.structure_completion
     TrialRecord.User.structure = struct('stimuli', {}, 'frames', {}, 'c_fails', {}, ... 
         'c_success', {},'c_completed', {}, 'a_fails', {}, 'a_success', {}, ...
         'a_completed', {}, 'p_fails', {}, 'p_success', {}, 'p_completed', {}, 'folder', {});
@@ -243,78 +243,39 @@ if TrialRecord.User.current_sum_categories ~= previous_sum_categories ...
         end
         index = index+1;
     end
-    if length(TrialRecord.User.structure) > TrialRecord.User.blocksize
-        TrialRecord.User.initial_active_stim_index = randperm(length(TrialRecord.User.structure), TrialRecord.User.blocksize);
-    else
-        TrialRecord.User.initial_active_stim_index = randperm(TrialRecord.User.blocksize);
-    end
-    TrialRecord.User.initial_active_stim_index = mod(TrialRecord.User.initial_active_stim_index-1, length(TrialRecord.User.structure))+1;
-    TrialRecord.User.initial_active_stim = struct('stimuli', {}, 'frames', {}, 'c_fails', {}, 'c_success', {}, 'c_completed', {},...
-        'a_fails', {}, 'a_success', {}, 'a_completed', {},...
-        'p_fails', {}, 'p_success', {}, 'p_completed', {}, 'folder', {});
-    index3 = 1;
-    while index3 ~= TrialRecord.User.blocksize + 1
-        TrialRecord.User.initial_active_stim(end+1) = TrialRecord.User.structure(TrialRecord.User.initial_active_stim_index(index3));
-        index3 = index3 + 1;
-    end
 end
 % determine categorizing, agent or patient ( codes 1,2 and 3)
-
-question = randperm(sum([TrialRecord.User.category TrialRecord.User.agent_on TrialRecord.User.patient_on], 'all'), 1);
-TrialRecord.User.active_stim = struct('stimuli', {}, 'frames', {}, 'c_fails', {}, 'c_success', {}, 'c_completed', {},...
-        'a_fails', {}, 'a_success', {}, 'a_completed', {},...
-        'p_fails', {}, 'p_success', {}, 'p_completed', {}, 'folder', {});
-
-index2 = 1;
-if ~TrialRecord.User.training_agent_patient
-    switch question
-        case 1
-            while index2 ~= length(TrialRecord.User.initial_active_stim)+1
-                if TrialRecord.User.initial_active_stim(index2).c_fails <= ...
-                        TrialRecord.User.max_fails && TrialRecord.User.initial_active_stim(index2).c_success ~= 1
-                    TrialRecord.User.active_stim(end+1) = TrialRecord.User.initial_active_stim(index2);
-                end
-                index2 = index2 +1;
-            end
-        case 2
-            while index2 ~= length(stimulus_list)+1
-                if TrialRecord.User.initial_active_stim(index2).a_fails <= ...
-                        TrialRecord.User.max_fails && TrialRecord.User.initial_active_stim(index2).a_success ~= 1
-                    TrialRecord.User.active_stim(end+1) = TrialRecord.User.initial_active_stim(index2);
-                end
-                index2 = index2 +1;
-            end
-        case 3
-            while index2 ~= length(stimulus_list)+1
-                if TrialRecord.User.initial_active_stim(index2).p_fails <= TrialRecord.User.max_fails && TrialRecord.User.initial_active_stim(index2).p_success ~= 1
-                    TrialRecord.User.active_stim(end+1) = TrialRecord.User.initial_active_stim(index2);
-                end
-                index2 = index2 +1;
-            end
-    end
-else
-    switch question
-        case 1
-            while index2 ~= length(stimulus_list)+1
-                if TrialRecord.User.initial_active_stim(index2).a_fails <= TrialRecord.User.max_fails && TrialRecord.User.initial_active_stim(index2).a_success ~= 1
-                    TrialRecord.User.active_stim(end+1) = TrialRecord.User.initial_active_stim(index2);
-                end
-                index2 = index2 +1;
-            end
-        case 2
-            while index2 ~= length(stimulus_list)+1
-                if TrialRecord.User.initial_active_stim(index2).p_fails <= TrialRecord.User.max_fails && TrialRecord.User.initial_active_stim(index2).p_success ~= 1
-                    TrialRecord.User.active_stim(end+1) = TrialRecord.User.initial_active_stim(index2);
-                end
-                index2 = index2 +1;
-            end
-    end
-end
-
-chosen_stim_index_active = randperm(length(TrialRecord.User.active_stim), 1);
+question = randperm(sum([TrialRecord.User.category TrialRecord.User.agent_on TrialRecord.User.patient_on], 'all'), 1); %%% hier nog groot probleem, wat als de gekozen question al compleet is, maar de andere nog niet? dit mss linken aan struct completion?
 if ~TrialRecord.User.repeat
-    TrialRecord.User.stimulus_chosen_in_active = TrialRecord.User.active_stim(chosen_stim_index_active).stimuli;
+    if ~TrialRecord.User.training_agent_patient
+        switch question
+            case 1
+                indexes_c_incomplete = find(TrialRecord.User.structure.c_completed==0);
+                index_index = randperm(length(indexes_c_incomplete), 1);
+                struct_index = indexes_c_incomplete(index_index);
+            case 2
+                indexes_a_incomplete = find(TrialRecord.User.structure.a_completed==0);
+                index_index = randperm(length(indexes_a_incomplete), 1);
+                struct_index = indexes_a_incomplete(index_index);
+            case 3
+                indexes_p_incomplete = find(TrialRecord.User.structure.p_completed==0);
+                index_index = randperm(length(indexes_p_incomplete), 1);
+                struct_index = indexes_p_incomplete(index_index);
+        end
+    else
+        switch question
+            case 1
+                indexes_a_incomplete = find(TrialRecord.User.structure.a_completed==0);
+                index_index = randperm(length(indexes_a_incomplete), 1);
+                struct_index = indexes_a_incomplete(index_index);
+            case 2
+                indexes_p_incomplete = find(TrialRecord.User.structure.p_completed==0);
+                index_index = randperm(length(indexes_p_incomplete), 1);
+                struct_index = indexes_p_incomplete(index_index);
+        end
+    end
 end
+
 
 i = 1;
 while i ~= length(TrialRecord.User.structure)+1
