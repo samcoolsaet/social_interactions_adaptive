@@ -14,6 +14,9 @@ correct_button_size_difference = 3;                                         % th
 wrong_button_size_difference = 1.75;
 x_axes = [-12 12];
 y_axes = [-10 -3.33 3.33 10];
+y_center = (TrialRecord.User.current_sum_categories-1)*y_reference/2;
+y_spacing = 6.66;
+TrialRecord.User.current_sum_categories
 movie_duration = 3000;
 answer_time = 8000;
 standard_time_out = 5000;
@@ -23,12 +26,12 @@ TrialRecord.User.repeat = false;
 
 %  init boxes
 engaging_box = { [1 1 1], [1 1 1], standard_button_size, [10 0] };
-chasing_box = {[1 0 0], [1 0 0], standard_button_size, [x_axes(1) y_axes(1)]};
-grooming_box = {[0 1 0], [0 1 0], standard_button_size, [x_axes(1) y_axes(2)]};
-mounting_box = {[1 1 0], [1 1 0], standard_button_size, [x_axes(1) y_axes(3)]};
-holding_box = {[0 0 1], [0 0 1], standard_button_size, [x_axes(1) y_axes(4)]};
-agent_box = {[0 1 1], [0 1 1], standard_button_size, [x_axes(2) y_axes(2)]};
-patient_box = {[1 0 1], [1 0 1], standard_button_size, [x_axes(2) y_axes(3)]};
+chasing_box = {[1 0.5 0.5], [1 0.5 0.5], standard_button_size, [x_axes(1) y_center]};
+grooming_box = {[0.5 1 0.5], [0.5 1 0.5], standard_button_size, [x_axes(1) (y_center + y_spacing)]};
+mounting_box = {[1 1 0], [1 1 0], standard_button_size, [x_axes(1) (y_center + 2*y_spacing)]};
+holding_box = {[0 0 1], [0 0 1], standard_button_size, [x_axes(1) (y_center + 3*y_spacing)]};
+agent_box = {[0 1 1], [0 1 1], standard_button_size, [x_axes(2) y_center]};
+patient_box = {[1 0 1], [1 0 1], standard_button_size, [x_axes(2) (y_center + y_spacing)]};
 
 % x_spacing = 3;
 % y_spacing = 3.33;

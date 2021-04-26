@@ -18,8 +18,8 @@ if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.progression_number = TrialRecord.User.start_progression_number;
     previous_sum_categories = 0;
     TrialRecord.User.max_fails = 3;
-    TrialRecord.User.overall_active_completion = 0;
     TrialRecord.User.repeat = 0;
+    TrialRecord.User.completed_stimuli
 else
     previous_sum_categories = TrialRecord.User.current_sum_categories;      % calculations of previous sum categories
 end
@@ -317,11 +317,11 @@ if ~TrialRecord.User.repeat
         TrialRecord.User.same_condition = 0;
     end
 end
-if TrialRecord.User.same_condition == 2
-    return social_userloop(); % ask Lucas, he might know this :D
-else
-    disp('no return')
-end
+% if TrialRecord.User.same_condition == 2
+%     return social_userloop(); % ask Lucas, he might know this :D
+% else
+%     disp('no return')
+% end
 
 
 TrialRecord.User.movie = strcat(pwd, '\stimuli\', ... 
