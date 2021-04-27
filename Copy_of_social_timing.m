@@ -415,9 +415,9 @@ if repeating
 end
 
 % for initial_active_stim
-c_structure_completion = mean([TrialRecord.User.structure.c_completed]);
-a_structure_completion = mean([TrialRecord.User.structure.a_completed]);
-p_structure_completion = mean([TrialRecord.User.structure.p_completed]);
+TrialRecord.User.c_structure_completion = mean([TrialRecord.User.structure.c_completed]);
+TrialRecord.User.a_structure_completion = mean([TrialRecord.User.structure.a_completed]);
+TrialRecord.User.p_structure_completion = mean([TrialRecord.User.structure.p_completed]);
 
 TrialRecord.User.structure_completion = mean([TrialRecord.User.structure.c_completed] + ...
     [TrialRecord.User.structure.a_completed] + [TrialRecord.User.structure.p_completed])/...

@@ -247,7 +247,25 @@ if TrialRecord.User.current_sum_categories ~= previous_sum_categories ...
     end
 end
 % determine categorizing, agent or patient ( codes 1,2 and 3)
-question = randperm(sum([TrialRecord.User.category TrialRecord.User.agent_on TrialRecord.User.patient_on], 'all'), 1); %%% hier nog groot probleem, wat als de gekozen question al compleet is, maar de andere nog niet? dit mss linken aan struct completion?
+x = 1
+while x ~= 0
+    question = randperm(sum([TrialRecord.User.category TrialRecord.User.agent_on TrialRecord.User.patient_on], 'all'), 1); %%% hier nog groot probleem, wat als de gekozen question al compleet is, maar de andere nog niet? dit mss linken aan struct completion?
+    switch question
+        case 1
+            if ~TrialRecord.User.c_structure_completion
+                x = 0;
+            end
+        case 2
+            if ~TrialRecord.User.a_structure_completion
+                x = 0;
+            end
+        case 3
+            if ~TrialRecord.User.p_structure_completion
+                x = 0;
+            end
+    end
+end
+    
 if ~TrialRecord.User.repeat
     if ~TrialRecord.User.training_agent_patient
         switch question
