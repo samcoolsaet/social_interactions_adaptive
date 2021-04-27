@@ -20,10 +20,14 @@ if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.max_fails = 3;
     TrialRecord.User.repeat = 0;
     TrialRecord.User.completed_stimuli = 0;
+    TrialRecord.User.c_structure_completion = 0;
+    TrialRecord.User.a_structure_completion = 0;
+    TrialRecord.User.p_structure_completion = 0;
 else
     previous_sum_categories = TrialRecord.User.current_sum_categories;      % calculations of previous sum categories
 end
 %% constants
+max_repeats_condition = 3;
 % progression
 TrialRecord.User.blocksize = 5;                                                              % The TrialRecord.User.blocksize is the number of animationsthe monkey has to complete.a block is the elementary unit, a block determines whether the progression number increases/decreases/stays the same.
 %%% maybe later create a blocksize as a function of previous performance to quickly skip to his level when starting again.                                                                            % block def: a set number of stimuli that have been showed for the first time
@@ -245,108 +249,224 @@ if TrialRecord.User.current_sum_categories ~= previous_sum_categories ...
         end
         index = index+1;
     end
-end
-% determine categorizing, agent or patient ( codes 1,2 and 3)
-x = 1
-while x ~= 0
-    question = randperm(sum([TrialRecord.User.category TrialRecord.User.agent_on TrialRecord.User.patient_on], 'all'), 1); %%% hier nog groot probleem, wat als de gekozen question al compleet is, maar de andere nog niet? dit mss linken aan struct completion?
-    switch question
-        case 1
-            if ~TrialRecord.User.c_structure_completion
-                x = 0;
+    if TrialRecord.User.training_categorization
+        condition_order = [ones(1, TrialRecord.User.chasing_on*length(TrialRecord.User.chasing_list)) ...
+            ones(1, TrialRecord.User.grooming_on*length(TrialRecord.User.grooming_list))*2 ... 
+            ones(1, TrialRecord.User.mounting_on*length(TrialRecord.User.mounting_list))*3 ...
+            ones(1, TrialRecord.User.holding_on*length(TrialRecord.User.holding_list))*4];
+    elseif TrialRecord.User.training_agent_patient
+        condition_order = [ones(1, length(TrialRecord.User.structure))*5 ...
+            ones(1, length(TrialRecord.User.structure))*6];
+    else
+        condition_order = [ones(1, TrialRecord.User.chasing_on*length(TrialRecord.User.chasing_list)) ...
+            ones(1, TrialRecord.User.grooming_on*length(TrialRecord.User.grooming_list))*2 ...
+            ones(1, TrialRecord.User.mounting_on*length(TrialRecord.User.mounting_list))*3 ...
+            ones(1, TrialRecord.User.holding_on*length(TrialRecord.User.holding_list))*4 ...
+            ones(1, length(TrialRecord.User.structure))*5 ...
+            ones(1, length(TrialRecord.User.structure))*6];
+    end
+
+    restricted = false;
+    while ~restricted
+        TrialRecord.User.random_condition_order = condition_order(randperm(length(condition_order)));
+        TrialRecord.User.random_condition_order_index = 0;
+        index2 = 1;
+        repetitions = 0;
+        while index2 ~= (length(TrialRecord.User.random_condition_order)-(max_repeats_condition-1))
+            if TrialRecord.User.random_condition_order(index2) == TrialRecord.User.random_condition_order(index2+1)...
+                    && TrialRecord.User.random_condition_order(index2) == TrialRecord.User.random_condition_order(index2+2)...
+                    && TrialRecord.User.random_condition_order(index2) == TrialRecord.User.random_condition_order(index2+3)
+                repetitions = repetitions + 1;
             end
-        case 2
-            if ~TrialRecord.User.a_structure_completion
-                x = 0;
-            end
-        case 3
-            if ~TrialRecord.User.p_structure_completion
-                x = 0;
-            end
+            index2 = index2 + 1;
+        end
+        if repetitions == 0
+            restricted = true;
+        end
     end
 end
+% determine categorizing, agent or patient ( codes 1,2 and 3)
+
+% proceed = false;
+% while ~proceed
+%     question = randperm(sum([TrialRecord.User.category TrialRecord.User.agent_on TrialRecord.User.patient_on], 'all'), 1); %%% hier nog groot probleem, wat als de gekozen question al compleet is, maar de andere nog niet? dit mss linken aan struct completion?
+%     switch question
+%         case 1
+%             if ~TrialRecord.User.c_structure_completion
+%                 proceed = true;
+%             end
+%         case 2
+%             if ~TrialRecord.User.a_structure_completion
+%                 proceed = true;
+%             end
+%         case 3
+%             if ~TrialRecord.User.p_structure_completion
+%                 proceed = true;
+%             end
+%         otherwise
+%             disp('structure has not been reset');
+%     end
+% end
     
+% if ~TrialRecord.User.repeat
+%     if ~TrialRecord.User.training_agent_patient
+%         switch question
+%             case 1
+%                 indexes_c_incomplete = find([TrialRecord.User.structure.c_completed]==0);
+%                 index_index = randperm(length(indexes_c_incomplete), 1);
+%                 TrialRecord.User.struct_index = indexes_c_incomplete(index_index);
+%             case 2
+%                 indexes_a_incomplete = find([TrialRecord.User.structure.a_completed]==0);
+%                 index_index = randperm(length(indexes_a_incomplete), 1);
+%                 TrialRecord.User.struct_index = indexes_a_incomplete(index_index);
+%             case 3
+%                 indexes_p_incomplete = find([TrialRecord.User.structure.p_completed==0]);
+%                 index_index = randperm(length(indexes_p_incomplete), 1);
+%                 TrialRecord.User.struct_index = indexes_p_incomplete(index_index);
+%         end
+%     else
+%         switch question
+%             case 1
+%                 indexes_a_incomplete = find([TrialRecord.User.structure.a_completed==0]);
+%                 index_index = randperm(length(indexes_a_incomplete), 1);
+%                 TrialRecord.User.struct_index = indexes_a_incomplete(index_index);
+%             case 2
+%                 indexes_p_incomplete = find([TrialRecord.User.structure.p_completed==0]);
+%                 index_index = randperm(length(indexes_p_incomplete), 1);
+%                 TrialRecord.User.struct_index = indexes_p_incomplete(index_index);
+%         end
+%     end
+% else
+%     disp('repeat');
+% end
+
 if ~TrialRecord.User.repeat
-    if ~TrialRecord.User.training_agent_patient
-        switch question
+    TrialRecord.User.random_condition_order_index = TrialRecord.User.random_condition_order_index + 1;
+    condition = TrialRecord.User.random_condition_order(TrialRecord.User.random_condition_order_index);
+        switch condition
             case 1
-                indexes_c_incomplete = find([TrialRecord.User.structure.c_completed]==0);
+                index3 = 1;
+                indexes_c_incomplete = [];
+                while index3 ~= length(TrialRecord.User.structure) + 1
+                    if strcmp(TrialRecord.User.structure(index3).folder, 'chasing')...
+                            && TrialRecord.User.structure(index3).c_completed == 0
+                        indexes_c_incomplete(end+1) = index3;
+                    end
+                    index3 = index3 + 1;
+                end
                 index_index = randperm(length(indexes_c_incomplete), 1);
                 TrialRecord.User.struct_index = indexes_c_incomplete(index_index);
             case 2
-                indexes_a_incomplete = find([TrialRecord.User.structure.a_completed]==0);
-                index_index = randperm(length(indexes_a_incomplete), 1);
-                TrialRecord.User.struct_index = indexes_a_incomplete(index_index);
+                index3 = 1;
+                indexes_c_incomplete = [];
+                while index3 ~= length(TrialRecord.User.structure) + 1
+                    if strcmp(TrialRecord.User.structure(index3).folder, 'grooming')...
+                            && TrialRecord.User.structure(index3).c_completed == 0
+                        indexes_c_incomplete(end+1) = index3;
+                    end
+                    index3 = index3 + 1;
+                end
+                index_index = randperm(length(indexes_c_incomplete), 1);
+                TrialRecord.User.struct_index = indexes_c_incomplete(index_index);
             case 3
-                indexes_p_incomplete = find([TrialRecord.User.structure.p_completed==0]);
-                index_index = randperm(length(indexes_p_incomplete), 1);
-                TrialRecord.User.struct_index = indexes_p_incomplete(index_index);
-        end
-    else
-        switch question
-            case 1
+                index3 = 1;
+                indexes_c_incomplete = [];
+                while index3 ~= length(TrialRecord.User.structure) + 1
+                    if strcmp(TrialRecord.User.structure(index3).folder, 'mounting')...
+                            && TrialRecord.User.structure(index3).c_completed == 0
+                        indexes_c_incomplete(end+1) = index3;
+                    end
+                    index3 = index3 + 1;
+                end
+                index_index = randperm(length(indexes_c_incomplete), 1);
+                TrialRecord.User.struct_index = indexes_c_incomplete(index_index);
+            case 4
+                index3 = 1;
+                indexes_c_incomplete = [];
+                while index3 ~= length(TrialRecord.User.structure) + 1
+                    if strcmp(TrialRecord.User.structure(index3).folder, 'holding')...
+                            && TrialRecord.User.structure(index3).c_completed == 0
+                        indexes_c_incomplete(end+1) = index3;
+                    end
+                    index3 = index3 + 1;
+                end
+                index_index = randperm(length(indexes_c_incomplete), 1);
+                TrialRecord.User.struct_index = indexes_c_incomplete(index_index);
+            case 5
                 indexes_a_incomplete = find([TrialRecord.User.structure.a_completed==0]);
                 index_index = randperm(length(indexes_a_incomplete), 1);
                 TrialRecord.User.struct_index = indexes_a_incomplete(index_index);
-            case 2
+            case 6
                 indexes_p_incomplete = find([TrialRecord.User.structure.p_completed==0]);
                 index_index = randperm(length(indexes_p_incomplete), 1);
                 TrialRecord.User.struct_index = indexes_p_incomplete(index_index);
+            otherwise
+                disp('indexing into structure failed');
         end
-    end
 else
     disp('repeat');
 end
 
-previous_condition = TrialRecord.CurrentCondition;
-if ~TrialRecord.User.training_agent_patient
-    switch question
-        case 1
-            if strncmpi('chas', TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli, 4)    % check for title of the animation to determine actual category
-                TrialRecord.User.chasing = true;
-                TrialRecord.NextCondition = 1;
-            elseif strncmpi('groom', TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli, 5)
-                TrialRecord.User.grooming = true;
-                TrialRecord.NextCondition = 2;
-            elseif strncmpi('mount', TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli, 5)
-                TrialRecord.User.mounting = true;
-                TrialRecord.NextCondition = 3;
-            elseif strncmpi('hold', TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli, 4)
-                TrialRecord.User.holding = true;
-                TrialRecord.NextCondition = 4;
-            end
-            TrialRecord.User.categorizing = true;
-        case 2
-            TrialRecord.NextCondition = 5;
-            TrialRecord.User.agenting = true;
-        case 3
-            TrialRecord.NextCondition = 6;
-            TrialRecord.User.patienting = true;
-    end
+if condition == 1
+    TrialRecord.User.chasing = true;
+    TrialRecord.NextCondition = 1;
+    TrialRecord.User.categorizing = true;
+elseif condition == 2
+    TrialRecord.User.grooming = true;
+    TrialRecord.NextCondition = 2;
+    TrialRecord.User.categorizing = true;
+elseif condition == 3
+    TrialRecord.User.mounting = true;
+    TrialRecord.NextCondition = 3;
+    TrialRecord.User.categorizing = true;
+elseif condition == 4
+    TrialRecord.User.holding = true;
+    TrialRecord.NextCondition = 4;
+    TrialRecord.User.categorizing = true;
+elseif condition == 5
+    TrialRecord.NextCondition = 5;
+    TrialRecord.User.agenting = true;
+elseif condition == 6
+    TrialRecord.NextCondition = 6;
+    TrialRecord.User.patienting = true;
 else
-    switch question
-        case 1
-            TrialRecord.NextCondition = 5;
-            TrialRecord.User.agenting = true;
-        case 2
-            TrialRecord.NextCondition = 6;
-            TrialRecord.User.patienting = true;
-    end
+    disp('condition not found');
 end
 
-if ~TrialRecord.User.repeat
-    if previous_condition == TrialRecord.NextCondition
-        TrialRecord.User.same_condition = TrialRecord.User.same_condition + 1;
-    else
-        TrialRecord.User.same_condition = 0;
-    end
-end
-% if TrialRecord.User.same_condition == 2
-%     return social_userloop(); % ask Lucas, he might know this :D
+% if ~TrialRecord.User.training_agent_patient
+%     switch question
+%         case 1
+%             if strncmpi('chas', TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli, 4)    % check for title of the animation to determine actual category
+%                 TrialRecord.User.chasing = true;
+%                 TrialRecord.NextCondition = 1;
+%             elseif strncmpi('groom', TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli, 5)
+%                 TrialRecord.User.grooming = true;
+%                 TrialRecord.NextCondition = 2;
+%             elseif strncmpi('mount', TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli, 5)
+%                 TrialRecord.User.mounting = true;
+%                 TrialRecord.NextCondition = 3;
+%             elseif strncmpi('hold', TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli, 4)
+%                 TrialRecord.User.holding = true;
+%                 TrialRecord.NextCondition = 4;
+%             end
+%             TrialRecord.User.categorizing = true;
+%         case 2
+%             TrialRecord.NextCondition = 5;
+%             TrialRecord.User.agenting = true;
+%         case 3
+%             TrialRecord.NextCondition = 6;
+%             TrialRecord.User.patienting = true;
+%     end
 % else
-%     disp('no return')
+%     switch question
+%         case 1
+%             TrialRecord.NextCondition = 5;
+%             TrialRecord.User.agenting = true;
+%         case 2
+%             TrialRecord.NextCondition = 6;
+%             TrialRecord.User.patienting = true;
+%     end
 % end
-
 
 TrialRecord.User.movie = strcat(pwd, '\stimuli\', ... 
     TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', ...
