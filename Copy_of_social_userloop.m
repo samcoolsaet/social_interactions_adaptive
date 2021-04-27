@@ -2,7 +2,7 @@ function [C,timingfile,userdefined_trialholder] = social_userloop(MLConfig,Trial
 %% template
 % return values
 C = [];
-timingfile = 'social_timing.m';                                 % Placeholder, real timing file assigned below.
+timingfile = 'Copy_of_social_timing.m';                                 % Placeholder, real timing file assigned below.
 userdefined_trialholder = '';
 
 persistent timing_filenames_retrieved
@@ -19,7 +19,7 @@ if TrialRecord.CurrentTrialNumber == 0
     previous_sum_categories = 0;
     TrialRecord.User.max_fails = 3;
     TrialRecord.User.repeat = 0;
-    TrialRecord.User.completed_stimuli
+    TrialRecord.User.completed_stimuli = 0;
 else
     previous_sum_categories = TrialRecord.User.current_sum_categories;      % calculations of previous sum categories
 end
@@ -151,6 +151,12 @@ end
 % calculation current sum categories after switches have been altered
 TrialRecord.User.current_sum_categories = sum([TrialRecord.User.chasing_on, ... % difference between current and previous sum of categories acts as a 
     TrialRecord.User.grooming_on,TrialRecord.User.holding_on, ...               % switch for new stimulus list creation involving new categories and other
+    TrialRecord.User.mounting_on,]);
+
+% TrialRecord.User.current_sum_buttons : check AP script for this
+
+TrialRecord.User.current_sum_buttons = sum([TrialRecord.User.chasing_on, ... % difference between current and previous sum of categories acts as a 
+    TrialRecord.User.grooming_on,TrialRecord.User.holding_on, ...               % switch for new stimulus list creation involving new categories and other
     TrialRecord.User.mounting_on, TrialRecord.User.agent_on, ...                % changes that have to be made when categories are added
     TrialRecord.User.patient_on]);
 %% orienting between stimuli and frame files creating individual folder lists and general stim and frame lists
@@ -246,26 +252,26 @@ if ~TrialRecord.User.repeat
     if ~TrialRecord.User.training_agent_patient
         switch question
             case 1
-                indexes_c_incomplete = find(TrialRecord.User.structure.c_completed==0);
+                indexes_c_incomplete = find([TrialRecord.User.structure.c_completed]==0);
                 index_index = randperm(length(indexes_c_incomplete), 1);
                 TrialRecord.User.struct_index = indexes_c_incomplete(index_index);
             case 2
-                indexes_a_incomplete = find(TrialRecord.User.structure.a_completed==0);
+                indexes_a_incomplete = find([TrialRecord.User.structure.a_completed]==0);
                 index_index = randperm(length(indexes_a_incomplete), 1);
                 TrialRecord.User.struct_index = indexes_a_incomplete(index_index);
             case 3
-                indexes_p_incomplete = find(TrialRecord.User.structure.p_completed==0);
+                indexes_p_incomplete = find([TrialRecord.User.structure.p_completed==0]);
                 index_index = randperm(length(indexes_p_incomplete), 1);
                 TrialRecord.User.struct_index = indexes_p_incomplete(index_index);
         end
     else
         switch question
             case 1
-                indexes_a_incomplete = find(TrialRecord.User.structure.a_completed==0);
+                indexes_a_incomplete = find([TrialRecord.User.structure.a_completed==0]);
                 index_index = randperm(length(indexes_a_incomplete), 1);
                 TrialRecord.User.struct_index = indexes_a_incomplete(index_index);
             case 2
-                indexes_p_incomplete = find(TrialRecord.User.structure.p_completed==0);
+                indexes_p_incomplete = find([TrialRecord.User.structure.p_completed==0]);
                 index_index = randperm(length(indexes_p_incomplete), 1);
                 TrialRecord.User.struct_index = indexes_p_incomplete(index_index);
         end
@@ -311,7 +317,7 @@ else
 end
 
 if ~TrialRecord.User.repeat
-    if previous_condition == TrialRecord.User.current_condition
+    if previous_condition == TrialRecord.NextCondition
         TrialRecord.User.same_condition = TrialRecord.User.same_condition + 1;
     else
         TrialRecord.User.same_condition = 0;
@@ -326,11 +332,10 @@ end
 
 TrialRecord.User.movie = strcat(pwd, '\stimuli\', ... 
     TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', ...
-    TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli);                                                  % complete path of the animation
+    TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli);     % complete path of the animation
 TrialRecord.User.frame = strcat(pwd,'\frames\', ... 
     TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', ...
-    TrialRecord.User.structure(TrialRecord.User.struct_index).frames);                    % and frame
-
+    TrialRecord.User.structure(TrialRecord.User.struct_index).frames);      % and frame
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for frame...
 % % img_size in degrees = 15*9, frames sizes (x, y), locations

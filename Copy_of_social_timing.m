@@ -14,9 +14,8 @@ correct_button_size_difference = 3;                                         % th
 wrong_button_size_difference = 1.75;
 x_axes = [-12 12];
 y_axes = [-10 -3.33 3.33 10];
-y_center = (TrialRecord.User.current_sum_categories-1)*y_reference/2;
 y_spacing = 6.66;
-TrialRecord.User.current_sum_categories
+y_center = -(TrialRecord.User.current_sum_categories-1)*y_spacing/2;
 movie_duration = 3000;
 answer_time = 8000;
 standard_time_out = 5000;
@@ -26,8 +25,8 @@ TrialRecord.User.repeat = false;
 
 %  init boxes
 engaging_box = { [1 1 1], [1 1 1], standard_button_size, [10 0] };
-chasing_box = {[1 0.5 0.5], [1 0.5 0.5], standard_button_size, [x_axes(1) y_center]};
-grooming_box = {[0.5 1 0.5], [0.5 1 0.5], standard_button_size, [x_axes(1) (y_center + y_spacing)]};
+chasing_box = {[1 0.8 0.6], [1 0.8 0.6], standard_button_size, [x_axes(1) y_center]};
+grooming_box = {[0.5 1 1], [0.5 1 1], standard_button_size, [x_axes(1) (y_center + y_spacing)]};
 mounting_box = {[1 1 0], [1 1 0], standard_button_size, [x_axes(1) (y_center + 2*y_spacing)]};
 holding_box = {[0 0 1], [0 0 1], standard_button_size, [x_axes(1) (y_center + 3*y_spacing)]};
 agent_box = {[0 1 1], [0 1 1], standard_button_size, [x_axes(2) y_center]};
@@ -385,9 +384,10 @@ else
     sound(y2, fs2);
     background = [1 0 0 time_out];
 end
-reward = BackgroundGolorChanger(null_);
-reward.List = background;
-con4 = Concurrent(reward);
+reward_scene = BackgroundColorChanger(null_);
+reward_scene.List = background;
+reward_scene.DurationUnit = 'msec';
+con4 = Concurrent(reward_scene);
 con4.add(cam);
 scene4 = create_scene(con4);
 run_scene(scene4);
@@ -407,22 +407,17 @@ end
 
 % setting a repeating variable for direct repeats when not completed
 if repeating
-    if TrialRecord.CurrentCondition < 5 && ~TrialRecord.User.structure(TrialRecord.User.struct_index).c_completed
-        TrialRecord.User.repeat = true;  
-    elseif TrialRecord.CurrentCondition == 5 && ~TrialRecord.User.structure(TrialRecord.User.struct_index).a_completed
-        TrialRecord.User.repeat = true;  
-    elseif TrialRecord.CurrentCondition == 6 && ~TrialRecord.User.structure(TrialRecord.User.struct_index).p_completed
+    if ~reward
         TrialRecord.User.repeat = true;
     else
         disp('this trial should not be repeated');
     end
 end
-    
 
 % for initial_active_stim
-c_structure_completion = mean([TrialRecord.User.initial_active_stim.c_completed]);
-a_structure_completion = mean([TrialRecord.User.initial_active_stim.a_completed]);
-p_structure_completion = mean([TrialRecord.User.initial_active_stim.p_completed]);
+c_structure_completion = mean([TrialRecord.User.structure.c_completed]);
+a_structure_completion = mean([TrialRecord.User.structure.a_completed]);
+p_structure_completion = mean([TrialRecord.User.structure.p_completed]);
 
 TrialRecord.User.structure_completion = mean([TrialRecord.User.structure.c_completed] + ...
     [TrialRecord.User.structure.a_completed] + [TrialRecord.User.structure.p_completed])/...
@@ -437,6 +432,6 @@ bhv_variable('size_progression', TrialRecord.User.size_progression,...
     'progression_number', TrialRecord.User.progression_number,...
     'stimulus_name', TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli,...
     'answer_time', answer_time, ...
-    'init_active_stim_completion', TrialRecord.User.init_active_stim_completion, ...
+    'structure_completion', TrialRecord.User.structure_completion, ...
     'completed_stim', TrialRecord.User.completed_stimuli);
 
