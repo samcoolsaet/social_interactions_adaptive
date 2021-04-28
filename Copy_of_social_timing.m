@@ -393,15 +393,21 @@ run_scene(scene4);
 
 if TrialRecord.User.structure(TrialRecord.User.struct_index).c_success == 1 ...
         || TrialRecord.User.structure(TrialRecord.User.struct_index).c_fails >= TrialRecord.User.max_fails
-    TrialRecord.User.struct(TrialRecord.User.struct_index).c_completed = 1;
+    TrialRecord.User.structure(TrialRecord.User.struct_index).c_completed = 1;
+else
+    TrialRecord.User.structure(TrialRecord.User.struct_index).c_completed = 0;
 end
 if TrialRecord.User.structure(TrialRecord.User.struct_index).a_success == 1 ...
         || TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails >= TrialRecord.User.max_fails
     TrialRecord.User.structure(TrialRecord.User.struct_index).a_completed = 1;
+else
+    TrialRecord.User.structure(TrialRecord.User.struct_index).c_completed = 0;
 end
 if TrialRecord.User.structure(TrialRecord.User.struct_index).p_success == 1 ...
         || TrialRecord.User.structure(TrialRecord.User.struct_index).p_fails >= TrialRecord.User.max_fails
     TrialRecord.User.structure(TrialRecord.User.struct_index).p_completed = 1;
+else
+    TrialRecord.User.structure(TrialRecord.User.struct_index).c_completed = 0;
 end
 
 % setting a repeating variable for direct repeats when not completed
@@ -421,6 +427,28 @@ TrialRecord.User.p_structure_completion = mean([TrialRecord.User.structure.p_com
 TrialRecord.User.structure_completion = mean([TrialRecord.User.structure.c_completed] + ...
     [TrialRecord.User.structure.a_completed] + [TrialRecord.User.structure.p_completed])/...
     (TrialRecord.User.agent_on+TrialRecord.User.patient_on+TrialRecord.User.category);
+
+% TrialRecord.User.previous_completed_stimuli berekenen voordat de
+% completion hier wordt toegevoegd, userloop bvb,dan
+% trialrecord.User.completed_stimuli =
+% TrialRecord.User.previous_completed_stimuli + 1 if deze trial fails == 3
+% of successes == 1
+
+%%%%
+% ik heb dus 2 problemen, enerzijds wil ik de stimuli van de oude struct naar de nieuwe struct overdragen
+% voordat hij reset als ze nog niet geevalueerd zijn. Anderzijds moet ik een manier vinden om telkens de laatst
+% vervulde stimuli te evalueren als de blocksize kleiner zou zijn dan de helft van de struct, want dan ga doe 
+% ik 2 evaluaties op dezelfde struct. welke tellen dan mee voor performance?
+%%%%
+% oplossing is mss dat ik na de evaluetie de vervolledigde stimuli uit de
+% struct verwijder, dan blijf ik over met die die nog niet compleet zijn,
+% in het eerste probleem kan ik die dan ook overbrengen op de nieuwe struct en
+% in het 2e probleem, doe ik geen evaluatie meer op de oude vervolledigde
+% stimuli.
+%%%%%%
+% of mss kan ik ook op basis van de indexes in de performance sectie, enkel de complete stimuli op het einde resetten
+% en dan kan ik een nieuwe volgorde berekenen als mijn complete stimuli == length struct om alle stimuli te doorlopen (OF ALS DE VOLGORDE VOLLEDIG DOORLOPEN IS).
+% ik moet dan alleen nog een nieuwe struct bouwen als er een categorie wordt toegevoegd.
 
 
 TrialRecord.User.completed_stimuli = sum([TrialRecord.User.structure.c_completed] + [TrialRecord.User.structure.a_completed] + [TrialRecord.User.structure.p_completed], 'all');

@@ -72,10 +72,10 @@ TrialRecord.User.mounting = false;
 
 
 %% determining next block and difficulty based on a general progression number %%%%%% maybe create a vector with the length of trialerrors but displaying the stimulus sequence numbers, this way I can keep track of actual fails and just going on when failing because the number of repeats hits the limit
-if TrialRecord.User.completed_stimuli == TrialRecord.User.blocksize     
-    indexes_used_c_stimuli = find(TrialRecord.User.structure.c_completed==1);
-    indexes_used_a_stimuli = find(TrialRecord.User.structure.a_completed==1);
-    indexes_used_p_stimuli = find(TrialRecord.User.structure.p_completed==1);
+if TrialRecord.User.completed_stimuli == TrialRecord.User.blocksize  % find a way to carry over the completed stim if the structure resets   
+    indexes_used_c_stimuli = find([TrialRecord.User.structure.c_completed]==1);
+    indexes_used_a_stimuli = find([TrialRecord.User.structure.a_completed]==1);
+    indexes_used_p_stimuli = find([TrialRecord.User.structure.p_completed]==1);
     fails = [TrialRecord.User.structure(indexes_used_c_stimuli).c_fails...
         TrialRecord.User.structure(indexes_used_a_stimuli).a_fails...
         TrialRecord.User.structure(indexes_used_p_stimuli).p_fails];
@@ -88,6 +88,12 @@ if TrialRecord.User.completed_stimuli == TrialRecord.User.blocksize
         TrialRecord.User.progression_number = ... 
             TrialRecord.User.progression_number - 1;
     end
+    TrialRecord.User.structure(indexes_used_c_stimuli).c_success = 0;
+    TrialRecord.User.structure(indexes_used_c_stimuli).c_fails = 0;
+    TrialRecord.User.structure(indexes_used_a_stimuli).a_success = 0;
+    TrialRecord.User.structure(indexes_used_a_stimuli).a_fails = 0;
+    TrialRecord.User.structure(indexes_used_p_stimuli).p_success = 0;
+    TrialRecord.User.structure(indexes_used_p_stimuli).p_fails = 0;
 end
 TrialRecord.NextBlock = TrialRecord.User.progression_number + 1;            
 if TrialRecord.User.progression_number > TrialRecord.User.max_c_progression_number
@@ -218,8 +224,8 @@ elseif ~TrialRecord.User.grooming_on && TrialRecord.User.chasing_on
 end
 
 
-if TrialRecord.User.current_sum_categories ~= previous_sum_categories ...
-        || TrialRecord.User.structure_completion
+if TrialRecord.User.current_sum_categories ~= previous_sum_categories
+    %         || TrialRecord.User.structure_completion == 1
     TrialRecord.User.structure = struct('stimuli', {}, 'frames', {}, 'c_fails', {}, ... 
         'c_success', {},'c_completed', {}, 'a_fails', {}, 'a_success', {}, ...
         'a_completed', {}, 'p_fails', {}, 'p_success', {}, 'p_completed', {}, 'folder', {});
@@ -249,6 +255,9 @@ if TrialRecord.User.current_sum_categories ~= previous_sum_categories ...
         end
         index = index+1;
     end
+end
+
+if TrialRecord.User.completed_stimuli == length(TrialRecord.User.random_condition_order)
     if TrialRecord.User.training_categorization
         condition_order = [ones(1, TrialRecord.User.chasing_on*length(TrialRecord.User.chasing_list)) ...
             ones(1, TrialRecord.User.grooming_on*length(TrialRecord.User.grooming_list))*2 ... 
@@ -284,6 +293,8 @@ if TrialRecord.User.current_sum_categories ~= previous_sum_categories ...
             restricted = true;
         end
     end
+else
+    disp('resetting random condition sequence failed');
 end
 % determine categorizing, agent or patient ( codes 1,2 and 3)
 
