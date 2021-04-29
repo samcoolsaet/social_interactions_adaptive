@@ -332,8 +332,6 @@ elseif TrialRecord.User.categorizing & TrialRecord.User.current_sum_categories ~
         reward = true;
     else
         TrialRecord.User.structure(TrialRecord.User.struct_index).c_fails = TrialRecord.User.structure(TrialRecord.User.struct_index).c_fails + 1; %%%% dit ook nog voor de rest doen        
-        sound(y2, fs2);
-        idle(time_out, [1 0 0], 5);
         reward = false;
         if tc_answer.Success
             dashboard(2, 'no response');
@@ -394,25 +392,19 @@ run_scene(scene4);
 if TrialRecord.User.structure(TrialRecord.User.struct_index).c_success == 1 ...
         || TrialRecord.User.structure(TrialRecord.User.struct_index).c_fails >= TrialRecord.User.max_fails
     TrialRecord.User.structure(TrialRecord.User.struct_index).c_completed = 1;
-    disp('stimulus set to complete');
-end
-if TrialRecord.User.structure(TrialRecord.User.struct_index).a_success == 1 ...
+    disp('stimulus set to complete, should not be repeated');
+elseif TrialRecord.User.structure(TrialRecord.User.struct_index).a_success == 1 ...
         || TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails >= TrialRecord.User.max_fails
     TrialRecord.User.structure(TrialRecord.User.struct_index).a_completed = 1;
-    disp('stimulus set to complete');
-end
-if TrialRecord.User.structure(TrialRecord.User.struct_index).p_success == 1 ...
+    disp('stimulus set to complete, should not be repeated');
+elseif TrialRecord.User.structure(TrialRecord.User.struct_index).p_success == 1 ...
         || TrialRecord.User.structure(TrialRecord.User.struct_index).p_fails >= TrialRecord.User.max_fails
     TrialRecord.User.structure(TrialRecord.User.struct_index).p_completed = 1;
-    disp('stimulus set to complete');
-end
-
-% setting a repeating variable for direct repeats when not completed
-if repeating
-    if ~reward
+    disp('stimulus set to complete, should not be repeated');
+else
+    if repeating
         TrialRecord.User.repeat = true;
-    else
-        disp('this trial should not be repeated');
+        disp('stimulus will be repeated');
     end
 end
 

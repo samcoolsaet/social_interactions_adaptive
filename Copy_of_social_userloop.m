@@ -20,7 +20,7 @@ if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.progression_number = TrialRecord.User.start_progression_number;
     previous_sum_categories = 0;
     TrialRecord.User.max_fails = 3;
-    TrialRecord.User.repeat = 0;
+    TrialRecord.User.repeat = false;
     TrialRecord.User.completed_stimuli = 0;
     TrialRecord.User.c_structure_completion = 0;
     TrialRecord.User.a_structure_completion = 0;
@@ -99,6 +99,7 @@ if TrialRecord.User.completed_stimuli == TrialRecord.User.blocksize  % find a wa
     [TrialRecord.User.structure(indexes_used_p_stimuli).p_success] = deal(0);
     [TrialRecord.User.structure(indexes_used_p_stimuli).p_fails] = deal(0);
     [TrialRecord.User.structure(indexes_used_c_stimuli).p_completed] = deal(0);
+    disp('last blocksize reset in struct');
 end
 TrialRecord.NextBlock = TrialRecord.User.progression_number + 1;            
 if TrialRecord.User.progression_number > TrialRecord.User.max_c_progression_number
@@ -262,8 +263,8 @@ if TrialRecord.User.current_sum_categories ~= previous_sum_categories
     end
 end
 
-if (TrialRecord.User.random_condition_order(TrialRecord.User.random_condition_order_index)...
-        == TrialRecord.User.random_condition_order(end))
+if TrialRecord.User.random_condition_order_index...
+        == length(TrialRecord.User.random_condition_order) % ja dit is dus een oetslechte voorwaarde, want er zijn natuurlijk meerdere van dezelfde waarden in die random condition order
     if TrialRecord.User.training_categorization
         condition_order = [ones(1, TrialRecord.User.chasing_on*length(TrialRecord.User.chasing_list)) ...
             ones(1, TrialRecord.User.grooming_on*length(TrialRecord.User.grooming_list))*2 ... 
@@ -299,9 +300,11 @@ if (TrialRecord.User.random_condition_order(TrialRecord.User.random_condition_or
             restricted = true;
         end
     end
+    disp('condition order reset');
 else
-    disp('resetting random condition sequence failed');
+    disp('did not reset random condition order');
 end
+x = TrialRecord.User.random_condition_order
 % determine categorizing, agent or patient ( codes 1,2 and 3)
 
 % proceed = false;
@@ -359,69 +362,74 @@ end
 
 if ~TrialRecord.User.repeat
     TrialRecord.User.random_condition_order_index = TrialRecord.User.random_condition_order_index + 1;
-    condition = TrialRecord.User.random_condition_order(TrialRecord.User.random_condition_order_index);
-        switch condition
-            case 1
-                index3 = 1;
-                indexes_c_incomplete = [];
-                while index3 ~= length(TrialRecord.User.structure) + 1
-                    if strcmp(TrialRecord.User.structure(index3).folder, 'chasing')...
-                            && TrialRecord.User.structure(index3).c_completed == 0
-                        indexes_c_incomplete(end+1) = index3;
-                    end
-                    index3 = index3 + 1;
-                end
-                index_index = randperm(length(indexes_c_incomplete), 1);
-                TrialRecord.User.struct_index = indexes_c_incomplete(index_index);
-            case 2
-                index3 = 1;
-                indexes_c_incomplete = [];
-                while index3 ~= length(TrialRecord.User.structure) + 1
-                    if strcmp(TrialRecord.User.structure(index3).folder, 'grooming')...
-                            && TrialRecord.User.structure(index3).c_completed == 0
-                        indexes_c_incomplete(end+1) = index3;
-                    end
-                    index3 = index3 + 1;
-                end
-                index_index = randperm(length(indexes_c_incomplete), 1);
-                TrialRecord.User.struct_index = indexes_c_incomplete(index_index);
-            case 3
-                index3 = 1;
-                indexes_c_incomplete = [];
-                while index3 ~= length(TrialRecord.User.structure) + 1
-                    if strcmp(TrialRecord.User.structure(index3).folder, 'mounting')...
-                            && TrialRecord.User.structure(index3).c_completed == 0
-                        indexes_c_incomplete(end+1) = index3;
-                    end
-                    index3 = index3 + 1;
-                end
-                index_index = randperm(length(indexes_c_incomplete), 1);
-                TrialRecord.User.struct_index = indexes_c_incomplete(index_index);
-            case 4
-                index3 = 1;
-                indexes_c_incomplete = [];
-                while index3 ~= length(TrialRecord.User.structure) + 1
-                    if strcmp(TrialRecord.User.structure(index3).folder, 'holding')...
-                            && TrialRecord.User.structure(index3).c_completed == 0
-                        indexes_c_incomplete(end+1) = index3;
-                    end
-                    index3 = index3 + 1;
-                end
-                index_index = randperm(length(indexes_c_incomplete), 1);
-                TrialRecord.User.struct_index = indexes_c_incomplete(index_index);
-            case 5
-                indexes_a_incomplete = find([TrialRecord.User.structure.a_completed==0]);
-                index_index = randperm(length(indexes_a_incomplete), 1);
-                TrialRecord.User.struct_index = indexes_a_incomplete(index_index);
-            case 6
-                indexes_p_incomplete = find([TrialRecord.User.structure.p_completed==0]);
-                index_index = randperm(length(indexes_p_incomplete), 1);
-                TrialRecord.User.struct_index = indexes_p_incomplete(index_index);
-            otherwise
-                disp('indexing into structure failed');
-        end
 else
     disp('repeat');
+end
+
+condition = TrialRecord.User.random_condition_order(TrialRecord.User.random_condition_order_index);
+if ~TrialRecord.User.repeat
+    switch condition % shouldn't do all of this when repeating, right?
+        case 1 % it's in case 1 when it should not be!!!
+            index3 = 1;
+            indexes_c_incomplete = [];
+            while index3 ~= length(TrialRecord.User.structure) + 1
+                if strcmp(TrialRecord.User.structure(index3).folder, 'chasing')...
+                        && TrialRecord.User.structure(index3).c_completed == 0
+                    indexes_c_incomplete(end+1) = index3;
+                end
+                index3 = index3 + 1;
+            end
+            index_index = randperm(length(indexes_c_incomplete), 1);
+            TrialRecord.User.struct_index = indexes_c_incomplete(index_index);
+        case 2
+            index3 = 1;
+            indexes_c_incomplete = [];
+            while index3 ~= length(TrialRecord.User.structure) + 1
+                if strcmp(TrialRecord.User.structure(index3).folder, 'grooming')...
+                        && TrialRecord.User.structure(index3).c_completed == 0
+                    indexes_c_incomplete(end+1) = index3;
+                end
+                index3 = index3 + 1;
+            end
+            index_index = randperm(length(indexes_c_incomplete), 1);
+            TrialRecord.User.struct_index = indexes_c_incomplete(index_index);
+        case 3
+            index3 = 1;
+            indexes_c_incomplete = [];
+            while index3 ~= length(TrialRecord.User.structure) + 1
+                if strcmp(TrialRecord.User.structure(index3).folder, 'mounting')...
+                        && TrialRecord.User.structure(index3).c_completed == 0
+                    indexes_c_incomplete(end+1) = index3;
+                end
+                index3 = index3 + 1;
+            end
+            index_index = randperm(length(indexes_c_incomplete), 1);
+            TrialRecord.User.struct_index = indexes_c_incomplete(index_index);
+        case 4
+            index3 = 1;
+            indexes_c_incomplete = [];
+            while index3 ~= length(TrialRecord.User.structure) + 1
+                if strcmp(TrialRecord.User.structure(index3).folder, 'holding')...
+                        && TrialRecord.User.structure(index3).c_completed == 0
+                    indexes_c_incomplete(end+1) = index3;
+                end
+                index3 = index3 + 1;
+            end
+            index_index = randperm(length(indexes_c_incomplete), 1);
+            TrialRecord.User.struct_index = indexes_c_incomplete(index_index);
+        case 5
+            indexes_a_incomplete = find([TrialRecord.User.structure.a_completed==0]);
+            index_index = randperm(length(indexes_a_incomplete), 1);
+            TrialRecord.User.struct_index = indexes_a_incomplete(index_index);
+        case 6
+            indexes_p_incomplete = find([TrialRecord.User.structure.p_completed==0]);
+            index_index = randperm(length(indexes_p_incomplete), 1);
+            TrialRecord.User.struct_index = indexes_p_incomplete(index_index);
+        otherwise
+            disp('indexing into structure failed');
+    end
+else
+    disp('same struct index used');
 end
 
 if condition == 1
