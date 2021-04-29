@@ -265,21 +265,27 @@ end
 % with the goal for that day?
 random_portion = randi(100, 1);
 max_reward = 400;
-min_reward = 200;
-category_bonus = 400; % maybe just add category bonus when switch
+min_reward = 150;
+category_bonus = 300; % maybe just add category bonus when switch
+extra_reward = 100;
 progression_goal_window = (2*TrialRecord.User.size_progression_factor +2) - TrialRecord.User.start_progression_number;
-progression_relative_start = TrialRecord.User.progression_number - TrialRecord.User.start_progression_number;                                         % reward goes from min to max over x progression numbers
+progression_relative_start = TrialRecord.User.progression_number - TrialRecord.User.start_progression_number;      % reward goes from min to max over x progression numbers
 reward_window = max_reward - min_reward;
-variable_reward_portion = progression_relative_start* ...          % here the variable portion is calculated based on a fraction of the complete task.
-    reward_window/progression_goal_window +(floor(progression_relative_start/TrialRecord.User.size_progression_factor)*category_bonus;
+variable_reward_portion = progression_relative_start* ...                   % here the variable portion is calculated based on a fraction of the complete task.
+    reward_window/progression_goal_window + floor(progression_relative_start/TrialRecord.User.size_progression_factor) * category_bonus;
 reward_dur1 = min_reward + variable_reward_portion;
-if reward_dur1 > max_reward                                                  % stay below max reward
+if reward_dur1 > max_reward                                                 % stay below max reward
     reward_dur1 = max_reward;
 elseif reward_dur1 < min_reward
     reward_dur1 = min_reward;
 end
+if TrialRecord.CurrentTrialNumber ~= 1 && TrialRecord.ConditionsPlayed(end)...
+        ~= TrialRecord.CurrentCondition
+    reward_dur1 = reward_dur1 + random_portion + extra_reward;
+else
+    reward_dur1 = reward_dur1 + random_portion;
+end
 
-reward_dur1 = reward_dur1 + random_portion;
 
 if TrialRecord.CurrentTrialNumber <= 10
     time_out = standard_time_out;
