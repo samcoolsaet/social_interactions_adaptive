@@ -19,6 +19,7 @@ if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.performance = 0;
     TrialRecord.User.progression_number = TrialRecord.User.start_progression_number;
     previous_sum_categories = 0;
+    TrialRecord.User.engaged = true;
     TrialRecord.User.max_fails = 3;
     TrialRecord.User.repeat = false;
     TrialRecord.User.completed_stimuli = 0;
@@ -104,8 +105,10 @@ end
 TrialRecord.NextBlock = TrialRecord.User.progression_number + 1;            
 if TrialRecord.User.progression_number > TrialRecord.User.max_c_progression_number
     TrialRecord.User.progression_number = TrialRecord.User.max_c_progression_number;
+    disp('max progression number reached');
 elseif TrialRecord.User.progression_number < min_c_progression_number
     TrialRecord.User.progression_number = min_c_progression_number;
+    disp('min progression number reached');
 end
 % setting independant category and button progression based on progression
 % number
@@ -231,7 +234,6 @@ end
 
 
 if TrialRecord.User.current_sum_categories ~= previous_sum_categories
-    %         || TrialRecord.User.structure_completion == 1
     TrialRecord.User.structure = struct('stimuli', {}, 'frames', {}, 'c_fails', {}, ... 
         'c_success', {},'c_completed', {}, 'a_fails', {}, 'a_success', {}, ...
         'a_completed', {}, 'p_fails', {}, 'p_success', {}, 'p_completed', {}, 'folder', {});
@@ -261,10 +263,12 @@ if TrialRecord.User.current_sum_categories ~= previous_sum_categories
         end
         index = index+1;
     end
+    disp('new structure made');
 end
 
-if TrialRecord.User.random_condition_order_index...
-        == length(TrialRecord.User.random_condition_order) % ja dit is dus een oetslechte voorwaarde, want er zijn natuurlijk meerdere van dezelfde waarden in die random condition order
+if (TrialRecord.User.random_condition_order_index...
+        == length(TrialRecord.User.random_condition_order)) && ...
+        (~TrialRecord.User.repeat) && (TrialRecord.User.engaged)
     if TrialRecord.User.training_categorization
         condition_order = [ones(1, TrialRecord.User.chasing_on*length(TrialRecord.User.chasing_list)) ...
             ones(1, TrialRecord.User.grooming_on*length(TrialRecord.User.grooming_list))*2 ... 
@@ -304,7 +308,7 @@ if TrialRecord.User.random_condition_order_index...
 else
     disp('did not reset random condition order');
 end
-x = TrialRecord.User.random_condition_order
+disp(TrialRecord.User.random_condition_order);
 % determine categorizing, agent or patient ( codes 1,2 and 3)
 
 % proceed = false;
@@ -360,14 +364,14 @@ x = TrialRecord.User.random_condition_order
 %     disp('repeat');
 % end
 
-if ~TrialRecord.User.repeat
+if ~TrialRecord.User.repeat && TrialRecord.User.engaged
     TrialRecord.User.random_condition_order_index = TrialRecord.User.random_condition_order_index + 1;
 else
     disp('repeat');
 end
 
 condition = TrialRecord.User.random_condition_order(TrialRecord.User.random_condition_order_index);
-if ~TrialRecord.User.repeat
+if ~TrialRecord.User.repeat && TrialRecord.User.engaged
     switch condition % shouldn't do all of this when repeating, right?
         case 1 % it's in case 1 when it should not be!!!
             index3 = 1;

@@ -225,9 +225,12 @@ con3.add(cam);
 scene1 = create_scene(con1);
 run_scene(scene1, 1);
 if tc_engagement.Success
-    dashboard(1, 'engagement scene time limit');
+    TrialRecord.User.engaged = false;
+    disp('not engaged');
     trialerror(8);
     return
+else
+    TrialRecord.User.engaged = true;
 end
 
 % run animation scene
@@ -263,11 +266,12 @@ end
 random_portion = randi(100, 1);
 max_reward = 400;
 min_reward = 200;
-progression_goal = (2*TrialRecord.User.size_progression_factor +2) - TrialRecord.User.start_progression_number;
-progression_aim_this_training = TrialRecord.User.progression_number - TrialRecord.User.start_progression_number;                                         % reward goes from min to max over x progression numbers
+category_bonus = 400; % maybe just add category bonus when switch
+progression_goal_window = (2*TrialRecord.User.size_progression_factor +2) - TrialRecord.User.start_progression_number;
+progression_relative_start = TrialRecord.User.progression_number - TrialRecord.User.start_progression_number;                                         % reward goes from min to max over x progression numbers
 reward_window = max_reward - min_reward;
-variable_reward_portion = progression_aim_this_training* ...          % here the variable portion is calculated based on a fraction of the complete task.
-    reward_window/progression_goal ;
+variable_reward_portion = progression_relative_start* ...          % here the variable portion is calculated based on a fraction of the complete task.
+    reward_window/progression_goal_window +(floor(progression_relative_start/TrialRecord.User.size_progression_factor)*category_bonus;
 reward_dur1 = min_reward + variable_reward_portion;
 if reward_dur1 > max_reward                                                  % stay below max reward
     reward_dur1 = max_reward;
@@ -422,23 +426,6 @@ TrialRecord.User.structure_completion = mean([TrialRecord.User.structure.c_compl
 % trialrecord.User.completed_stimuli =
 % TrialRecord.User.previous_completed_stimuli + 1 if deze trial fails == 3
 % of successes == 1
-
-%%%%
-% ik heb dus 2 problemen, enerzijds wil ik de stimuli van de oude struct naar de nieuwe struct overdragen
-% voordat hij reset als ze nog niet geevalueerd zijn. Anderzijds moet ik een manier vinden om telkens de laatst
-% vervulde stimuli te evalueren als de blocksize kleiner zou zijn dan de helft van de struct, want dan ga doe 
-% ik 2 evaluaties op dezelfde struct. welke tellen dan mee voor performance?
-%%%%
-% oplossing is mss dat ik na de evaluetie de vervolledigde stimuli uit de
-% struct verwijder, dan blijf ik over met die die nog niet compleet zijn,
-% in het eerste probleem kan ik die dan ook overbrengen op de nieuwe struct en
-% in het 2e probleem, doe ik geen evaluatie meer op de oude vervolledigde
-% stimuli.
-%%%%%%
-% of mss kan ik ook op basis van de indexes in de performance sectie, enkel de complete stimuli op het einde resetten
-% en dan kan ik een nieuwe volgorde berekenen als mijn complete stimuli == length struct om alle stimuli te doorlopen (OF ALS DE VOLGORDE VOLLEDIG DOORLOPEN IS).
-% ik moet dan alleen nog een nieuwe struct bouwen als er een categorie wordt toegevoegd.
-
 
 TrialRecord.User.completed_stimuli = sum([TrialRecord.User.structure.c_completed] + [TrialRecord.User.structure.a_completed] + [TrialRecord.User.structure.p_completed], 'all');
 
