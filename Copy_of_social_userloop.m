@@ -14,6 +14,8 @@ persistent timing_filenames_retrieved
 TrialRecord.User.start_progression_number = 11;                                               % the progression number to start training with
 
 if TrialRecord.CurrentTrialNumber == 0
+    TrialRecord.User.random_condition_order = 1;
+    TrialRecord.User.random_condition_order_index = 1;
     TrialRecord.User.performance = 0;
     TrialRecord.User.progression_number = TrialRecord.User.start_progression_number;
     previous_sum_categories = 0;
@@ -88,12 +90,15 @@ if TrialRecord.User.completed_stimuli == TrialRecord.User.blocksize  % find a wa
         TrialRecord.User.progression_number = ... 
             TrialRecord.User.progression_number - 1;
     end
-    TrialRecord.User.structure(indexes_used_c_stimuli).c_success = 0;
-    TrialRecord.User.structure(indexes_used_c_stimuli).c_fails = 0;
-    TrialRecord.User.structure(indexes_used_a_stimuli).a_success = 0;
-    TrialRecord.User.structure(indexes_used_a_stimuli).a_fails = 0;
-    TrialRecord.User.structure(indexes_used_p_stimuli).p_success = 0;
-    TrialRecord.User.structure(indexes_used_p_stimuli).p_fails = 0;
+    [TrialRecord.User.structure(indexes_used_c_stimuli).c_success] = deal(0);
+    [TrialRecord.User.structure(indexes_used_c_stimuli).c_fails] = deal(0);
+    [TrialRecord.User.structure(indexes_used_c_stimuli).c_completed] = deal(0);
+    [TrialRecord.User.structure(indexes_used_a_stimuli).a_success] = deal(0);
+    [TrialRecord.User.structure(indexes_used_a_stimuli).a_fails] = deal(0);
+    [TrialRecord.User.structure(indexes_used_c_stimuli).a_completed] = deal(0);
+    [TrialRecord.User.structure(indexes_used_p_stimuli).p_success] = deal(0);
+    [TrialRecord.User.structure(indexes_used_p_stimuli).p_fails] = deal(0);
+    [TrialRecord.User.structure(indexes_used_c_stimuli).p_completed] = deal(0);
 end
 TrialRecord.NextBlock = TrialRecord.User.progression_number + 1;            
 if TrialRecord.User.progression_number > TrialRecord.User.max_c_progression_number
@@ -257,7 +262,8 @@ if TrialRecord.User.current_sum_categories ~= previous_sum_categories
     end
 end
 
-if TrialRecord.User.completed_stimuli == length(TrialRecord.User.random_condition_order)
+if (TrialRecord.User.random_condition_order(TrialRecord.User.random_condition_order_index)...
+        == TrialRecord.User.random_condition_order(end))
     if TrialRecord.User.training_categorization
         condition_order = [ones(1, TrialRecord.User.chasing_on*length(TrialRecord.User.chasing_list)) ...
             ones(1, TrialRecord.User.grooming_on*length(TrialRecord.User.grooming_list))*2 ... 

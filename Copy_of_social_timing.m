@@ -376,11 +376,11 @@ elseif TrialRecord.User.patienting & touch.ChosenTarget ~= 2
 end
 
 if reward
-    sound(y1, fs1);
+%     sound(y1, fs1);
     goodmonkey(reward_dur1);
     background = [0 1 0 1000];
 else
-    sound(y2, fs2);
+%     sound(y2, fs2);
     background = [1 0 0 time_out];
 end
 reward_scene = BackgroundColorChanger(null_);
@@ -394,20 +394,17 @@ run_scene(scene4);
 if TrialRecord.User.structure(TrialRecord.User.struct_index).c_success == 1 ...
         || TrialRecord.User.structure(TrialRecord.User.struct_index).c_fails >= TrialRecord.User.max_fails
     TrialRecord.User.structure(TrialRecord.User.struct_index).c_completed = 1;
-else
-    TrialRecord.User.structure(TrialRecord.User.struct_index).c_completed = 0;
+    disp('stimulus set to complete');
 end
 if TrialRecord.User.structure(TrialRecord.User.struct_index).a_success == 1 ...
         || TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails >= TrialRecord.User.max_fails
     TrialRecord.User.structure(TrialRecord.User.struct_index).a_completed = 1;
-else
-    TrialRecord.User.structure(TrialRecord.User.struct_index).c_completed = 0;
+    disp('stimulus set to complete');
 end
 if TrialRecord.User.structure(TrialRecord.User.struct_index).p_success == 1 ...
         || TrialRecord.User.structure(TrialRecord.User.struct_index).p_fails >= TrialRecord.User.max_fails
     TrialRecord.User.structure(TrialRecord.User.struct_index).p_completed = 1;
-else
-    TrialRecord.User.structure(TrialRecord.User.struct_index).c_completed = 0;
+    disp('stimulus set to complete');
 end
 
 % setting a repeating variable for direct repeats when not completed
