@@ -66,20 +66,20 @@ if TrialRecord.User.training_categorization                                 % if
     switch TrialRecord.User.current_sum_categories                         % if 1 category is active
         case 1
             if TrialRecord.User.chasing                                         % if the stimulus is chasing
-                chasing_box(3) = {correct_button_size};                         % then chasing is the correct button and size should be accordingly to the size progression
+                chasing_box(3) = {standard_button_size};                         % then chasing is the correct button and size should be accordingly to the size progression
             else
                 chasing_box(3) = {wrong_button_size};                           % else, chasing button is the wrong button
             end
         case 2                         % analogous to the chasing example
             if TrialRecord.User.grooming
-                grooming_box(3) = {correct_button_size};
+                grooming_box(3) = {standard_button_size};
                 chasing_box(3) = {wrong_button_size};
             else
                 grooming_box(3) = {wrong_button_size};
             end
         case 3
             if TrialRecord.User.mounting
-                mounting_box(3) = {correct_button_size};
+                mounting_box(3) = {standard_button_size};
                 chasing_box(3) = {wrong_button_size};
                 grooming_box(3) = {wrong_button_size};
             else
@@ -87,7 +87,7 @@ if TrialRecord.User.training_categorization                                 % if
             end
         case 4
             if TrialRecord.User.holding
-                holding_box(3) = {correct_button_size};
+                holding_box(3) = {standard_button_size};
                 chasing_box(3) = {wrong_button_size};
                 grooming_box(3) = {wrong_button_size};
                 mounting_box(3) = {wrong_button_size};
@@ -100,17 +100,17 @@ if TrialRecord.User.training_agent_patient
     switch TrialRecord.User.current_sum_categories
         case 1
             if TrialRecord.User.agenting
-                agent_box(3) = {correct_button_size};
+                agent_box(3) = {standard_button_size};
             else
                 agent_box(3) = {wrong_button_size};
             end
         case 2
             if TrialRecord.User.patienting
-                patient_box(3) = {correct_button_size};
+                patient_box(3) = {standard_button_size};
                 agent_box(3) = {wrong_button_size};
             else
                 patient_box(3) = {wrong_button_size};
-                agent_box(3) = {correct_button_size};
+                agent_box(3) = {standard_button_size};
             end
     end
 end
@@ -442,5 +442,6 @@ bhv_variable('size_progression', TrialRecord.User.size_progression,...
     'stimulus_name', TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli,...
     'structure_completion', TrialRecord.User.structure_completion, ...
     'structure', TrialRecord.User.structure, ...
-    'completed_stim', TrialRecord.User.completed_stimuli);
+    'completed_stim', TrialRecord.User.completed_stimuli,...
+    'random_condition_order_index', TrialRecord.User.random_condition_order_index);
 

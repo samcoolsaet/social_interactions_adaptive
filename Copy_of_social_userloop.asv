@@ -269,7 +269,7 @@ if TrialRecord.User.current_sum_categories ~= previous_sum_categories
     end
     disp('new structure made');
 end
-condition_order = [];
+
 if (TrialRecord.User.random_condition_order_index...
         == length(TrialRecord.User.random_condition_order)) && ...
         (~TrialRecord.User.repeat) && (TrialRecord.User.engaged)
@@ -278,9 +278,9 @@ if (TrialRecord.User.random_condition_order_index...
             ones(1, TrialRecord.User.grooming_on*length(TrialRecord.User.grooming_list))*2 ... 
             ones(1, TrialRecord.User.mounting_on*length(TrialRecord.User.mounting_list))*3 ...
             ones(1, TrialRecord.User.holding_on*length(TrialRecord.User.holding_list))*4];
-%         for i = 1:length(TrialRecord.User.structure)
-%             condition_order(end+1) = [TrialRecord.User.structure(i).condition(1)];
-%         end
+        for i = 1:length(TrialRecord.User.structure)
+            condition(end+1) = [TrialRecord.User.structure(i).condition(1)];
+        end
     elseif TrialRecord.User.training_agent_patient
         condition_order = [ones(1, length(TrialRecord.User.structure))*5 ...
             ones(1, length(TrialRecord.User.structure))*6];
