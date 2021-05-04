@@ -269,7 +269,6 @@ if TrialRecord.User.current_sum_categories ~= previous_sum_categories
     end
     disp('new structure made');
 end
-
 if (TrialRecord.User.random_condition_order_index...
         == length(TrialRecord.User.random_condition_order)) && ...
         (~TrialRecord.User.repeat) && (TrialRecord.User.engaged)
@@ -295,12 +294,12 @@ if (TrialRecord.User.random_condition_order_index...
     indexes_used_c_stimuli = find([TrialRecord.User.structure.c_completed]==1);
     used_c_conditions = [];
     for i = 1:length(indexes_used_c_stimuli)
-        used_c_conditions(end+1) = TrialRecord.User.structure(indexes_used_c_stimuli(i)).condition(1);
+        used_c_conditions(end+1) = TrialRecord.User.structure(i).condition(1);
     end
     indexes_used_a_stimuli = find([TrialRecord.User.structure.a_completed]==1);
     used_a_conditions = ones(1, length(indexes_used_a_stimuli))*5;
     indexes_used_p_stimuli = find([TrialRecord.User.structure.p_completed]==1);
-    used_p_conditions = ones(1, length(indexes_used_p_stimuli))*6;
+    used_p_conditions = ones(1, length(indexes_used_a_stimuli)*6;
     used_conditions = horzcat(used_c_conditions, used_a_conditions, used_p_conditions);
     conditions_already_completed = TrialRecord.User.random_condition_order(end-length(used_conditions)+1:end);
     steps_till_reset = TrialRecord.User.blocksize - TrialRecord.User.completed_stimuli;
@@ -317,13 +316,13 @@ if (TrialRecord.User.random_condition_order_index...
             end
             index2 = index2 + 1;
         end
-        problem_vector = horzcat(conditions_already_completed, TrialRecord.User.random_condition_order(1:steps_till_reset));
+        problem_vector = horzcat(conditions_already_completed, TrialRecord.User.random_condition_order(1:steps_till_reset);
         if length(find(problem_vector==1)) > length(TrialRecord.User.chasing_list) ||...
                 length(find(problem_vector==2)) > length(TrialRecord.User.grooming_list) ||...
                 length(find(problem_vector==3)) > length(TrialRecord.User.mounting_list) ||...
                 length(find(problem_vector==4)) > length(TrialRecord.User.holding_list) ||...
-                length(find(problem_vector==5)) > length(stimulus_list) ||...
-                length(find(problem_vector==6)) > length(stimulus_list)
+                length(find(problem_vector==5)) > length(TrialRecord.User.stimulus_list) ||...
+                length(find(problem_vector==6)) > length(TrialRecord.User.stimulus_list)
             size_error = true;
         else
             size_error = false;
@@ -437,6 +436,42 @@ elseif condition == 6
 else
     disp('condition not found');
 end
+
+% if ~TrialRecord.User.training_agent_patient
+%     switch question
+%         case 1
+%             if strncmpi('chas', TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli, 4)    % check for title of the animation to determine actual category
+%                 TrialRecord.User.chasing = true;
+%                 TrialRecord.NextCondition = 1;
+%             elseif strncmpi('groom', TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli, 5)
+%                 TrialRecord.User.grooming = true;
+%                 TrialRecord.NextCondition = 2;
+%             elseif strncmpi('mount', TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli, 5)
+%                 TrialRecord.User.mounting = true;
+%                 TrialRecord.NextCondition = 3;
+%             elseif strncmpi('hold', TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli, 4)
+%                 TrialRecord.User.holding = true;
+%                 TrialRecord.NextCondition = 4;
+%             end
+%             TrialRecord.User.categorizing = true;
+%         case 2
+%             TrialRecord.NextCondition = 5;
+%             TrialRecord.User.agenting = true;
+%         case 3
+%             TrialRecord.NextCondition = 6;
+%             TrialRecord.User.patienting = true;
+%     end
+% else
+%     switch question
+%         case 1
+%             TrialRecord.NextCondition = 5;
+%             TrialRecord.User.agenting = true;
+%         case 2
+%             TrialRecord.NextCondition = 6;
+%             TrialRecord.User.patienting = true;
+%     end
+% end
+
 TrialRecord.User.movie = strcat(pwd, '\stimuli\', ... 
     TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', ...
     TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli);     % complete path of the animation
