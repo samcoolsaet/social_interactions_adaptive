@@ -183,10 +183,10 @@ TrialRecord.User.current_sum_buttons = sum([TrialRecord.User.chasing_on, ... % d
 % I want these variables to be fixed throughout the run
 if TrialRecord.CurrentTrialNumber == 0
     % dir() gives a struct of the contents of the path
-    chasing_struct = dir(strcat(pwd, '\stimuli\chasing'));
-    grooming_struct = dir(strcat(pwd, '\stimuli\grooming'));
-    mounting_struct = dir(strcat(pwd, '\stimuli\mounting'));
-    holding_struct = dir(strcat(pwd, '\stimuli\holding'));
+    chasing_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\chasing');
+    grooming_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\grooming');
+    mounting_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\mounting');
+    holding_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\holding');
     % isolating the name field
     TrialRecord.User.chasing_list = {chasing_struct.name};
     TrialRecord.User.grooming_list = {grooming_struct.name};
@@ -199,10 +199,10 @@ if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.holding_list(1:2) = [];
 
     % analogous for the frames
-    chasing_frame_struct = dir(strcat(pwd, '\frames\chasing'));
-    grooming_frame_struct = dir(strcat(pwd, '\frames\grooming'));
-    mounting_frame_struct = dir(strcat(pwd, '\frames\mounting'));
-    holding_frame_struct = dir(strcat(pwd, '\frames\holding'));
+    chasing_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\chasing');
+    grooming_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\grooming');
+    mounting_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\mounting');
+    holding_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\holding');
     TrialRecord.User.chasing_frame_list = {chasing_frame_struct.name};
     TrialRecord.User.grooming_frame_list = {grooming_frame_struct.name};
     TrialRecord.User.mounting_frame_list = {mounting_frame_struct.name};
@@ -269,28 +269,25 @@ if TrialRecord.User.current_sum_categories ~= previous_sum_categories
     end
     disp('new structure made');
 end
-condition_order = [];
 if (TrialRecord.User.random_condition_order_index...
         == length(TrialRecord.User.random_condition_order)) && ...
         (~TrialRecord.User.repeat) && (TrialRecord.User.engaged)
+    condition_order = [];
     if TrialRecord.User.training_categorization % [TrialRecord.User.structure.condition(1)]  [TrialRecord.User.structure(1).condition(1)]
-        condition_order = [ones(1, TrialRecord.User.chasing_on*length(TrialRecord.User.chasing_list)) ...
-            ones(1, TrialRecord.User.grooming_on*length(TrialRecord.User.grooming_list))*2 ... 
-            ones(1, TrialRecord.User.mounting_on*length(TrialRecord.User.mounting_list))*3 ...
-            ones(1, TrialRecord.User.holding_on*length(TrialRecord.User.holding_list))*4];
-%         for i = 1:length(TrialRecord.User.structure)
-%             condition_order(end+1) = [TrialRecord.User.structure(i).condition(1)];
-%         end
+        for i = 1:length(TrialRecord.User.structure)
+            condition_order(end+1) = [TrialRecord.User.structure(i).condition(1)];
+        end
     elseif TrialRecord.User.training_agent_patient
-        condition_order = [ones(1, length(TrialRecord.User.structure))*5 ...
-            ones(1, length(TrialRecord.User.structure))*6];
+        for i = 1:length(TrialRecord.User.structure)
+            condition_order(end+1) = [TrialRecord.User.structure(i).condition(2)];
+            condition_order(end+1) = [TrialRecord.User.structure(i).condition(3)];
+        end
     else
-        condition_order = [ones(1, TrialRecord.User.chasing_on*length(TrialRecord.User.chasing_list)) ...
-            ones(1, TrialRecord.User.grooming_on*length(TrialRecord.User.grooming_list))*2 ...
-            ones(1, TrialRecord.User.mounting_on*length(TrialRecord.User.mounting_list))*3 ...
-            ones(1, TrialRecord.User.holding_on*length(TrialRecord.User.holding_list))*4 ...
-            ones(1, length(TrialRecord.User.structure))*5 ...
-            ones(1, length(TrialRecord.User.structure))*6];
+        for i = 1:length(TrialRecord.User.structure)
+            condition_order(end+1) = [TrialRecord.User.structure(i).condition(1)];
+            condition_order(end+1) = [TrialRecord.User.structure(i).condition(2)];
+            condition_order(end+1) = [TrialRecord.User.structure(i).condition(3)];
+        end
     end
 
     restricted = false;
@@ -321,59 +318,6 @@ else
 end
 disp(TrialRecord.User.random_condition_order);
 % determine categorizing, agent or patient ( codes 1,2 and 3)
-
-% proceed = false;
-% while ~proceed
-%     question = randperm(sum([TrialRecord.User.category TrialRecord.User.agent_on TrialRecord.User.patient_on], 'all'), 1); %%% hier nog groot probleem, wat als de gekozen question al compleet is, maar de andere nog niet? dit mss linken aan struct completion?
-%     switch question
-%         case 1
-%             if ~TrialRecord.User.c_structure_completion
-%                 proceed = true;
-%             end
-%         case 2
-%             if ~TrialRecord.User.a_structure_completion
-%                 proceed = true;
-%             end
-%         case 3
-%             if ~TrialRecord.User.p_structure_completion
-%                 proceed = true;
-%             end
-%         otherwise
-%             disp('structure has not been reset');
-%     end
-% end
-    
-% if ~TrialRecord.User.repeat
-%     if ~TrialRecord.User.training_agent_patient
-%         switch question
-%             case 1
-%                 indexes_c_incomplete = find([TrialRecord.User.structure.c_completed]==0);
-%                 index_index = randperm(length(indexes_c_incomplete), 1);
-%                 TrialRecord.User.struct_index = indexes_c_incomplete(index_index);
-%             case 2
-%                 indexes_a_incomplete = find([TrialRecord.User.structure.a_completed]==0);
-%                 index_index = randperm(length(indexes_a_incomplete), 1);
-%                 TrialRecord.User.struct_index = indexes_a_incomplete(index_index);
-%             case 3
-%                 indexes_p_incomplete = find([TrialRecord.User.structure.p_completed==0]);
-%                 index_index = randperm(length(indexes_p_incomplete), 1);
-%                 TrialRecord.User.struct_index = indexes_p_incomplete(index_index);
-%         end
-%     else
-%         switch question
-%             case 1
-%                 indexes_a_incomplete = find([TrialRecord.User.structure.a_completed==0]);
-%                 index_index = randperm(length(indexes_a_incomplete), 1);
-%                 TrialRecord.User.struct_index = indexes_a_incomplete(index_index);
-%             case 2
-%                 indexes_p_incomplete = find([TrialRecord.User.structure.p_completed==0]);
-%                 index_index = randperm(length(indexes_p_incomplete), 1);
-%                 TrialRecord.User.struct_index = indexes_p_incomplete(index_index);
-%         end
-%     end
-% else
-%     disp('repeat');
-% end
 
 if ~TrialRecord.User.repeat && TrialRecord.User.engaged                     % engaged refers to return when time limit for engagement scene is reached
     TrialRecord.User.random_condition_order_index = TrialRecord.User.random_condition_order_index + 1;
