@@ -15,7 +15,7 @@ wrong_button_size_difference = 1.75;
 x_axes = [-12 12];
 y_axes = [-10 -3.33 3.33 10];
 y_spacing = 6.66;
-y_center = -(TrialRecord.User.current_sum_categories-1)*y_spacing/2;
+y_center = -(TrialRecord.User.current_sum_buttons-1)*y_spacing/2;
 movie_duration = 1000;
 answer_time = 8000;
 standard_time_out = 5000;
@@ -97,7 +97,7 @@ if TrialRecord.User.training_categorization                                 % if
     end
 end
 if TrialRecord.User.training_agent_patient
-    switch TrialRecord.User.current_sum_categories
+    switch TrialRecord.User.current_sum_buttons
         case 1
             if TrialRecord.User.agenting
                 agent_box(3) = {standard_button_size};
@@ -212,14 +212,6 @@ con3 = Concurrent(or);
 con3.add(img);
 con3.add(trial_box);
 con3.add(cam);
-
-% temporary cue
-
-% cue = CircleGraphic(null_);
-% cue.List = {[1 1 1], [1 1 1], 1, [0 0] };
-% if TrialRecord.User.agenting
-%     con3.add(cue);
-% end
 %% running scenes
 % run engagement scene
 scene1 = create_scene(con1);
@@ -312,7 +304,7 @@ if TrialRecord.User.current_sum_categories == 1 && TrialRecord.User.categorizing
         TrialRecord.User.structure(TrialRecord.User.struct_index).c_fails = TrialRecord.User.structure(TrialRecord.User.struct_index).c_fails + 1; %%%% dit ook nog voor de rest doen
         reward = false;
     end
-elseif TrialRecord.User.current_sum_categories == 1 && TrialRecord.User.agenting_patienting
+elseif TrialRecord.User.current_sum_buttons == 1 && TrialRecord.User.agenting_patienting
     if touch.Success
         dashboard(2, 'success!!! <3 ');
         trialerror(0);
@@ -370,7 +362,7 @@ elseif TrialRecord.User.patienting & touch.ChosenTarget == 2
     dashboard(2, 'success!!! <3 ');
     trialerror(0)
     TrialRecord.User.structure(TrialRecord.User.struct_index).p_success = TrialRecord.User.structure(TrialRecord.User.struct_index).p_success + 1; %%%% dit ook nog voor de rest doen
-    reward = false;
+    reward = true;
 elseif TrialRecord.User.patienting & touch.ChosenTarget ~= 2
     TrialRecord.User.structure(TrialRecord.User.struct_index).p_fails = TrialRecord.User.structure(TrialRecord.User.struct_index).p_fails + 1; %%%% dit ook nog voor de rest doen       
     reward = false;
@@ -427,12 +419,6 @@ TrialRecord.User.structure_completion = mean([TrialRecord.User.structure.c_compl
     [TrialRecord.User.structure.a_completed] + [TrialRecord.User.structure.p_completed])/...
     (TrialRecord.User.agent_on+TrialRecord.User.patient_on+TrialRecord.User.category);
 
-% TrialRecord.User.previous_completed_stimuli berekenen voordat de
-% completion hier wordt toegevoegd, userloop bvb,dan
-% trialrecord.User.completed_stimuli =
-% TrialRecord.User.previous_completed_stimuli + 1 if deze trial fails == 3
-% of successes == 1
-
 TrialRecord.User.completed_stimuli = sum([TrialRecord.User.structure.c_completed] + [TrialRecord.User.structure.a_completed] + [TrialRecord.User.structure.p_completed], 'all');
 
 bhv_variable('size_progression', TrialRecord.User.size_progression,...
@@ -444,4 +430,3 @@ bhv_variable('size_progression', TrialRecord.User.size_progression,...
     'structure', TrialRecord.User.structure, ...
     'completed_stim', TrialRecord.User.completed_stimuli,...
     'random_condition_order_index', TrialRecord.User.random_condition_order_index);
-

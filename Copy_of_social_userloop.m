@@ -18,7 +18,7 @@ if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.random_condition_order_index = 1;
     TrialRecord.User.performance = 0;
     TrialRecord.User.progression_number = TrialRecord.User.start_progression_number;
-    previous_sum_categories = 0;
+    previous_sum_buttons = 0;
     TrialRecord.User.engaged = true;
     TrialRecord.User.max_fails = 3;
     TrialRecord.User.repeat = false;
@@ -27,34 +27,37 @@ if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.a_structure_completion = 0;
     TrialRecord.User.p_structure_completion = 0;
 else
-    previous_sum_categories = TrialRecord.User.current_sum_categories;      % calculations of previous sum categories
+    previous_sum_buttons = TrialRecord.User.current_sum_buttons;      % calculations of previous sum categories
 end
 %% constants
 max_repeats_condition = 3;
 % progression
-TrialRecord.User.blocksize = 5;                                                              % The TrialRecord.User.blocksize is the number of animationsthe monkey has to complete.a block is the elementary unit, a block determines whether the progression number increases/decreases/stays the same.
+TrialRecord.User.blocksize = 5;                                             % The TrialRecord.User.blocksize is the number of animationsthe monkey has to complete.a block is the elementary unit, a block determines whether the progression number increases/decreases/stays the same.
+
 %%% maybe later create a blocksize as a function of previous performance to quickly skip to his level when starting again.                                                                            % block def: a set number of stimuli that have been showed for the first time
+
 succes_threshold = 0.80;                                                    % if performance is bigger than or equal to this, progression number + 1
 fail_threshold = 0;                                                         % if performance is smaller than or equal to this, progression number - 1
 TrialRecord.User.size_progression_factor = 10;                              % the number of progression number steps needed to go from start size to end size, used for both category and agent patient
-category_progression_factor = TrialRecord.User.size_progression_factor + 1; % number of progression number steps needed to add a category button
-agent_patient_progression_factor = TrialRecord.User.size_progression_factor + 2; % number of progression number steps needed to add a patient button
 
-% progression_trials = TrialRecord.User.blocksize * TrialRecord.User.size_progression_factor;  % the number of trials needed to get to the final size
-% consolidation_trials = TrialRecord.User.blocksize * ...
-%     (category_progression_factor-TrialRecord.User.size_progression_factor); % the number of trials to consolidate the current size progression 
+category_progression_factor = TrialRecord.User.size_progression_factor + 1; % number of progression number steps needed to add a category button
+
+agent_patient_progression_factor = ...
+    TrialRecord.User.size_progression_factor + 1;                           % number of progression number steps needed to add a patient button
+
+% progression_trials % the number of trials needed to get to the final size
+% consolidation_trials =  % the number of trials to consolidate the current size progression, is the difference between size and category progression * progression number 
 
 TrialRecord.User.max_c_progression_number = category_progression_factor * 2 ...
     + TrialRecord.User.size_progression_factor;                               % last button active + at final size
-% max_ap_progression_number =agent_patient_progression_factor * 1 + ...
-%     TrialRecord.User.size_progression_factor;
-min_c_progression_number = 0;
-% max_ap_progression_number =agent_patient_progression_factor * 1 + ...
-%     TrialRecord.User.size_progression_factor;
+TrialRecord.User.max_ap_progression_number = agent_patient_progression_factor * 1 + ...
+    TrialRecord.User.size_progression_factor;
+TrialRecord.User.min_c_progression_number = category_progression_factor;
+TrialRecord.User.min_ap_progression_number = category_progression_factor;
 
 % training
-TrialRecord.User.training_categorization = true;                            % complete task or training
-TrialRecord.User.training_agent_patient = false;
+TrialRecord.User.training_categorization = false;                            % complete task or training
+TrialRecord.User.training_agent_patient = true;
 
 % fixed constants
 TrialRecord.User.chasing_on = false;                                        % all false for script to work
@@ -102,14 +105,25 @@ if TrialRecord.User.completed_stimuli == TrialRecord.User.blocksize  % find a wa
     [TrialRecord.User.structure(indexes_used_c_stimuli).p_completed] = deal(0);
     disp('last blocksize reset in struct');
 end
-TrialRecord.NextBlock = TrialRecord.User.progression_number + 1;            
-if TrialRecord.User.progression_number > TrialRecord.User.max_c_progression_number
-    TrialRecord.User.progression_number = TrialRecord.User.max_c_progression_number;
-    disp('max progression number reached');
-elseif TrialRecord.User.progression_number < min_c_progression_number
-    TrialRecord.User.progression_number = min_c_progression_number;
-    disp('min progression number reached');
+TrialRecord.NextBlock = TrialRecord.User.progression_number + 1;
+if TrialRecord.User.training_categorization
+    if TrialRecord.User.progression_number > TrialRecord.User.max_c_progression_number
+        TrialRecord.User.progression_number = TrialRecord.User.max_c_progression_number;
+        disp('max progression number reached');
+    elseif TrialRecord.User.progression_number < TrialRecord.User.min_c_progression_number
+        TrialRecord.User.progression_number = TrialRecord.User.min_c_progression_number;
+        disp('min progression number reached');
+    end
+elseif TrialRecord.User.training_agent_patient
+    if TrialRecord.User.progression_number > TrialRecord.User.max_ap_progression_number
+        TrialRecord.User.progression_number = TrialRecord.User.max_ap_progression_number;
+        disp('max progression number reached');
+    elseif TrialRecord.User.progression_number < TrialRecord.User.min_ap_progression_number
+        TrialRecord.User.progression_number = TrialRecord.User.min_ap_progression_number;
+        disp('min progression number reached');
+    end
 end
+
 % setting independant category and button progression based on progression
 % number
 TrialRecord.User.category_progression = ...                                 % the category progression factor, which should be at least bigger than than the size progression factor in order 
@@ -166,6 +180,8 @@ else
 end
 if TrialRecord.User.chasing_on || TrialRecord.User.grooming_on || TrialRecord.User.holding_on || TrialRecord.User.mounting_on
     TrialRecord.User.category = true;
+else
+    TrialRecord.User.category = false;
 end
 % calculation current sum categories after switches have been altered
 TrialRecord.User.current_sum_categories = sum([TrialRecord.User.chasing_on, ... % difference between current and previous sum of categories acts as a 
@@ -233,7 +249,7 @@ elseif ~TrialRecord.User.grooming_on && TrialRecord.User.chasing_on
 end
 
 
-if TrialRecord.User.current_sum_categories ~= previous_sum_categories
+if TrialRecord.User.current_sum_buttons ~= previous_sum_buttons
     TrialRecord.User.structure = struct('stimuli', {}, 'frames', {}, 'c_fails', {}, ... 
         'c_success', {},'c_completed', {}, 'a_fails', {}, 'a_success', {}, ...
         'a_completed', {}, 'p_fails', {}, 'p_success', {}, 'p_completed', {}, 'folder', {}, 'condition', {});
@@ -398,11 +414,11 @@ if ~TrialRecord.User.repeat && TrialRecord.User.engaged
             index_index = randperm(length(indexes_c_incomplete), 1);
             TrialRecord.User.struct_index = indexes_c_incomplete(index_index);
         case 5
-            indexes_a_incomplete = find([TrialRecord.User.structure.a_completed==0]);
+            indexes_a_incomplete = find([TrialRecord.User.structure.a_completed]==0);
             index_index = randperm(length(indexes_a_incomplete), 1);
             TrialRecord.User.struct_index = indexes_a_incomplete(index_index);
         case 6
-            indexes_p_incomplete = find([TrialRecord.User.structure.p_completed==0]);
+            indexes_p_incomplete = find([TrialRecord.User.structure.p_completed]==0);
             index_index = randperm(length(indexes_p_incomplete), 1);
             TrialRecord.User.struct_index = indexes_p_incomplete(index_index);
         otherwise
