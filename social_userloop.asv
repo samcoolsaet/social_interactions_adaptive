@@ -369,13 +369,13 @@ else
 end
 
 condition = TrialRecord.User.random_condition_order(TrialRecord.User.random_condition_order_index);
-%% given the condition, pick a stimulus that has not yet been completed in the current structure
-if ~TrialRecord.User.repeat && TrialRecord.User.engaged                     % if this, we should just do everything the same as previous trial
-    switch condition
-        case 1
+%% given 
+if ~TrialRecord.User.repeat && TrialRecord.User.engaged
+    switch condition % shouldn't do all of this when repeating, right?
+        case 1 % it's in case 1 when it should not be!!! all opf the condition 1 have already been completed, so the problem is: why condition == 1
             index3 = 1;
             indexes_c_incomplete = [];
-            while index3 ~= length(TrialRecord.User.structure) + 1          % just iterate over the structure and see which ones are still available (not completed), given the condition
+            while index3 ~= length(TrialRecord.User.structure) + 1
                 if strcmp(TrialRecord.User.structure(index3).folder, 'chasing')...
                         && TrialRecord.User.structure(index3).c_completed == 0
                     indexes_c_incomplete(end+1) = index3;
@@ -434,7 +434,7 @@ if ~TrialRecord.User.repeat && TrialRecord.User.engaged                     % if
 else
     disp('same struct index used');
 end
-%% set the condition for the timing file
+
 if condition == 1
     TrialRecord.User.chasing = true;
     TrialRecord.NextCondition = 1;
@@ -460,11 +460,10 @@ elseif condition == 6
 else
     disp('condition not found');
 end
-
-TrialRecord.User.movie = strcat('G:\sam\stimuli\stimuli\',... 
+TrialRecord.User.movie = strcat(pwd, '\stimuli\', ... 
     TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', ...
     TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli);     % complete path of the animation
-TrialRecord.User.frame = strcat('G:\sam\frames\frames\',... 
+TrialRecord.User.frame = strcat(pwd,'\frames\', ... 
     TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', ...
     TrialRecord.User.structure(TrialRecord.User.struct_index).frames);      % and frame
 

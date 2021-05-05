@@ -379,11 +379,10 @@ if reward
 %     sound(y1, fs1);
     goodmonkey(reward_dur1);
     background = [0 1 0 1000];
-    disp(['reward given:' string(reward_dur1)]);
+    disp('reward given
 else
 %     sound(y2, fs2);
     background = [1 0 0 time_out];
-    disp(['no reward, time out' string(time_out)]);
 end
 reward_scene = BackgroundColorChanger(null_);
 reward_scene.List = background;
