@@ -360,13 +360,13 @@ else
     disp('did not reset random condition order');
 end
 disp(TrialRecord.User.random_condition_order);
-disp(TrialRecord.User.random_condition_order_index);
 
 if ~TrialRecord.User.repeat && TrialRecord.User.engaged                     % engaged refers to return when time limit for engagement scene is reached
     TrialRecord.User.random_condition_order_index = TrialRecord.User.random_condition_order_index + 1;
 else
     disp('repeat');
 end
+disp(TrialRecord.User.random_condition_order_index);
 
 condition = TrialRecord.User.random_condition_order(TrialRecord.User.random_condition_order_index);
 %% given the condition, pick a stimulus that has not yet been completed in the current structure

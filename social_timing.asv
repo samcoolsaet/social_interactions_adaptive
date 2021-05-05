@@ -1,11 +1,11 @@
 [y3, fs3] = audioread('alarm.wav');
-hotkey('k','sound(y3, fs3);');
+hotkey('k','sound(y3, fs3); TrialRecord.User.engaged = false; trialerror(8); return;');
 hotkey('x', 'escape_screen(); assignin(''caller'',''continue_'',false);');
 hotkey('r', 'goodmonkey(reward_dur, ''juiceline'', MLConfig.RewardFuncArgs.JuiceLine, ''eventmarker'', 14, ''nonblocking'', 1);');   % manual reward
 hotkey('p', 'TrialRecord.User.progression_number = TrialRecord.User.progression_number + 1;');
 hotkey('o', 'TrialRecord.User.progression_number = TrialRecord.User.progression_number + (TrialRecord.User.size_progression_factor - TrialRecord.User.size_progression)+1;');
 hotkey('l', 'TrialRecord.User.progression_number = TrialRecord.User.progression_number - TrialRecord.User.size_progression;');
-hotkey('m', 'TrialRecord.User.progression_number = TrialRecord.User.progression_number - 1; dashboard(1, string(TrialRecord.User.progression_number));');
+hotkey('m', 'TrialRecord.User.progression_number = TrialRecord.User.progression_number - 1;');
 bhv_code(1, 'run_engagement_scene', 2, 'run_video', 3, 'run_answer_scene', 5, 'end_aswer_scene');
 %% constants
 touch_threshold = 2;
@@ -31,21 +31,6 @@ mounting_box = {[1 1 0], [1 1 0], standard_button_size, [x_axes(1) (y_center + 2
 holding_box = {[0 0 1], [0 0 1], standard_button_size, [x_axes(1) (y_center + 3*y_spacing)]};
 agent_box = {[0 1 1], [0 1 1], standard_button_size, [x_axes(2) y_center]};
 patient_box = {[1 0 1], [1 0 1], standard_button_size, [x_axes(2) (y_center + y_spacing)]};
-
-% x_spacing = 3;
-% y_spacing = 3.33;
-% x_center_points = [-13 12];
-% % y_center_points = 0;
-% y_center_points = floor(TrialRecord.User.current_sum_categories/2)*(-y_spacing)+3*y_spacing;
-% 
-% engaging_box = { [1 1 1], [1 1 1], standard_button_size, [10 0] };
-% chasing_box = {[1 0 0], [1 0 0], standard_button_size, [x_center_points(1)-x_spacing y_center_points-3*y_spacing]};
-% grooming_box = {[0 1 0], [0 1 0], standard_button_size, [x_center_points(1)+x_spacing y_center_points-3*y_spacing]};
-% mounting_box = {[1 1 0], [1 1 0], standard_button_size, [x_center_points(1)-x_spacing y_center_points-y_spacing]};
-% holding_box = {[0 0 1], [0 0 1], standard_button_size, [x_center_points(1)+x_spacing y_center_points-y_spacing]};
-% agent_box = {[0 1 1], [0 1 1], standard_button_size, [x_center_points(2) y_center_points-y_spacing]};
-% patient_box = {[1 0 1], [1 0 1], standard_button_size, [x_center_points(2) y_center_points+y_spacing]};
-
 %% sizing buttons
 % determining correct button size in case of training
 correct_button_size_step = (1 - TrialRecord.User.size_progression/...               % the step in wich the size decreases, size progression is linked in a 1 to 1 basis with the progression number. So play with the blocksize in order to change #trials per size
@@ -289,10 +274,10 @@ else
         time_out = 7000;
     end
 end
-
+% x = TrialRecord.User.agenting & touch.ChosenTarget ~= 1
 [y1, fs1] = audioread('right.wav');
 [y2, fs2] = audioread('wrong.wav');
-if TrialRecord.User.current_sum_categories == 1 && TrialRecord.User.categorizing
+if TrialRecord.User.current_sum_buttons == 1 && TrialRecord.User.categorizing
     if touch.Success
         dashboard(2, 'success!!! <3 ');
         trialerror(0);
@@ -315,15 +300,8 @@ elseif TrialRecord.User.current_sum_buttons == 1 && TrialRecord.User.agenting_pa
         trialerror(1);
         TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails = TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails + 1; %%%% dit ook nog voor de rest doen
         reward = false;
-        if tc_answer.Success
-            dashboard(2, 'no response');
-            trialerror(1);
-        else
-            dashboard(2, 'FAIL!!!');
-            trialerror(6);
-        end
     end
-elseif TrialRecord.User.categorizing & TrialRecord.User.current_sum_categories ~= 1
+elseif TrialRecord.User.categorizing & TrialRecord.User.current_sum_buttons ~= 1
     if (TrialRecord.User.chasing & touch.ChosenTarget == 1) | ...
             (TrialRecord.User.grooming & touch.ChosenTarget == 2) | ...
             (TrialRecord.User.mounting & touch.ChosenTarget == 3) | ...
@@ -343,22 +321,24 @@ elseif TrialRecord.User.categorizing & TrialRecord.User.current_sum_categories ~
             trialerror(6);
         end
     end
-elseif TrialRecord.User.agenting & touch.ChosenTarget == 1
-    dashboard(2, 'success!!! <3 ');
-    trialerror(0);
-    TrialRecord.User.structure(TrialRecord.User.struct_index).a_success = TrialRecord.User.structure(TrialRecord.User.struct_index).a_success + 1; %%%% dit ook nog voor de rest doen
-    reward = true;
-elseif TrialRecord.User.agenting & touch.ChosenTarget ~= 1
-    TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails = TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails + 1; %%%% dit ook nog voor de rest doen    
-    reward = false;    
-    if tc_answer.Success
-        dashboard(2, 'no response');
-        trialerror(1);
-    else
-        dashboard(2, 'FAIL!!!');
-        trialerror(6);
+elseif TrialRecord.User.agenting & TrialRecord.User.current_sum_buttons ~= 1
+    if touch.ChosenTarget == 1
+        dashboard(2, 'success!!! <3 ');
+        trialerror(0);
+        TrialRecord.User.structure(TrialRecord.User.struct_index).a_success = TrialRecord.User.structure(TrialRecord.User.struct_index).a_success + 1; %%%% dit ook nog voor de rest doen
+        reward = true;
+    else 
+        TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails = TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails + 1; %%%% dit ook nog voor de rest doen    
+        reward = false;    
+        if tc_answer.Success
+            dashboard(2, 'no response');
+            trialerror(1);
+        else
+            dashboard(2, 'FAIL!!!');
+            trialerror(6);
+        end
     end
-elseif TrialRecord.User.patienting & touch.ChosenTarget == 2
+elseif TrialRecord.User.patienting & TrialRecord.User.current_sum_buttons ~= 2
     dashboard(2, 'success!!! <3 ');
     trialerror(0)
     TrialRecord.User.structure(TrialRecord.User.struct_index).p_success = TrialRecord.User.structure(TrialRecord.User.struct_index).p_success + 1; %%%% dit ook nog voor de rest doen
@@ -379,10 +359,11 @@ if reward
 %     sound(y1, fs1);
     goodmonkey(reward_dur1);
     background = [0 1 0 1000];
-    disp('reward given
+    disp(['reward given:' string(reward_dur1)]);
 else
 %     sound(y2, fs2);
     background = [1 0 0 time_out];
+    disp(['no reward, time out' string(time_out)]);
 end
 reward_scene = BackgroundColorChanger(null_);
 reward_scene.List = background;
