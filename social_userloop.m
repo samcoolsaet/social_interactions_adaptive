@@ -11,7 +11,7 @@ persistent timing_filenames_retrieved
     return
     end
 %% initializing for first trial
-TrialRecord.User.start_progression_number = 11;                                               % the progression number to start training with
+TrialRecord.User.start_progression_number = 21;                                               % the progression number to start training with
 
 if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.random_condition_order = 1;
@@ -55,8 +55,8 @@ TrialRecord.User.min_c_progression_number = category_progression_factor;    % at
 TrialRecord.User.min_ap_progression_number = category_progression_factor;
 
 % training
-TrialRecord.User.training_categorization = false;                            % complete task or training
-TrialRecord.User.training_agent_patient = true;
+TrialRecord.User.training_categorization = true;                            % complete task or training
+TrialRecord.User.training_agent_patient = false;
 
 % fixed constants
 TrialRecord.User.chasing_on = false;                                        % all false for script to work
@@ -106,25 +106,25 @@ if TrialRecord.User.completed_stimuli == TrialRecord.User.blocksize             
     disp('last blocksize reset in struct');
 end
 
-TrialRecord.NextBlock = TrialRecord.User.progression_number + 1;            % blocknumber is now based on progression, so that I can easily keep track of everything
-
 if TrialRecord.User.training_categorization
     if TrialRecord.User.progression_number > TrialRecord.User.max_c_progression_number
         TrialRecord.User.progression_number = TrialRecord.User.max_c_progression_number;
-        disp(['max progression number reached' string(TrialRecord.User.max_c_progression_number)]);
+        disp(['max c progression number reached' string(TrialRecord.User.max_c_progression_number)]);
     elseif TrialRecord.User.progression_number < TrialRecord.User.min_c_progression_number
         TrialRecord.User.progression_number = TrialRecord.User.min_c_progression_number;
-        disp(['min progression number reached' string(TrialRecord.User.min_c_progression_number)]);
+        disp(['min c progression number reached' string(TrialRecord.User.min_c_progression_number)]);
     end
 elseif TrialRecord.User.training_agent_patient
     if TrialRecord.User.progression_number > TrialRecord.User.max_ap_progression_number
         TrialRecord.User.progression_number = TrialRecord.User.max_ap_progression_number;
-        disp(['max progression number reached' string(TrialRecord.User.max_ap_progression_number)]);
+        disp(['max ap progression number reached' string(TrialRecord.User.max_ap_progression_number)]);
     elseif TrialRecord.User.progression_number < TrialRecord.User.min_ap_progression_number
         TrialRecord.User.progression_number = TrialRecord.User.min_ap_progression_number;
-        disp(['min progression number reached' string(TrialRecord.User.min_ap_progression_number)]);
+        disp(['min ap progression number reached' string(TrialRecord.User.min_ap_progression_number)]);
     end
 end
+
+TrialRecord.NextBlock = TrialRecord.User.progression_number + 1;            % blocknumber is now based on progression, so that I can easily keep track of everything
 
 % setting independant category and button progression based on progression
 % number

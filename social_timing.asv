@@ -33,10 +33,10 @@ agent_box = {[0 1 1], [0 1 1], standard_button_size, [x_axes(2) y_center]};
 patient_box = {[1 0 1], [1 0 1], standard_button_size, [x_axes(2) (y_center + y_spacing)]};
 %% sizing buttons
 % determining correct button size in case of training
-correct_button_size_step = (1 - TrialRecord.User.size_progression/...               % the step in wich the size decreases, size progression is linked in a 1 to 1 basis with the progression number. So play with the blocksize in order to change #trials per size
-    TrialRecord.User.size_progression_factor) * correct_button_size_difference;
-wrong_button_size_step = (1 - TrialRecord.User.size_progression/...               % the step in wich the size decreases, size progression is linked in a 1 to 1 basis with the progression number. So play with the blocksize in order to change #trials per size
-    TrialRecord.User.size_progression_factor) * wrong_button_size_difference;
+correct_button_size_step = (1 - TrialRecord.User.size_progression) * ...               % the step in wich the size decreases, size progression is linked in a 1 to 1 basis with the progression number. So play with the blocksize in order to change #trials per size
+    correct_button_size_difference;
+wrong_button_size_step = (1 - TrialRecord.User.size_progression) * ...               % the step in wich the size decreases, size progression is linked in a 1 to 1 basis with the progression number. So play with the blocksize in order to change #trials per size
+    wrong_button_size_difference;
 if correct_button_size_step > 0                                                     % if the step is larger than 0
     correct_button_size = 2 + correct_button_size_step;                             % add the button size step to the standard size
     wrong_button_size = 2 - wrong_button_size_step;                               % subtract the size step from the standard size
@@ -269,12 +269,12 @@ if TrialRecord.CurrentTrialNumber <= 10
 else
     boolean_last_ten = TrialRecord.TrialErrors(end-9:end) == 0;
     performance_last_ten = mean(boolean_last_ten);
-    time_out = standard_time_out / sqrt(TrialRecord.User.performance);
+    time_out = standard_time_out / sqrt(performance_last_ten);
     if time_out > 7000
         time_out = 7000;
     end
 end
-% x = TrialRecord.User.agenting & touch.ChosenTarget ~= 1
+
 [y1, fs1] = audioread('right.wav');
 [y2, fs2] = audioread('wrong.wav');
 if TrialRecord.User.current_sum_buttons == 1 && TrialRecord.User.categorizing
@@ -325,10 +325,10 @@ elseif TrialRecord.User.agenting & TrialRecord.User.current_sum_buttons ~= 1
     if touch.ChosenTarget == 1
         dashboard(2, 'success!!! <3 ');
         trialerror(0);
-        TrialRecord.User.structure(TrialRecord.User.struct_index).a_success = TrialRecord.User.structure(TrialRecord.User.struct_index).a_success + 1; %%%% dit ook nog voor de rest doen
+        TrialRecord.User.structure(TrialRecord.User.struct_index).a_success = TrialRecord.User.structure(TrialRecord.User.struct_index).a_success + 1;
         reward = true;
     else 
-        TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails = TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails + 1; %%%% dit ook nog voor de rest doen    
+        TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails = TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails + 1;    
         reward = false;    
         if tc_answer.Success
             dashboard(2, 'no response');
@@ -338,20 +338,22 @@ elseif TrialRecord.User.agenting & TrialRecord.User.current_sum_buttons ~= 1
             trialerror(6);
         end
     end
-elseif TrialRecord.User.patienting & TrialRecord.User.current_sum_buttons ~= 2
-    dashboard(2, 'success!!! <3 ');
-    trialerror(0)
-    TrialRecord.User.structure(TrialRecord.User.struct_index).p_success = TrialRecord.User.structure(TrialRecord.User.struct_index).p_success + 1; %%%% dit ook nog voor de rest doen
-    reward = true;
-elseif TrialRecord.User.patienting & touch.ChosenTarget ~= 2
-    TrialRecord.User.structure(TrialRecord.User.struct_index).p_fails = TrialRecord.User.structure(TrialRecord.User.struct_index).p_fails + 1; %%%% dit ook nog voor de rest doen       
-    reward = false;
-    if tc_answer.Success
-        dashboard(2, 'no response');
-        trialerror(1);
+elseif TrialRecord.User.patienting & TrialRecord.User.current_sum_buttons ~= 1
+    if touch.ChosenTarget == 2
+        dashboard(2, 'success!!! <3 ');
+        trialerror(0)
+        TrialRecord.User.structure(TrialRecord.User.struct_index).p_success = TrialRecord.User.structure(TrialRecord.User.struct_index).p_success + 1;
+        reward = true;
     else
-        dashboard(2, 'FAIL!!!');
-        trialerror(6);
+        TrialRecord.User.structure(TrialRecord.User.struct_index).p_fails = TrialRecord.User.structure(TrialRecord.User.struct_index).p_fails + 1;       
+        reward = false;
+        if tc_answer.Success
+            dashboard(2, 'no response');
+            trialerror(1);
+        else
+            dashboard(2, 'FAIL!!!');
+            trialerror(6);
+        end
     end
 end
 
