@@ -33,13 +33,13 @@ agent_box = {[0 1 1], [0 1 1], standard_button_size, [x_axes(2) y_center]};
 patient_box = {[1 0 1], [1 0 1], standard_button_size, [x_axes(2) (y_center + y_spacing)]};
 %% sizing buttons
 % determining correct button size in case of training
-correct_button_size_step = (1 - TrialRecord.User.size_progression) * ...               % the step in wich the size decreases, size progression is linked in a 1 to 1 basis with the progression number. So play with the blocksize in order to change #trials per size
+correct_button_size_step = (1 - TrialRecord.User.size_progression) * ...    % the step in wich the size decreases, size progression is linked in a 1 to 1 basis with the progression number. So play with the blocksize in order to change #trials per size
     correct_button_size_difference;
-wrong_button_size_step = (1 - TrialRecord.User.size_progression) * ...               % the step in wich the size decreases, size progression is linked in a 1 to 1 basis with the progression number. So play with the blocksize in order to change #trials per size
+wrong_button_size_step = (1 - TrialRecord.User.size_progression) * ...      % the step in wich the size decreases, size progression is linked in a 1 to 1 basis with the progression number. So play with the blocksize in order to change #trials per size
     wrong_button_size_difference;
-if correct_button_size_step > 0                                                     % if the step is larger than 0
-    correct_button_size = 2 + correct_button_size_step;                             % add the button size step to the standard size
-    wrong_button_size = 2 - wrong_button_size_step;                               % subtract the size step from the standard size
+if correct_button_size_step > 0                                             % if the step is larger than 0
+    correct_button_size = 2 + correct_button_size_step;                     % add the button size step to the standard size
+    wrong_button_size = 2 - wrong_button_size_step;                         % subtract the size step from the standard size
 else
     correct_button_size = standard_button_size;                             % els, it means that maximum progression through the size difference is reached
     wrong_button_size = standard_button_size;                               % thus the button size is the final button size
@@ -48,12 +48,12 @@ end
 % only adjust last added button to correct, wrong or standard size,
 % depending on corrext answer
 if TrialRecord.User.training_categorization                                 % if training this
-    switch TrialRecord.User.current_sum_categories                         % if 1 category is active
+    switch TrialRecord.User.current_sum_categories                          % if 1 category is active
         case 1
-            if TrialRecord.User.chasing                                         % if the stimulus is chasing
-                chasing_box(3) = {standard_button_size};                         % then chasing is the correct button and size should be accordingly to the size progression
+            if TrialRecord.User.chasing                                     % if the stimulus is chasing
+                chasing_box(3) = {standard_button_size};                    % then chasing is the correct button and size should be accordingly to the size progression
             else
-                chasing_box(3) = {wrong_button_size};                           % else, chasing button is the wrong button
+                chasing_box(3) = {wrong_button_size};                       % else, chasing button is the wrong button
             end
         case 2                         % analogous to the chasing example
             if TrialRecord.User.grooming
@@ -240,29 +240,33 @@ end
 
 % make reward scale with ( a fraction of ) progression number correlated
 % with the goal for that day?
-random_portion = randi(100, 1);
-max_reward = 400;
-min_reward = 150;
-category_bonus = 300; % maybe just add category bonus when switch
-extra_reward = 100;
-progression_goal_window = (2*TrialRecord.User.size_progression_factor +2) - TrialRecord.User.start_progression_number;
-progression_relative_start = TrialRecord.User.progression_number - TrialRecord.User.start_progression_number;      % reward goes from min to max over x progression numbers
-reward_window = max_reward - min_reward;
-variable_reward_portion = progression_relative_start* ...                   % here the variable portion is calculated based on a fraction of the complete task.
-    reward_window/progression_goal_window + floor(progression_relative_start/TrialRecord.User.size_progression_factor) * category_bonus;
-reward_dur1 = min_reward + variable_reward_portion;
-if reward_dur1 > max_reward                                                 % stay below max reward
-    reward_dur1 = max_reward;
-elseif reward_dur1 < min_reward
-    reward_dur1 = min_reward;
-end
-if TrialRecord.CurrentTrialNumber ~= 1 && TrialRecord.ConditionsPlayed(end)...
-        ~= TrialRecord.CurrentCondition
-    reward_dur1 = reward_dur1 + random_portion + extra_reward;
+if TrialRecord.User.training_categorization ||...
+        TrialRecord.User.training_agent_patient
+    random_portion = randi(100, 1);
+    max_reward = 400;
+    min_reward = 150;
+    category_bonus = 300;                                                   % bonus when he reaches extra button ( check thism should be zhen he gi9ve
+    extra_reward = 100;                                                     
+    progression_goal_window = (2*TrialRecord.User.size_progression_factor +2) - TrialRecord.User.start_progression_number;
+    progression_relative_start = TrialRecord.User.progression_number - TrialRecord.User.start_progression_number;      % reward goes from min to max over x progression numbers
+    reward_window = max_reward - min_reward;
+    variable_reward_portion = progression_relative_start* ...                   % here the variable portion is calculated based on a fraction of the complete task.
+        reward_window/progression_goal_window + floor(progression_relative_start/TrialRecord.User.size_progression_factor) * category_bonus;
+    reward_dur1 = min_reward + variable_reward_portion;
+    if reward_dur1 > max_reward                                                 % stay below max reward
+        reward_dur1 = max_reward;
+    elseif reward_dur1 < min_reward
+        reward_dur1 = min_reward;
+    end
+    if TrialRecord.CurrentTrialNumber ~= 1 && TrialRecord.ConditionsPlayed(end)...
+            ~= TrialRecord.CurrentCondition
+        reward_dur1 = reward_dur1 + random_portion + extra_reward;
+    else
+        reward_dur1 = reward_dur1 + random_portion;
+    end
 else
-    reward_dur1 = reward_dur1 + random_portion;
+    reward_dur1 = 400;
 end
-
 
 if TrialRecord.CurrentTrialNumber <= 10
     time_out = standard_time_out;

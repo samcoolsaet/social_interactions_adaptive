@@ -245,8 +245,8 @@ if TrialRecord.User.training_categorization ||...
     random_portion = randi(100, 1);
     max_reward = 400;
     min_reward = 150;
-    category_bonus = 300; % maybe just add category bonus when switch
-    extra_reward = 100;
+    category_bonus = 300;                                                   % bonus when he reaches extra button ( check thism should be zhen he gi9ves correct answer to equal sized buttons )
+    extra_reward = 100;                                                     % extra reward if when he immediately gets a condition switch right 
     progression_goal_window = (2*TrialRecord.User.size_progression_factor +2) - TrialRecord.User.start_progression_number;
     progression_relative_start = TrialRecord.User.progression_number - TrialRecord.User.start_progression_number;      % reward goes from min to max over x progression numbers
     reward_window = max_reward - min_reward;
