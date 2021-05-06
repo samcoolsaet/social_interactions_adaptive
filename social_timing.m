@@ -24,24 +24,37 @@ repeating = true;
 TrialRecord.User.repeat = false;
 
 %  init boxes
-engaging_box = { [1 1 1], [1 1 1], standard_button_size, [10 0] };
-chasing_box = {[1 0.8 0.6], [1 0.8 0.6], standard_button_size, [x_axes(1) y_center]};
-grooming_box = {[0.5 1 1], [0.5 1 1], standard_button_size, [x_axes(1) (y_center + y_spacing)]};
-mounting_box = {[1 1 0], [1 1 0], standard_button_size, [x_axes(1) (y_center + 2*y_spacing)]};
-holding_box = {[0 0 1], [0 0 1], standard_button_size, [x_axes(1) (y_center + 3*y_spacing)]};
-agent_box = {[0 1 1], [0 1 1], standard_button_size, [x_axes(2) y_center]};
-patient_box = {[1 0 1], [1 0 1], standard_button_size, [x_axes(2) (y_center + y_spacing)]};
+if TrialRecord.User.training_categorization ||...
+        TrialRecord.User.training_agent_patient
+    engaging_box = { [1 1 1], [1 1 1], standard_button_size, [10 0] };
+    chasing_box = {[1 0.8 0.6], [1 0.8 0.6], standard_button_size, [x_axes(1) y_center]};
+    grooming_box = {[0.5 1 1], [0.5 1 1], standard_button_size, [x_axes(1) (y_center + y_spacing)]};
+    mounting_box = {[1 1 0], [1 1 0], standard_button_size, [x_axes(1) (y_center + 2*y_spacing)]};
+    holding_box = {[0 0 1], [0 0 1], standard_button_size, [x_axes(1) (y_center + 3*y_spacing)]};
+    agent_box = {[0 1 1], [0 1 1], standard_button_size, [x_axes(2) y_center]};
+    patient_box = {[1 0 1], [1 0 1], standard_button_size, [x_axes(2) (y_center + y_spacing)]};
+else
+    engaging_box = { [1 1 1], [1 1 1], standard_button_size, [10 0] };
+    chasing_box = {[1 0.8 0.6], [1 0.8 0.6], standard_button_size, [x_axes(1) y_axes(1)]};
+    grooming_box = {[0.5 1 1], [0.5 1 1], standard_button_size, [x_axes(1) y_axes(2)]};
+    mounting_box = {[1 1 0], [1 1 0], standard_button_size, [x_axes(1) y_axes(3)]};
+    holding_box = {[0 0 1], [0 0 1], standard_button_size, [x_axes(1) y_axes(4)]};
+    agent_box = {[0 1 1], [0 1 1], standard_button_size, [x_axes(2) y_axes(2)]};
+    patient_box = {[1 0 1], [1 0 1], standard_button_size, [x_axes(2) y_axes(3)]};
+end
 %% sizing buttons
 % determining correct button size in case of training
-correct_button_size_step = (1 - TrialRecord.User.size_progression) * ...    % the step in wich the size decreases, size progression is linked in a 1 to 1 basis with the progression number. So play with the blocksize in order to change #trials per size
+correct_button_size_step = (1 - TrialRecord.User.size_progression/...
+    TrialRecord.User.size_progression_factor) * ...                         % the step in wich the size decreases, size progression is linked in a 1 to 1 basis with the progression number. So play with the blocksize in order to change #trials per size
     correct_button_size_difference;
-wrong_button_size_step = (1 - TrialRecord.User.size_progression) * ...      % the step in wich the size decreases, size progression is linked in a 1 to 1 basis with the progression number. So play with the blocksize in order to change #trials per size
+wrong_button_size_step = (1 - TrialRecord.User.size_progression/...
+    TrialRecord.User.size_progression_factor) * ...                         % the step in wich the size decreases, size progression is linked in a 1 to 1 basis with the progression number. So play with the blocksize in order to change #trials per size
     wrong_button_size_difference;
 if correct_button_size_step > 0                                             % if the step is larger than 0
     correct_button_size = 2 + correct_button_size_step;                     % add the button size step to the standard size
     wrong_button_size = 2 - wrong_button_size_step;                         % subtract the size step from the standard size
 else
-    correct_button_size = standard_button_size;                             % els, it means that maximum progression through the size difference is reached
+    correct_button_size = standard_button_size;                             % else, it means that maximum progression through the size difference is reached
     wrong_button_size = standard_button_size;                               % thus the button size is the final button size
 end
 
@@ -51,20 +64,20 @@ if TrialRecord.User.training_categorization                                 % if
     switch TrialRecord.User.current_sum_categories                          % if 1 category is active
         case 1
             if TrialRecord.User.chasing                                     % if the stimulus is chasing
-                chasing_box(3) = {standard_button_size};                    % then chasing is the correct button and size should be accordingly to the size progression
+                chasing_box(3) = {correct_button_size};                    % then chasing is the correct button and size should be accordingly to the size progression
             else
-                chasing_box(3) = {wrong_button_size};                       % else, chasing button is the wrong button
+                chasing_box(3) = {standard_button_size};                       % else, chasing button is the wrong button
             end
         case 2                         % analogous to the chasing example
             if TrialRecord.User.grooming
-                grooming_box(3) = {standard_button_size};
+                grooming_box(3) = {correct_button_size};
                 chasing_box(3) = {wrong_button_size};
             else
                 grooming_box(3) = {wrong_button_size};
             end
         case 3
             if TrialRecord.User.mounting
-                mounting_box(3) = {standard_button_size};
+                mounting_box(3) = {correct_button_size};
                 chasing_box(3) = {wrong_button_size};
                 grooming_box(3) = {wrong_button_size};
             else
@@ -72,7 +85,7 @@ if TrialRecord.User.training_categorization                                 % if
             end
         case 4
             if TrialRecord.User.holding
-                holding_box(3) = {standard_button_size};
+                holding_box(3) = {correct_button_size};
                 chasing_box(3) = {wrong_button_size};
                 grooming_box(3) = {wrong_button_size};
                 mounting_box(3) = {wrong_button_size};
@@ -85,17 +98,17 @@ if TrialRecord.User.training_agent_patient
     switch TrialRecord.User.current_sum_buttons
         case 1
             if TrialRecord.User.agenting
-                agent_box(3) = {standard_button_size};
+                agent_box(3) = {correct_button_size};
             else
                 agent_box(3) = {wrong_button_size};
             end
         case 2
             if TrialRecord.User.patienting
-                patient_box(3) = {standard_button_size};
+                patient_box(3) = {correct_button_size};
                 agent_box(3) = {wrong_button_size};
             else
                 patient_box(3) = {wrong_button_size};
-                agent_box(3) = {standard_button_size};
+                agent_box(3) = {correct_button_size};
             end
     end
 end
@@ -243,19 +256,26 @@ end
 if TrialRecord.User.training_categorization ||...
         TrialRecord.User.training_agent_patient
     random_portion = randi(100, 1);
-    max_reward = 400;
+    max_reward = 300;
     min_reward = 150;
-    category_bonus = 300;                                                   % bonus when he reaches extra button ( check thism should be zhen he gi9ves correct answer to equal sized buttons )
+    category_bonus = 0;
+    if TrialRecord.User.progression_number >= (3*TrialRecord.User.category_progression_factor-1)
+        category_bonus = 300;                                                   % bonus when he reaches extra button ( check thism should be zhen he gi9ves correct answer to equal sized buttons )
+    elseif TrialRecord.User.progression_number >= (2*TrialRecord.User.category_progression_factor-1)
+        category_bonus = 150;
+    end
     extra_reward = 100;                                                     % extra reward if when he immediately gets a condition switch right 
-    progression_goal_window = (2*TrialRecord.User.size_progression_factor +2) - TrialRecord.User.start_progression_number;
-    progression_relative_start = TrialRecord.User.progression_number - TrialRecord.User.start_progression_number;      % reward goes from min to max over x progression numbers
+    progression_goal_window = (2*TrialRecord.User.category_progression_factor+5)...
+        - TrialRecord.User.start_progression_number;
+    progression_relative_start = TrialRecord.User.progression_number - ...
+        TrialRecord.User.start_progression_number;                          % reward goes from min to max over x progression numbers
     reward_window = max_reward - min_reward;
     variable_reward_portion = progression_relative_start* ...                   % here the variable portion is calculated based on a fraction of the complete task.
-        reward_window/progression_goal_window + floor(progression_relative_start/TrialRecord.User.size_progression_factor) * category_bonus;
+        reward_window/progression_goal_window + category_bonus;             % moet overslaan op 10 21 32 
     reward_dur1 = min_reward + variable_reward_portion;
-    if reward_dur1 > max_reward                                                 % stay below max reward
-        reward_dur1 = max_reward;
-    elseif reward_dur1 < min_reward
+%     if reward_dur1 > max_reward                                                 % stay below max reward
+%         reward_dur1 = max_reward;
+    if reward_dur1 < min_reward
         reward_dur1 = min_reward;
     end
     if TrialRecord.CurrentTrialNumber ~= 1 && TrialRecord.ConditionsPlayed(end)...
