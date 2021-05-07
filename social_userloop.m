@@ -56,7 +56,7 @@ TrialRecord.User.min_c_progression_number = TrialRecord.User.category_progressio
 TrialRecord.User.min_ap_progression_number = TrialRecord.User.category_progression_factor;
 
 % training
-TrialRecord.User.training_categorization = false;                            % complete task or training
+TrialRecord.User.training_categorization = true;                            % complete task or training
 TrialRecord.User.training_agent_patient = false;
 
 % fixed constants

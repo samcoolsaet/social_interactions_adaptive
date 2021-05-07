@@ -1,5 +1,5 @@
 [y3, fs3] = audioread('alarm.wav');
-hotkey('k','sound(y3, fs3); TrialRecord.User.engaged = false; trialerror(8); return;');
+% hotkey('k','sound(y3, fs3); TrialRecord.User.engaged = false; trialerror(8); return;');
 hotkey('x', 'escape_screen(); assignin(''caller'',''continue_'',false);');
 hotkey('r', 'goodmonkey(reward_dur, ''juiceline'', MLConfig.RewardFuncArgs.JuiceLine, ''eventmarker'', 14, ''nonblocking'', 1);');   % manual reward
 hotkey('p', 'TrialRecord.User.progression_number = TrialRecord.User.progression_number + 1;');
