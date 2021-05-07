@@ -470,19 +470,6 @@ TrialRecord.User.frame = strcat('D:\onedrive\OneDrive - KU Leuven\social_interac
     TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', ...
     TrialRecord.User.structure(TrialRecord.User.struct_index).frames);      % and frame
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for frame...
-% % img_size in degrees = 15*9, frames sizes (x, y), locations
-% % open the file
-% fid=fopen('frames.txt'); 
-% % set linenum to the desired line number that you want to import
-% linenum = 1;
-% % use '%s' if you want to read in the entire line or use '%f' if you want to read only the first numeric value
-% C = textscan(fid,'%s',4, 'delimiter',';', 'headerlines',linenum-1)
-% dimensions = C{1, 1}{2, 1}
-% x_degree = C{1, 1}{3, 1}
-% y_degree = C{1, 1}{4, 1}
-% frewind(fid)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % creating condition
 C = {'sqr([2 1], [1 0 0], 0, 0, -1)'};
 end
