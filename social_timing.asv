@@ -77,7 +77,7 @@ if TrialRecord.User.training_categorization                                 % if
             end
         case 3
             if TrialRecord.User.mounting
-                mounting_box(3) = {standard_button_size};
+                mounting_box(3) = {correct_button_size};
                 chasing_box(3) = {wrong_button_size};
                 grooming_box(3) = {wrong_button_size};
             else
@@ -85,7 +85,7 @@ if TrialRecord.User.training_categorization                                 % if
             end
         case 4
             if TrialRecord.User.holding
-                holding_box(3) = {standard_button_size};
+                holding_box(3) = {correct_button_size};
                 chasing_box(3) = {wrong_button_size};
                 grooming_box(3) = {wrong_button_size};
                 mounting_box(3) = {wrong_button_size};

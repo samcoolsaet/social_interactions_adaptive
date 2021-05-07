@@ -202,10 +202,10 @@ TrialRecord.User.current_sum_buttons = sum([TrialRecord.User.chasing_on, ... % d
 % I want these variables to be fixed throughout the run
 if TrialRecord.CurrentTrialNumber == 0
     % dir() gives a struct of the contents of the path
-    chasing_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\chasing');
-    grooming_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\grooming');
-    mounting_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\mounting');
-    holding_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\holding');
+    chasing_struct = dir('G:\sam\stimuli\stimuli\chasing');
+    grooming_struct = dir('G:\sam\stimuli\stimuli\grooming');
+    mounting_struct = dir('G:\sam\stimuli\stimuli\mounting');
+    holding_struct = dir('G:\sam\stimuli\stimuli\holding');
     % isolating the name field
     TrialRecord.User.chasing_list = {chasing_struct.name};
     TrialRecord.User.grooming_list = {grooming_struct.name};
@@ -218,10 +218,10 @@ if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.holding_list(1:2) = [];
 
     % analogous for the frames
-    chasing_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\chasing');
-    grooming_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\grooming');
-    mounting_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\mounting');
-    holding_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\holding');
+    chasing_frame_struct = dir('G:\sam\frames\frames\chasing');
+    grooming_frame_struct = dir('G:\sam\frames\frames\grooming');
+    mounting_frame_struct = dir('G:\sam\frames\frames\mounting');
+    holding_frame_struct = dir('G:\sam\frames\frames\holding');
     TrialRecord.User.chasing_frame_list = {chasing_frame_struct.name};
     TrialRecord.User.grooming_frame_list = {grooming_frame_struct.name};
     TrialRecord.User.mounting_frame_list = {mounting_frame_struct.name};
@@ -463,10 +463,10 @@ else
     disp('condition not found');
 end
 
-TrialRecord.User.movie = strcat('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\',... 
+TrialRecord.User.movie = strcat('G:\sam\stimuli\stimuli\',... 
     TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', ...
     TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli);     % complete path of the animation
-TrialRecord.User.frame = strcat('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\',... 
+TrialRecord.User.frame = strcat('G:\sam\frames\frames\',... 
     TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', ...
     TrialRecord.User.structure(TrialRecord.User.struct_index).frames);      % and frame
 

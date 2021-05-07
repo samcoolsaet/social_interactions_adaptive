@@ -1,4 +1,4 @@
-function [image_list] = FrameCreator()
+function [bitmap] = FrameCreator()
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for frame...
 % % img_size in degrees = 15*9, frames sizes (x, y), locations
