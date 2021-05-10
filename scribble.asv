@@ -1,0 +1,32 @@
+count = mglgetadaptercount
+[width,height,refresh_rate] = mglgetadapterdisplaymode(2)
+info = mglgetadapteridentifier
+rect = mglgetadapterrect(2)
+x_length = 100;
+y_length = 100;
+line_thickness = 5;
+red = zeros(x_length, y_length);
+green = zeros(x_length, y_length);
+blue = zeros(x_length, y_length);
+red(1:line_thickness,:) = ones(line_thickness, x_length);
+red(end-(line_thickness-1):end,:) = ones(line_thickness, x_length);
+red(:,1:line_thickness) = ones(y_length, line_thickness);
+red(:,end(line_thickness)) = ones(line_thickness, x_length);
+
+
+bitmap = cat(3, red, green, blue)
+
+mglcreatesubjectscreen(2)   % Do not use the adapter_no of the current screen
+% mglcreatecontrolscreen([400 300 800 600])      % Need to create the subject screen first
+% id = mgladdbox([1 1 1; 1 1 1],[100 100]);
+id = mgladdbitmap(bitmap);
+mglsetproperty(id,'active',1,'origin',[400 300]);
+mglrendergraphic
+mglpresent
+
+pause(2);
+
+mgldestroygraphic(id)
+
+% mgldestroycontrolscreen                    % Destruction is in the opposite order
+mgldestroysubjectscreen
