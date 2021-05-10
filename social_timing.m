@@ -175,10 +175,10 @@ mov = MovieGraphic(fix);
 mov.List = { TrialRecord.User.movie, [0 0], 0, 1.25, 90 };   % movie filename
 % tc = TimeCounter(mov);
 img = ImageGraphic(null_);
-% img.List = { TrialRecord.User.frame, [0 0], 0, 1.25, 90 };
-bitmap = FrameCreator;
-img.List = { bitmap, [0 0], 0, 1, 90;...
-    TrialRecord.User.frame, [0 0], 0, 1.25, 90};
+img.List = { TrialRecord.User.frame, [0 0], 0, 1.25, 90 };
+% bitmap = FrameCreator;
+% img.List = { bitmap, [0 0], 0, 1, 90;...
+%     TrialRecord.User.frame, [0 0], 0, 1.25, 90};
 
 %% constructing scenes
 % setting timecounter for duration of animation in first scene and time to
