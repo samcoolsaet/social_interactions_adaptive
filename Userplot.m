@@ -1,2 +1,0 @@
-function Userplot(TrialRecord)
-end
