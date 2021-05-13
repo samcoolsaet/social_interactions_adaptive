@@ -262,13 +262,13 @@ end
 if TrialRecord.User.training_categorization ||...
         TrialRecord.User.training_agent_patient
     random_portion = randi(100, 1);
-    max_reward = 300;
+    max_reward = 270;
     min_reward = 150;
     category_bonus = 0;
     if TrialRecord.User.progression_number >= (3*TrialRecord.User.category_progression_factor-1)
-        category_bonus = 300;                                                   % bonus when he reaches extra button ( check thism should be zhen he gi9ves correct answer to equal sized buttons )
+        category_bonus = 200;                                                   % bonus when he reaches extra button ( check thism should be zhen he gi9ves correct answer to equal sized buttons )
     elseif TrialRecord.User.progression_number >= (2*TrialRecord.User.category_progression_factor-1)
-        category_bonus = 150;
+        category_bonus = 100;
     end
     extra_reward = 100;                                                     % extra reward if when he immediately gets a condition switch right 
     progression_goal_window = (2*TrialRecord.User.category_progression_factor+5)...
@@ -388,12 +388,12 @@ elseif TrialRecord.User.patienting & TrialRecord.User.current_sum_buttons ~= 1
 end
 
 if reward
-%     sound(y1, fs1);
+    sound(y1, fs1);
     goodmonkey(reward_dur1);
     background = [0 1 0 1000];
     disp(['reward given:' string(reward_dur1)]);
 else
-%     sound(y2, fs2);
+    sound(y2, fs2);
     background = [1 0 0 time_out];
     disp(['no reward, time out' string(time_out)]);
 end
