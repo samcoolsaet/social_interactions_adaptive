@@ -192,20 +192,21 @@ TrialRecord.User.current_sum_categories = sum([TrialRecord.User.chasing_on, ... 
     TrialRecord.User.mounting_on,]);
 
 % TrialRecord.User.current_sum_buttons : check AP script for this
-
+% if (~TrialRecord.User.repeat) && (TrialRecord.User.engaged)
 TrialRecord.User.current_sum_buttons = sum([TrialRecord.User.chasing_on, ... % difference between current and previous sum of categories acts as a 
     TrialRecord.User.grooming_on,TrialRecord.User.holding_on, ...               % switch for new stimulus list creation involving new categories and other
     TrialRecord.User.mounting_on, TrialRecord.User.agent_on, ...                % changes that have to be made when categories are added
     TrialRecord.User.patient_on]);
+% end
 %% orienting between stimuli and frame files creating individual folder lists and general stim and frame lists
 % Do all of this for trial 0 because it would be inefficient to repeat and
 % I want these variables to be fixed throughout the run
 if TrialRecord.CurrentTrialNumber == 0
     % dir() gives a struct of the contents of the path
-    chasing_struct = dir('G:\sam\stimuli\stimuli\chasing');
-    grooming_struct = dir('G:\sam\stimuli\stimuli\grooming');
-    mounting_struct = dir('G:\sam\stimuli\stimuli\mounting');
-    holding_struct = dir('G:\sam\stimuli\stimuli\holding');
+    chasing_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\chasing');
+    grooming_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\grooming');
+    mounting_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\mounting');
+    holding_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\holding');
     % isolating the name field
     TrialRecord.User.chasing_list = {chasing_struct.name};
     TrialRecord.User.grooming_list = {grooming_struct.name};
@@ -218,10 +219,10 @@ if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.holding_list(1:2) = [];
 
     % analogous for the frames
-    chasing_frame_struct = dir('G:\sam\frames\frames\chasing');
-    grooming_frame_struct = dir('G:\sam\frames\frames\grooming');
-    mounting_frame_struct = dir('G:\sam\frames\frames\mounting');
-    holding_frame_struct = dir('G:\sam\frames\frames\holding');
+    chasing_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\chasing');
+    grooming_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\grooming');
+    mounting_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\mounting');
+    holding_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\holding');
     TrialRecord.User.chasing_frame_list = {chasing_frame_struct.name};
     TrialRecord.User.grooming_frame_list = {grooming_frame_struct.name};
     TrialRecord.User.mounting_frame_list = {mounting_frame_struct.name};
@@ -290,9 +291,9 @@ if TrialRecord.User.current_sum_buttons ~= previous_sum_buttons             % th
 end
 %% create a random condition order with a restriction of max consecutive conditions and a precaution for overlap across structure resets 
 if ((TrialRecord.User.random_condition_order_index...                        % if we have reached the end of the order during previous userloop, reset
-        == length(TrialRecord.User.random_condition_order)) ||...
-        TrialRecord.User.current_sum_buttons ~= previous_sum_buttons) && ...
-        (~TrialRecord.User.repeat) && (TrialRecord.User.engaged)
+        == length(TrialRecord.User.random_condition_order)) && ...
+        (~TrialRecord.User.repeat) && (TrialRecord.User.engaged)) ||...
+        TrialRecord.User.current_sum_buttons ~= previous_sum_buttons  
     condition_order = [];
     if TrialRecord.User.training_categorization 
         for i = 1:length(TrialRecord.User.structure)
@@ -363,7 +364,8 @@ else
 end
 disp(TrialRecord.User.random_condition_order);
 
-if ~TrialRecord.User.repeat && TrialRecord.User.engaged                     % engaged refers to return when time limit for engagement scene is reached
+if (~TrialRecord.User.repeat && TrialRecord.User.engaged) || ...
+        TrialRecord.User.current_sum_buttons ~= previous_sum_buttons        % engaged refers to return when time limit for engagement scene is reached
     TrialRecord.User.random_condition_order_index = TrialRecord.User.random_condition_order_index + 1;
 else
     disp('repeat');
@@ -372,7 +374,8 @@ disp(TrialRecord.User.random_condition_order_index);
 
 condition = TrialRecord.User.random_condition_order(TrialRecord.User.random_condition_order_index);
 %% given the condition, pick a stimulus that has not yet been completed in the current structure
-if ~TrialRecord.User.repeat && TrialRecord.User.engaged                     % if this, we should just do everything the same as previous trial
+if ~TrialRecord.User.repeat && TrialRecord.User.engaged || ...
+        TrialRecord.User.current_sum_buttons ~= previous_sum_buttons                    % if this, we should just do everything the same as previous trial
     switch condition
         case 1
             index3 = 1;
@@ -463,10 +466,10 @@ else
     disp('condition not found');
 end
 
-TrialRecord.User.movie = strcat('G:\sam\stimuli\stimuli\',... 
+TrialRecord.User.movie = strcat('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\',... 
     TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', ...
     TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli);     % complete path of the animation
-TrialRecord.User.frame = strcat('G:\sam\frames\frames\',... 
+TrialRecord.User.frame = strcat('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\',... 
     TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', ...
     TrialRecord.User.structure(TrialRecord.User.struct_index).frames);      % and frame
 
