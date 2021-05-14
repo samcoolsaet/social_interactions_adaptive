@@ -260,21 +260,20 @@ end
 % make reward scale with ( a fraction of ) progression number correlated
 % with the goal for that day?
 reward_multiplicator = 1;
-% if TrialRecord.CurrentTrialNumber > 1
-%     for i = 0:(length(TrialRecord.TrialErrors)-1)
-%         if TrialRecord.TrialErrors(end-i) ~= 0
-%             break
-%         end
-%     end
 if TrialRecord.CurrentTrialNumber > 10
     for i = 0:9
         if TrialRecord.TrialErrors(end-i) ~= 0
             break
         end
     end
+elseif TrialRecord.CurrentTrialNumber > 1
+    for i = 0:(length(TrialRecord.TrialErrors)-1)
+        if TrialRecord.TrialErrors(end-i) ~= 0
+            break
+        end
+    end
 reward_multiplicator = reward_multiplicator + ( i * 0.1 );
 end
-disp('reward_multiplicator');
 disp(reward_multiplicator);
 
 if TrialRecord.User.training_categorization ||...
@@ -304,9 +303,9 @@ if TrialRecord.User.training_categorization ||...
     end
     if TrialRecord.CurrentTrialNumber ~= 1 && TrialRecord.ConditionsPlayed(end)...
             ~= TrialRecord.CurrentCondition
-        reward_dur1 = (reward_dur1 + random_portion + extra_reward)*reward_multiplicator;
+        reward_dur1 = reward_dur1 + random_portion + extra_reward;
     else
-        reward_dur1 = (reward_dur1 + random_portion)*reward_multiplicator;
+        reward_dur1 = reward_dur1 + random_portion;
     end
 else
     reward_dur1 = 400;
