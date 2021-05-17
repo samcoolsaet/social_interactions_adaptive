@@ -266,13 +266,13 @@ reward_multiplicator = 1;
 %             break
 %         end
 %     end
-if TrialRecord.CurrentTrialNumber > 10
-    for i = 0:9
+if TrialRecord.CurrentTrialNumber > 11
+    for i = 0:10
         if TrialRecord.TrialErrors(end-i) ~= 0
             break
         end
     end
-reward_multiplicator = reward_multiplicator + ( i * 0.1 );
+reward_multiplicator = reward_multiplicator + ( i * 0.2 );
 end
 disp('reward_multiplicator');
 disp(reward_multiplicator);
