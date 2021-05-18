@@ -266,8 +266,8 @@ reward_multiplicator = 1;
 %             break
 %         end
 %     end
-if TrialRecord.CurrentTrialNumber > 11
-    for i = 0:10
+if TrialRecord.CurrentTrialNumber > 6
+    for i = 0:5
         if TrialRecord.TrialErrors(end-i) ~= 0
             break
         end
