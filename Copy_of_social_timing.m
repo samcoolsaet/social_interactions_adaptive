@@ -2,8 +2,8 @@
 % hotkey('k','sound(y3, fs3); TrialRecord.User.engaged = false; trialerror(8); return;');
 hotkey('x', 'escape_screen(); assignin(''caller'',''continue_'',false);');
 hotkey('r', 'goodmonkey(reward_dur, ''juiceline'', MLConfig.RewardFuncArgs.JuiceLine, ''eventmarker'', 14, ''nonblocking'', 1);');   % manual reward
-hotkey('p', 'TrialRecord.User.progression_number = TrialRecord.User.progression_number + 1;');
-hotkey('o', 'TrialRecord.User.progression_number = TrialRecord.User.progression_number + (TrialRecord.User.size_progression_factor - TrialRecord.User.size_progression)+1;');
+hotkey('p', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock + 1;');
+hotkey('o', 'TrialRecord.User.NextBlock = TrialRecord.User.progression_number + (TrialRecord.User.size_progression_factor - TrialRecord.User.size_progression)+1;');
 hotkey('l', 'TrialRecord.User.progression_number = TrialRecord.User.progression_number - TrialRecord.User.size_progression;');
 hotkey('m', 'TrialRecord.User.progression_number = TrialRecord.User.progression_number - 1;');
 bhv_code(1, 'run_engagement_scene', 2, 'run_video', 3, 'run_answer_scene', 5, 'end_aswer_scene');

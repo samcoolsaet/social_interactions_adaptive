@@ -32,7 +32,7 @@ end
 %% constants
 max_repeats_condition = 3;
 % progression
-TrialRecord.User.blocksize = 20;                                            % The TrialRecord.User.blocksize is the number of animations the monkey has to complete.
+TrialRecord.User.blocksize = 20;                                             % The TrialRecord.User.blocksize is the number of animations the monkey has to complete.
 TrialRecord.User.size_progression_factor = 20;                              % the number of progression number steps needed to go from start size to end size, used for both category and agent patient
 
 TrialRecord.User.button_progression_factor = ...
@@ -49,10 +49,10 @@ TrialRecord.User.training_categorization = true;                            % co
 TrialRecord.User.training_agent_patient = false;
 
 % fixed constants
-[TrialRecord.User.chasing_on, TrialRecord.User.grooming_on, TrialRecord.User.holding_on, ...
-TrialRecord.User.mounting_on, TrialRecord.User.agent_on, TrialRecord.User.patient_on, ...
-TrialRecord.User.categorizing, TrialRecord.User.agenting, TrialRecord.User.patienting, ...
-TrialRecord.User.grooming, TrialRecord.User.chasing, TrialRecord.User.holding, ...
+[TrialRecord.User.chasing_on TrialRecord.User.grooming_on TrialRecord.User.holding_on ...
+TrialRecord.User.mounting_on TrialRecord.User.agent_on TrialRecord.User.patient_on ...
+TrialRecord.User.categorizing TrialRecord.User.agenting TrialRecord.User.patienting ...
+TrialRecord.User.grooming TrialRecord.User.chasing TrialRecord.User.holding ...
 TrialRecord.User.mounting] = deal(false);                                   % always false for script to work
 
 
@@ -74,32 +74,47 @@ if TrialRecord.User.completed_stimuli == TrialRecord.User.blocksize             
             TrialRecord.CurrentBlock - 1;
     end
     
-    % reset all the completed stimuli
-    % this way, the data of the used, but not completed ones stays in there
-    [TrialRecord.User.structure(indexes_used_c_stimuli).c_success, TrialRecord.User.structure(indexes_used_c_stimuli).c_fails, ...
-    TrialRecord.User.structure(indexes_used_c_stimuli).c_completed, TrialRecord.User.structure(indexes_used_a_stimuli).a_success, ...
-    TrialRecord.User.structure(indexes_used_a_stimuli).a_fails, TrialRecord.User.structure(indexes_used_c_stimuli).a_completed, ...
-    TrialRecord.User.structure(indexes_used_p_stimuli).p_success, TrialRecord.User.structure(indexes_used_p_stimuli).p_fails, ...
-    TrialRecord.User.structure(indexes_used_c_stimuli).p_completed] = deal(0);
+    [TrialRecord.User.structure(indexes_used_c_stimuli).c_success] = deal(0);   % reset all the completed stimuli
+    [TrialRecord.User.structure(indexes_used_c_stimuli).c_fails] = deal(0);     % this way, the data of the used, but not completed ones stays in there
+    [TrialRecord.User.structure(indexes_used_c_stimuli).c_completed] = deal(0);
+    [TrialRecord.User.structure(indexes_used_a_stimuli).a_success] = deal(0);
+    [TrialRecord.User.structure(indexes_used_a_stimuli).a_fails] = deal(0);
+    [TrialRecord.User.structure(indexes_used_c_stimuli).a_completed] = deal(0);
+    [TrialRecord.User.structure(indexes_used_p_stimuli).p_success] = deal(0);
+    [TrialRecord.User.structure(indexes_used_p_stimuli).p_fails] = deal(0);
+    [TrialRecord.User.structure(indexes_used_c_stimuli).p_completed] = deal(0);
     disp(['performance:' string(TrialRecord.User.performance)]);
     disp('last blocksize reset in struct');
 end
 
-if TrialRecord.User.training_categorization || TrialRecord.User.training_agent_patient
-    if TrialRecord.NextBlock > TrialRecord.User.max_block
-        TrialRecord.NextBlock = TrialRecord.User.max_block;
-        disp(['max block number reached' string(TrialRecord.User.max_c_progression_number)]);
-    elseif TrialRecord.NextBlock < TrialRecord.User.min_block
-        TrialRecord.NextBlock = TrialRecord.User.min_block;
-        disp(['min block number reached' string(TrialRecord.User.min_c_progression_number)]);
+if TrialRecord.User.training_categorization
+    if TrialRecord.User.progression_number > TrialRecord.User.max_c_progression_number
+        TrialRecord.User.progression_number = TrialRecord.User.max_c_progression_number;
+        disp(['max c progression number reached' string(TrialRecord.User.max_c_progression_number)]);
+    elseif TrialRecord.User.progression_number < TrialRecord.User.min_c_progression_number
+        TrialRecord.User.progression_number = TrialRecord.User.min_c_progression_number;
+        disp(['min c progression number reached' string(TrialRecord.User.min_c_progression_number)]);
+    end
+elseif TrialRecord.User.training_agent_patient
+    if TrialRecord.User.progression_number > TrialRecord.User.max_ap_progression_number
+        TrialRecord.User.progression_number = TrialRecord.User.max_ap_progression_number;
+        disp(['max ap progression number reached' string(TrialRecord.User.max_ap_progression_number)]);
+    elseif TrialRecord.User.progression_number < TrialRecord.User.min_ap_progression_number
+        TrialRecord.User.progression_number = TrialRecord.User.min_ap_progression_number;
+        disp(['min ap progression number reached' string(TrialRecord.User.min_ap_progression_number)]);
     end
 end
 
+TrialRecord.NextBlock = TrialRecord.User.progression_number;            % blocknumber is now based on progression, so that I can easily keep track of everything
+
 % setting independant category and button progression based on progression
 % number
-TrialRecord.User.button_progression = ...                                 % the category progression factor, which should be at least bigger than the size progression factor in order 
-    floor(TrialRecord.User.progression_number / ...                               % in order to go through the complete size evolution before adding a category, determines the number of progression
-    TrialRecord.User.button_progression_factor);                                          % number steps needed to increase category progression + 1
+TrialRecord.User.category_progression = ...                                 % the category progression factor, which should be at least bigger than the size progression factor in order 
+    TrialRecord.User.progression_number / ...                               % in order to go through the complete size evolution before adding a category, determines the number of progression
+    (TrialRecord.User.button_progression_factor);                                          % number steps needed to increase category progression + 1
+TrialRecord.User.agent_patient_progression = ...                            % analogous to category
+    TrialRecord.User.progression_number / ... 
+    (TrialRecord.User.agent_patient_progression_factor);
 
 
 % if TrialRecord.User.category_progression < 4 && ...                         % as long as not all the buttons are unlocked, reset size progression when new button is added
@@ -118,24 +133,24 @@ TrialRecord.User.button_progression = ...                                 % the 
 %% toggling conditions on
 % training progression switches. at the end ( if not training ) all switches
 % are turned on 
-if TrialRecord.User.button_progression
+if TrialRecord.User.training_categorization
     if TrialRecord.User.category_progression >=0
         TrialRecord.User.chasing_on = true;
     end
-    if TrialRecord.User.button_progression >=1
+    if TrialRecord.User.category_progression >=1
         TrialRecord.User.grooming_on = true;
     end
-    if TrialRecord.User.button_progression >=2
+    if TrialRecord.User.category_progression >=2
         TrialRecord.User.mounting_on = true;
     end
-    if TrialRecord.User.button_progression >=3
+    if TrialRecord.User.category_progression >=3
         TrialRecord.User.holding_on = true;
     end
 elseif TrialRecord.User.training_agent_patient
-    if TrialRecord.User.button_progression >=0
+    if TrialRecord.User.agent_patient_progression >=0
         TrialRecord.User.agent_on = true;
     end
-    if TrialRecord.User.button_progression >=1
+    if TrialRecord.User.agent_patient_progression >=1
         TrialRecord.User.patient_on = true;
     end
 else
@@ -152,9 +167,9 @@ else
     TrialRecord.User.category = false;
 end
 % calculation current sum categories after switches have been altered
-% TrialRecord.User.current_sum_categories = sum([TrialRecord.User.chasing_on, ... % difference between current and previous sum of categories acts as a 
-%     TrialRecord.User.grooming_on,TrialRecord.User.holding_on, ...               % switch for new stimulus list creation involving new categories and other
-%     TrialRecord.User.mounting_on,]);
+TrialRecord.User.current_sum_categories = sum([TrialRecord.User.chasing_on, ... % difference between current and previous sum of categories acts as a 
+    TrialRecord.User.grooming_on,TrialRecord.User.holding_on, ...               % switch for new stimulus list creation involving new categories and other
+    TrialRecord.User.mounting_on,]);
 
 % TrialRecord.User.current_sum_buttons : check AP script for this
 % if (~TrialRecord.User.repeat) && (TrialRecord.User.engaged)
@@ -168,10 +183,10 @@ TrialRecord.User.current_sum_buttons = sum([TrialRecord.User.chasing_on, ... % d
 % I want these variables to be fixed throughout the run
 if TrialRecord.CurrentTrialNumber == 0
     % dir() gives a struct of the contents of the path
-    [chasing_struct, grooming_struct, mounting_struct, holding_struct] =  deal(dir('G:\sam\stimuli\stimuli\chasing'), ...
-        dir('G:\sam\stimuli\stimuli\grooming'), ...
-        dir('G:\sam\stimuli\stimuli\mounting'), ...
-        dir('G:\sam\stimuli\stimuli\holding'));    
+    chasing_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\chasing');
+    grooming_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\grooming');
+    mounting_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\mounting');
+    holding_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\holding');
     % isolating the name field
     TrialRecord.User.chasing_list = {chasing_struct.name};
     TrialRecord.User.grooming_list = {grooming_struct.name};
@@ -184,10 +199,10 @@ if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.holding_list(1:2) = [];
 
     % analogous for the frames
-    chasing_frame_struct = dir('G:\sam\stimuli\frames\chasing');
-    grooming_frame_struct = dir('G:\sam\stimuli\frames\grooming');
-    mounting_frame_struct = dir('G:\sam\stimuli\frames\mounting');
-    holding_frame_struct = dir('G:\sam\stimuli\frames\holding');
+    chasing_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\chasing');
+    grooming_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\grooming');
+    mounting_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\mounting');
+    holding_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\holding');
     TrialRecord.User.chasing_frame_list = {chasing_frame_struct.name};
     TrialRecord.User.grooming_frame_list = {grooming_frame_struct.name};
     TrialRecord.User.mounting_frame_list = {mounting_frame_struct.name};
@@ -431,10 +446,10 @@ else
     disp('condition not found');
 end
 
-TrialRecord.User.movie = strcat('G:\sam\stimuli\stimuli\',... 
+TrialRecord.User.movie = strcat('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\',... 
     TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', ...
     TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli);     % complete path of the animation
-TrialRecord.User.frame = strcat('G:\sam\stimuli\frames\',... 
+TrialRecord.User.frame = strcat('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\',... 
     TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', ...
     TrialRecord.User.structure(TrialRecord.User.struct_index).frames);      % and frame
 
