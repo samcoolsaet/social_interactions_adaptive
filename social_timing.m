@@ -51,12 +51,14 @@ wrong_button_size_step = (1 - TrialRecord.User.size_progression/...
     TrialRecord.User.size_progression_factor) * ...                         % the step in wich the size decreases, size progression is linked in a 1 to 1 basis with the progression number. So play with the blocksize in order to change #trials per size
     wrong_button_size_difference;
 if correct_button_size_step > 0                                             % if the step is larger than 0
-    correct_button_size = 2 + correct_button_size_step;                     % add the button size step to the standard size
-    wrong_button_size = 2 - wrong_button_size_step;                         % subtract the size step from the standard size
+    correct_button_size = standard_button_size + correct_button_size_step;  % add the button size step to the standard size
+    wrong_button_size = standard_button_size - wrong_button_size_step;      % subtract the size step from the standard size
 else
     correct_button_size = standard_button_size;                             % else, it means that maximum progression through the size difference is reached
     wrong_button_size = standard_button_size;                               % thus the button size is the final button size
 end
+disp('absolute button sizes: ');
+disp([correct_button_size wrong_button_size]);
 
 % only adjust last added button to correct, wrong or standard size,
 % depending on corrext answer
@@ -461,4 +463,5 @@ bhv_variable('size_progression', TrialRecord.User.size_progression,...
     'structure_completion', TrialRecord.User.structure_completion, ...
     'structure', TrialRecord.User.structure, ...
     'completed_stim', TrialRecord.User.completed_stimuli,...
-    'random_condition_order_index', TrialRecord.User.random_condition_order_index);
+    'random_condition_order_index', TrialRecord.User.random_condition_order_index,...
+    'repeat', TrialRecord.User.repeat);
