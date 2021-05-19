@@ -267,7 +267,7 @@ if TrialRecord.CurrentTrialNumber > 6
             break
         end
     end
-reward_multiplicator = reward_multiplicator + ( i^2 * 0.2 );
+reward_multiplicator = reward_multiplicator + ( i^2 * 0.15 );
 end
 disp('reward_multiplicator');
 disp(reward_multiplicator);
