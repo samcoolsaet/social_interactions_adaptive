@@ -14,18 +14,13 @@ persistent timing_filenames_retrieved
 TrialRecord.User.start_block = 40;                                               % the progression number to start training with
 
 if TrialRecord.CurrentTrialNumber == 0
-    TrialRecord.User.random_condition_order = 1;
-    TrialRecord.User.random_condition_order_index = 1;
-    TrialRecord.User.performance = 0;
-    TrialRecord.NextBlock = TrialRecord.User.start_block;
-    previous_sum_buttons = 0;
-    TrialRecord.User.engaged = true;
     TrialRecord.User.max_fails = 3;
-    TrialRecord.User.repeat = false;
-    TrialRecord.User.completed_stimuli = 0;
-    TrialRecord.User.c_structure_completion = 0;
-    TrialRecord.User.a_structure_completion = 0;
-    TrialRecord.User.p_structure_completion = 0;
+    TrialRecord.NextBlock = TrialRecord.User.start_block;
+    [TrialRecord.User.random_condition_order, TrialRecord.User.random_condition_order_index, ...
+        TrialRecord.User.engaged] = deal(1);
+    [TrialRecord.User.repeat, previous_sum_buttons, TrialRecord.User.completed_stimuli, ...
+        TrialRecord.User.performance, TrialRecord.User.c_structure_completion, ...
+        TrialRecord.User.a_structure_completion, TrialRecord.User.p_structure_completion] = deal(0);
 else
     previous_sum_buttons = TrialRecord.User.current_sum_buttons;      % calculations of previous sum categories
 end
@@ -98,9 +93,8 @@ end
 % setting independant category and button progression based on progression
 % number
 TrialRecord.User.button_progression = ...                                 % the category progression factor, which should be at least bigger than the size progression factor in order 
-    floor(TrialRecord.User.progression_number / ...                               % in order to go through the complete size evolution before adding a category, determines the number of progression
+    floor(TrialRecord.CurrentBlock / ...                               % in order to go through the complete size evolution before adding a category, determines the number of progression
     TrialRecord.User.button_progression_factor);                                          % number steps needed to increase category progression + 1
-
 
 % if TrialRecord.User.category_progression < 4 && ...                         % as long as not all the buttons are unlocked, reset size progression when new button is added
 %         TrialRecord.User.training_categorization
@@ -111,7 +105,7 @@ TrialRecord.User.button_progression = ...                                 % the 
 % if TrialRecord.User.agent_patient_progression < 2 && ...                    % analogous
 %         TrialRecord.User.training_agent_patient
     TrialRecord.User.size_progression = ... 
-        mod(TrialRecord.User.progression_number, ... 
+        mod(TrialRecord.CurrentBlock, ... 
         TrialRecord.User.button_progression_factor);
 % end
 
@@ -156,7 +150,6 @@ end
 %     TrialRecord.User.grooming_on,TrialRecord.User.holding_on, ...               % switch for new stimulus list creation involving new categories and other
 %     TrialRecord.User.mounting_on,]);
 
-% TrialRecord.User.current_sum_buttons : check AP script for this
 % if (~TrialRecord.User.repeat) && (TrialRecord.User.engaged)
 TrialRecord.User.current_sum_buttons = sum([TrialRecord.User.chasing_on, ... % difference between current and previous sum of categories acts as a 
     TrialRecord.User.grooming_on,TrialRecord.User.holding_on, ...               % switch for new stimulus list creation involving new categories and other
@@ -168,35 +161,28 @@ TrialRecord.User.current_sum_buttons = sum([TrialRecord.User.chasing_on, ... % d
 % I want these variables to be fixed throughout the run
 if TrialRecord.CurrentTrialNumber == 0
     % dir() gives a struct of the contents of the path
-    [chasing_struct, grooming_struct, mounting_struct, holding_struct] =  deal(dir('G:\sam\stimuli\stimuli\chasing'), ...
-        dir('G:\sam\stimuli\stimuli\grooming'), ...
-        dir('G:\sam\stimuli\stimuli\mounting'), ...
-        dir('G:\sam\stimuli\stimuli\holding'));    
+    [chasing_struct, grooming_struct, mounting_struct, holding_struct,...
+        chasing_frame_struct, grooming_frame_struct, mounting_frame_struct, holding_frame_struct]...
+        =  deal(dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\chasing'), ...
+        dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\grooming'), ...
+        dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\mounting'), ...
+        dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\holding'), ...
+        dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\chasing'),...
+        dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\grooming'),...
+        dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\mounting'),...
+        dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\holding'));    
     % isolating the name field
-    TrialRecord.User.chasing_list = {chasing_struct.name};
-    TrialRecord.User.grooming_list = {grooming_struct.name};
-    TrialRecord.User.mounting_list = {mounting_struct.name};
-    TrialRecord.User.holding_list = {holding_struct.name};
-    % deleting the 2 empty spots from the name field
-    TrialRecord.User.chasing_list(1:2) = [];
-    TrialRecord.User.grooming_list(1:2) = [];
-    TrialRecord.User.mounting_list(1:2) = [];
-    TrialRecord.User.holding_list(1:2) = [];
+    TrialRecord.User.chasing_list = {chasing_struct(3:end).name};
+    TrialRecord.User.grooming_list = {grooming_struct(3:end).name};
+    TrialRecord.User.mounting_list = {mounting_struct(3:end).name};
+    TrialRecord.User.holding_list = {holding_struct(3:end).name};
 
     % analogous for the frames
-    chasing_frame_struct = dir('G:\sam\stimuli\frames\chasing');
-    grooming_frame_struct = dir('G:\sam\stimuli\frames\grooming');
-    mounting_frame_struct = dir('G:\sam\stimuli\frames\mounting');
-    holding_frame_struct = dir('G:\sam\stimuli\frames\holding');
-    TrialRecord.User.chasing_frame_list = {chasing_frame_struct.name};
-    TrialRecord.User.grooming_frame_list = {grooming_frame_struct.name};
-    TrialRecord.User.mounting_frame_list = {mounting_frame_struct.name};
-    TrialRecord.User.holding_frame_list = {holding_frame_struct.name};
-    TrialRecord.User.chasing_frame_list(1:2) = [];
-    TrialRecord.User.grooming_frame_list(1:2) = [];
-    TrialRecord.User.mounting_frame_list(1:2) = [];
-    TrialRecord.User.holding_frame_list(1:2) = [];
-
+    TrialRecord.User.chasing_frame_list = {chasing_frame_struct(3:end).name};
+    TrialRecord.User.grooming_frame_list = {grooming_frame_struct(3:end).name};
+    TrialRecord.User.mounting_frame_list = {mounting_frame_struct(3:end).name};
+    TrialRecord.User.holding_frame_list = {holding_frame_struct(3:end).name};
+    
     % creating general lists with all the files
     TrialRecord.User.general_stimulus_list = [TrialRecord.User.chasing_list, TrialRecord.User.grooming_list, TrialRecord.User.mounting_list, TrialRecord.User.holding_list]; 
     TrialRecord.User.general_frame_list = [TrialRecord.User.chasing_frame_list, TrialRecord.User.grooming_frame_list, TrialRecord.User.mounting_frame_list, TrialRecord.User.holding_frame_list];
@@ -343,50 +329,42 @@ if ~TrialRecord.User.repeat && TrialRecord.User.engaged || ...
         TrialRecord.User.current_sum_buttons ~= previous_sum_buttons                    % if this, we should just do everything the same as previous trial
     switch condition
         case 1
-            index3 = 1;
             indexes_c_incomplete = [];
-            while index3 ~= length(TrialRecord.User.structure) + 1          % just iterate over the structure and see which ones are still available (not completed), given the condition
-                if strcmp(TrialRecord.User.structure(index3).folder, 'chasing')...
-                        && TrialRecord.User.structure(index3).c_completed == 0
-                    indexes_c_incomplete(end+1) = index3;
+            for i = 1:length(TrialRecord.User.structure)                     % just iterate over the structure and see which ones are still available (not completed), given the condition
+                if strcmp(TrialRecord.User.structure(i).folder, 'chasing')...
+                        && TrialRecord.User.structure(i).c_completed == 0
+                    indexes_c_incomplete(end+1) = i;
                 end
-                index3 = index3 + 1;
             end
             index_index = randperm(length(indexes_c_incomplete), 1);
             TrialRecord.User.struct_index = indexes_c_incomplete(index_index);
         case 2
-            index3 = 1;
             indexes_c_incomplete = [];
-            while index3 ~= length(TrialRecord.User.structure) + 1
-                if strcmp(TrialRecord.User.structure(index3).folder, 'grooming')...
-                        && TrialRecord.User.structure(index3).c_completed == 0
-                    indexes_c_incomplete(end+1) = index3;
+            for i = 1:length(TrialRecord.User.structure)
+                if strcmp(TrialRecord.User.structure(i).folder, 'grooming')...
+                        && TrialRecord.User.structure(i).c_completed == 0
+                    indexes_c_incomplete(end+1) = i;
                 end
-                index3 = index3 + 1;
             end
             index_index = randperm(length(indexes_c_incomplete), 1);
             TrialRecord.User.struct_index = indexes_c_incomplete(index_index);
         case 3
-            index3 = 1;
             indexes_c_incomplete = [];
-            while index3 ~= length(TrialRecord.User.structure) + 1
-                if strcmp(TrialRecord.User.structure(index3).folder, 'mounting')...
-                        && TrialRecord.User.structure(index3).c_completed == 0
-                    indexes_c_incomplete(end+1) = index3;
+            for i = 1:length(TrialRecord.User.structure)
+                if strcmp(TrialRecord.User.structure(i).folder, 'mounting')...
+                        && TrialRecord.User.structure(i).c_completed == 0
+                    indexes_c_incomplete(end+1) = i;
                 end
-                index3 = index3 + 1;
             end
             index_index = randperm(length(indexes_c_incomplete), 1);
             TrialRecord.User.struct_index = indexes_c_incomplete(index_index);
         case 4
-            index3 = 1;
             indexes_c_incomplete = [];
-            while index3 ~= length(TrialRecord.User.structure) + 1
-                if strcmp(TrialRecord.User.structure(index3).folder, 'holding')...
-                        && TrialRecord.User.structure(index3).c_completed == 0
-                    indexes_c_incomplete(end+1) = index3;
+            for i = 1:length(TrialRecord.User.structure)
+                if strcmp(TrialRecord.User.structure(i).folder, 'holding')...
+                        && TrialRecord.User.structure(i).c_completed == 0
+                    indexes_c_incomplete(end+1) = i;
                 end
-                index3 = index3 + 1;
             end
             index_index = randperm(length(indexes_c_incomplete), 1);
             TrialRecord.User.struct_index = indexes_c_incomplete(index_index);
@@ -431,10 +409,10 @@ else
     disp('condition not found');
 end
 
-TrialRecord.User.movie = strcat('G:\sam\stimuli\stimuli\',... 
+TrialRecord.User.movie = strcat('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\',... 
     TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', ...
     TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli);     % complete path of the animation
-TrialRecord.User.frame = strcat('G:\sam\stimuli\frames\',... 
+TrialRecord.User.frame = strcat('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\',... 
     TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', ...
     TrialRecord.User.structure(TrialRecord.User.struct_index).frames);      % and frame
 

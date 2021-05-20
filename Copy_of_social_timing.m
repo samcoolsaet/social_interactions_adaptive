@@ -3,9 +3,9 @@
 hotkey('x', 'escape_screen(); assignin(''caller'',''continue_'',false);');
 hotkey('r', 'goodmonkey(reward_dur, ''juiceline'', MLConfig.RewardFuncArgs.JuiceLine, ''eventmarker'', 14, ''nonblocking'', 1);');   % manual reward
 hotkey('p', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock + 1;');
-hotkey('o', 'TrialRecord.User.NextBlock = TrialRecord.User.progression_number + (TrialRecord.User.size_progression_factor - TrialRecord.User.size_progression)+1;');
-hotkey('l', 'TrialRecord.User.progression_number = TrialRecord.User.progression_number - TrialRecord.User.size_progression;');
-hotkey('m', 'TrialRecord.User.progression_number = TrialRecord.User.progression_number - 1;');
+hotkey('o', 'TrialRecord.User.NextBlock = TrialRecord.CurrentBlock + (TrialRecord.User.size_progression_factor - TrialRecord.User.size_progression)+1;');
+hotkey('l', 'TrialRecord.User.NextBlock = TrialRecord.CurrentBlock - TrialRecord.User.size_progression;');
+hotkey('m', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock - 1;');
 bhv_code(1, 'run_engagement_scene', 2, 'run_video', 3, 'run_answer_scene', 5, 'end_aswer_scene');
 %% constants
 touch_threshold = 2;
@@ -21,7 +21,6 @@ answer_time = 8000;
 standard_time_out = 5000;
 engagement_duration = 8000;
 repeating = true;
-TrialRecord.User.repeat = false;
 
 %  init boxes
 if TrialRecord.User.training_categorization ||...
