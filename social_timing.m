@@ -2,10 +2,10 @@
 % hotkey('k','sound(y3, fs3); TrialRecord.User.engaged = false; trialerror(8); return;');
 hotkey('x', 'escape_screen(); assignin(''caller'',''continue_'',false);');
 hotkey('r', 'goodmonkey(reward_dur, ''juiceline'', MLConfig.RewardFuncArgs.JuiceLine, ''eventmarker'', 14, ''nonblocking'', 1);');   % manual reward
-hotkey('p', 'TrialRecord.User.progression_number = TrialRecord.User.progression_number + 1;');
-hotkey('o', 'TrialRecord.User.progression_number = TrialRecord.User.progression_number + (TrialRecord.User.size_progression_factor - TrialRecord.User.size_progression)+1;');
-hotkey('l', 'TrialRecord.User.progression_number = TrialRecord.User.progression_number - TrialRecord.User.size_progression;');
-hotkey('m', 'TrialRecord.User.progression_number = TrialRecord.User.progression_number - 1;');
+hotkey('p', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock + 1;');
+hotkey('o', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock + (TrialRecord.User.size_progression_factor - TrialRecord.User.size_progression)+1;');
+hotkey('l', 'TrialRecord.User.progression_number = TrialRecord.CurrentBlock - TrialRecord.User.size_progression;');
+hotkey('m', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock - 1;;');
 bhv_code(1, 'run_engagement_scene', 2, 'run_video', 3, 'run_answer_scene', 5, 'end_aswer_scene');
 %% constants
 touch_threshold = 2;
@@ -22,6 +22,8 @@ standard_time_out = 5000;
 engagement_duration = 8000;
 repeating = true;
 TrialRecord.User.repeat = false;
+TrialRecord.NextBlock = TrialRecord.CurrentBlock;
+
 
 %  init boxes
 if TrialRecord.User.training_categorization ||...
@@ -57,8 +59,7 @@ else
     correct_button_size = standard_button_size;                             % else, it means that maximum progression through the size difference is reached
     wrong_button_size = standard_button_size;                               % thus the button size is the final button size
 end
-disp('absolute button sizes: ');
-disp([correct_button_size wrong_button_size]);
+disp(['absolute button sizes: ' string(correct_button_size) string(wrong_button_size)]);
 
 % only adjust last added button to correct, wrong or standard size,
 % depending on corrext answer
@@ -280,16 +281,16 @@ if TrialRecord.User.training_categorization ||...
     min_reward = 100;
     reward_window = max_reward - min_reward;
     progression_goal_window = (2*TrialRecord.User.category_progression_factor-1)...
-    - TrialRecord.User.start_progression_number;
+    - TrialRecord.User.start_block;
     category_bonus = 0;
-    if TrialRecord.User.progression_number >= (3*TrialRecord.User.category_progression_factor-1)
+    if TrialRecord.CurrentBlock >= (3*TrialRecord.User.category_progression_factor-1)
         category_bonus = 200;                                                   % bonus when he reaches extra button ( check thism should be zhen he gi9ves correct answer to equal sized buttons )
-    elseif TrialRecord.User.progression_number >= (2*TrialRecord.User.category_progression_factor-1)
+    elseif TrialRecord.CurrentBlock >= (2*TrialRecord.User.category_progression_factor-1)
         category_bonus = 150;
     end
     
-    progression_relative_start = TrialRecord.User.progression_number - ...
-        TrialRecord.User.start_progression_number;                          % reward goes from min to max over x progression numbers
+    progression_relative_start = TrialRecord.CurrentBlock - ...
+        TrialRecord.User.start_block;                          % reward goes from min to max over x progression numbers
     
     variable_reward_portion = (progression_relative_start/progression_goal_window) * ...                   % here the variable portion is calculated based on a fraction of the complete task.
         reward_window + category_bonus;                                     % moet overslaan op 10 21 32 
@@ -482,7 +483,6 @@ TrialRecord.User.completed_stimuli = sum([TrialRecord.User.structure.c_completed
 bhv_variable('size_progression', TrialRecord.User.size_progression,...
     'category_progression', TrialRecord.User.category_progression,...
     'performance_previous_block', TrialRecord.User.performance,...
-    'progression_number', TrialRecord.User.progression_number,...
     'stimulus_name', TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli,...
     'structure_completion', TrialRecord.User.structure_completion, ...
     'structure', TrialRecord.User.structure, ...

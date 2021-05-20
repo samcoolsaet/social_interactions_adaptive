@@ -28,7 +28,7 @@ if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.p_structure_completion = 0;
 else
     previous_sum_buttons = TrialRecord.User.current_sum_buttons;      % calculations of previous sum categories
-%     TrialRecord.NextBlock = TrialRecord.CurrentBlock;
+    TrialRecord.NextBlock = TrialRecord.CurrentBlock;
 end
 %% constants
 max_repeats_condition = 3;
@@ -143,7 +143,9 @@ TrialRecord.User.category_progression = ...                                 % th
 % TrialRecord.User.agent_patient_progression = ...                            % analogous to category
 %     TrialRecord.NextBlock / ... 
 %     (TrialRecord.User.agent_patient_progression_factor);
-
+x = 5
+disp(TrialRecord.NextBlock);
+y = 6
 
 % if TrialRecord.User.category_progression < 4 && ...                         % as long as not all the buttons are unlocked, reset size progression when new button is added
 %         TrialRecord.User.training_categorization
@@ -205,6 +207,8 @@ TrialRecord.User.current_sum_buttons = sum([TrialRecord.User.chasing_on, ... % d
     TrialRecord.User.grooming_on,TrialRecord.User.holding_on, ...               % switch for new stimulus list creation involving new categories and other
     TrialRecord.User.mounting_on, TrialRecord.User.agent_on, ...                % changes that have to be made when categories are added
     TrialRecord.User.patient_on]);
+disp('teelballen');
+disp(TrialRecord.User.current_sum_buttons);
 % end
 %% orienting between stimuli and frame files creating individual folder lists and general stim and frame lists
 % Do all of this for trial 0 because it would be inefficient to repeat and
