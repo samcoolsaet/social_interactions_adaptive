@@ -261,17 +261,35 @@ end
 %% evaluate
 
 % reward multiplier goes up whenn he gets trials right in a row
-reward_multiplicator = 1;
-if TrialRecord.CurrentTrialNumber > 6
-    for i = 0:3
-        if TrialRecord.TrialErrors(end-i) ~= 0
-            break
-        end
+% reward_multiplicator = 1;
+% if TrialRecord.CurrentTrialNumber > 6
+%     for i = 0:3
+%         if TrialRecord.TrialErrors(end-i) ~= 0
+%             break
+%         end
+%     end
+% reward_multiplicator = reward_multiplicator + ( i^2 * 0.2 );
+% end
+% disp('reward_multiplicator');
+% disp(reward_multiplicator);
+
+
+if TrialRecord.CurrentTrialNumber > 1
+    TrialRecord.User.reward_factors = 1:3;
+    if TrialRecord.TrialErrors(end) == 0 && TrialRecord.User.reward_index < 4 ...
+            && ~TrialRecord.User.test_trial
+        TrialRecord.User.reward_multiplicator = TrialRecord.User.reward_multiplicator + ...
+            ( TrialRecord.User.reward_factors(TrialRecord.User.reward_index)^2 * 0.2 );
+        TrialRecord.User.reward_index = TrialRecord.User.reward_index + 1;
+    elseif TrialRecord.TrialErrors(end) ~= 0 && ~TrialRecord.User.test_trial
+        TrialRecord.User.reward_multiplicator = 1;
+        TrialRecord.User.reward_index = 1;
     end
-reward_multiplicator = reward_multiplicator + ( i^2 * 0.2 );
+else
+    TrialRecord.User.reward_multiplicator = 1;
+    TrialRecord.User.reward_index = 1;
 end
-disp('reward_multiplicator');
-disp(reward_multiplicator);
+disp(['reward_multiplicator' string(TrialRecord.User.reward_multiplicator)]);
 
 % calculate baseline reward
 if TrialRecord.User.training_categorization ||...
@@ -299,45 +317,10 @@ if TrialRecord.User.training_categorization ||...
     if reward_dur1 < min_reward
         reward_dur1 = min_reward;
     end
-    reward_dur1 = reward_dur1*reward_multiplicator;
+    reward_dur1 = reward_dur1*TrialRecord.User.reward_multiplicator;
 else
     reward_dur1 = 400;
 end
-
-% if TrialRecord.User.training_categorization ||...
-%         TrialRecord.User.training_agent_patient
-%     random_portion = randi(50, 1);
-%     max_reward = 150;
-%     min_reward = 100;
-%     reward_window = max_reward - min_reward;
-%     extra_reward = 50;                                                     % extra reward if when he immediately gets a condition switch right 
-%     category_bonus = 0;
-%     if TrialRecord.User.progression_number >= (3*TrialRecord.User.category_progression_factor-1)
-%         category_bonus = 100;                                                   % bonus when he reaches extra button ( check thism should be zhen he gi9ves correct answer to equal sized buttons )
-%     elseif TrialRecord.User.progression_number >= (2*TrialRecord.User.category_progression_factor-1)
-%         category_bonus = 75;
-%     end
-%     progression_goal_window = (2*TrialRecord.User.category_progression_factor+10)...
-%         - TrialRecord.User.start_progression_number;
-%     progression_relative_start = TrialRecord.User.progression_number - ...
-%         TrialRecord.User.start_progression_number;                          % reward goes from min to max over x progression numbers
-%     variable_reward_portion = progression_relative_start* ...                   % here the variable portion is calculated based on a fraction of the complete task.
-%         reward_window/progression_goal_window + category_bonus;             % moet overslaan op 10 21 32 
-%     reward_dur1 = min_reward + variable_reward_portion;
-% %     if reward_dur1 > max_reward                                                 % stay below max reward
-% %         reward_dur1 = max_reward;
-%     if reward_dur1 < min_reward
-%         reward_dur1 = min_reward;
-%     end
-%     if TrialRecord.CurrentTrialNumber ~= 1 && TrialRecord.ConditionsPlayed(end)...
-%             ~= TrialRecord.CurrentCondition
-%         reward_dur1 = (reward_dur1 + random_portion + extra_reward)*reward_multiplicator;
-%     else
-%         reward_dur1 = (reward_dur1 + random_portion)*reward_multiplicator;
-%     end
-% else
-%     reward_dur1 = 400;
-% end
 
 if TrialRecord.CurrentTrialNumber <= 10
     time_out = standard_time_out;
@@ -431,6 +414,9 @@ elseif TrialRecord.User.patienting & TrialRecord.User.current_sum_buttons ~= 1
         end
     end
 end
+if TrialRecord.User.test_trial
+    reward = true;
+end
 
 if reward
     sound(y1, fs1);
@@ -449,23 +435,38 @@ con4 = Concurrent(reward_scene);
 con4.add(cam);
 scene4 = create_scene(con4);
 run_scene(scene4);
-
-if TrialRecord.User.structure(TrialRecord.User.struct_index).c_success == 1 ...
-        || TrialRecord.User.structure(TrialRecord.User.struct_index).c_fails >= TrialRecord.User.max_fails
-    TrialRecord.User.structure(TrialRecord.User.struct_index).c_completed = 1;
-    disp('stimulus set to complete, should not be repeated');
-elseif TrialRecord.User.structure(TrialRecord.User.struct_index).a_success == 1 ...
-        || TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails >= TrialRecord.User.max_fails
-    TrialRecord.User.structure(TrialRecord.User.struct_index).a_completed = 1;
-    disp('stimulus set to complete, should not be repeated');
-elseif TrialRecord.User.structure(TrialRecord.User.struct_index).p_success == 1 ...
-        || TrialRecord.User.structure(TrialRecord.User.struct_index).p_fails >= TrialRecord.User.max_fails
-    TrialRecord.User.structure(TrialRecord.User.struct_index).p_completed = 1;
-    disp('stimulus set to complete, should not be repeated');
+if TrialRecord.User.test_trial
+    if TrialRecord.User.structure(TrialRecord.User.struct_index).c_success ||... 
+        TrialRecord.User.structure(TrialRecord.User.struct_index).c_fails == 1        
+            TrialRecord.User.structure(TrialRecord.User.struct_index).c_completed = 1;
+            disp('stimulus set to complete, should not be repeated');
+    elseif TrialRecord.User.structure(TrialRecord.User.struct_index).a_success ||... 
+        TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails == 1        
+            TrialRecord.User.structure(TrialRecord.User.struct_index).a_completed = 1;
+            disp('stimulus set to complete, should not be repeated');
+    elseif TrialRecord.User.structure(TrialRecord.User.struct_index).p_success ||... 
+        TrialRecord.User.structure(TrialRecord.User.struct_index).p_fails == 1        
+            TrialRecord.User.structure(TrialRecord.User.struct_index).p_completed = 1;
+            disp('stimulus set to complete, should not be repeated');
+    end
 else
-    if repeating
-        TrialRecord.User.repeat = true;
-        disp('stimulus will be repeated');
+    if TrialRecord.User.structure(TrialRecord.User.struct_index).c_success == 1 ...
+            || TrialRecord.User.structure(TrialRecord.User.struct_index).c_fails >= TrialRecord.User.max_fails
+        TrialRecord.User.structure(TrialRecord.User.struct_index).c_completed = 1;
+        disp('stimulus set to complete, should not be repeated');
+    elseif TrialRecord.User.structure(TrialRecord.User.struct_index).a_success == 1 ...
+            || TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails >= TrialRecord.User.max_fails
+        TrialRecord.User.structure(TrialRecord.User.struct_index).a_completed = 1;
+        disp('stimulus set to complete, should not be repeated');
+    elseif TrialRecord.User.structure(TrialRecord.User.struct_index).p_success == 1 ...
+            || TrialRecord.User.structure(TrialRecord.User.struct_index).p_fails >= TrialRecord.User.max_fails
+        TrialRecord.User.structure(TrialRecord.User.struct_index).p_completed = 1;
+        disp('stimulus set to complete, should not be repeated');
+    else
+        if repeating
+            TrialRecord.User.repeat = true;
+            disp('stimulus will be repeated');
+        end
     end
 end
 
