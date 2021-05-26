@@ -361,6 +361,7 @@ if TrialRecord.User.current_sum_buttons ~= previous_sum_buttons             % th
     TrialRecord.User.structure = struct('stimuli', {}, 'frames', {}, 'c_fails', {}, ... 
         'c_success', {},'c_completed', {}, 'a_fails', {}, 'a_success', {}, ...
         'a_completed', {}, 'p_fails', {}, 'p_success', {}, 'p_completed', {}, 'folder', {}, 'condition', {});
+    i = 1;
     for i = 1:length(stimulus_list)
         TrialRecord.User.structure(i).stimuli = stimulus_list(i);
         TrialRecord.User.structure(i).frames = frame_list(i);
@@ -401,16 +402,16 @@ if TrialRecord.User.current_sum_buttons ~= previous_sum_buttons             % th
             TrialRecord.User.structure(i).folder = TrialRecord.User.gen_grooming_folder;
             TrialRecord.User.structure(i).condition = [2 5 6];
         elseif i <= cum_length(5)
-            TrialRecord.User.structure(i).folder = TrialRecord.User.mounting_folder;
+            TrialRecord.User.structure(i).folder = TrialRecord.User.gen_grooming_folder;
             TrialRecord.User.structure(i).condition = [3 5 6];
         elseif i <= cum_length(6)
-            TrialRecord.User.structure(i).folder = TrialRecord.User.gen_mounting_folder;
+            TrialRecord.User.structure(i).folder = TrialRecord.User.gen_grooming_folder;
             TrialRecord.User.structure(i).condition = [3 5 6];
         elseif i <= cum_length(7)
-            TrialRecord.User.structure(i).folder = TrialRecord.User.holding_folder;
+            TrialRecord.User.structure(i).folder = TrialRecord.User.gen_grooming_folder;
             TrialRecord.User.structure(i).condition = [4 5 6];
         elseif i <= cum_length(8)
-            TrialRecord.User.structure(i).folder = TrialRecord.User.gen_holding_folder;
+            TrialRecord.User.structure(i).folder = TrialRecord.User.gen_grooming_folder;
             TrialRecord.User.structure(i).condition = [4 5 6];
         end
     end
