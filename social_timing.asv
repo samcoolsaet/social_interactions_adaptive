@@ -284,6 +284,8 @@ if TrialRecord.CurrentTrialNumber > 1
     elseif TrialRecord.TrialErrors(end) ~= 0 && ~TrialRecord.User.test_trial
         TrialRecord.User.reward_multiplicator = 1;
         TrialRecord.User.reward_index = 1;
+    else
+        break
     end
 else
     TrialRecord.User.reward_multiplicator = 1;
@@ -436,12 +438,18 @@ con4.add(cam);
 scene4 = create_scene(con4);
 run_scene(scene4);
 if TrialRecord.User.test_trial
-    if TrialRecord.User.structure(TrialRecord.User.struct_index).c_success || 
-        == 1 ...
-    end
-    if TrialRecord.User.structure(TrialRecord.User.struct_index).c_success == 1 ...
-    end
-    if TrialRecord.User.structure(TrialRecord.User.struct_index).c_success == 1 ...
+    if TrialRecord.User.structure(TrialRecord.User.struct_index).c_success ||... 
+        TrialRecord.User.structure(TrialRecord.User.struct_index).c_fails == 1        
+            TrialRecord.User.structure(TrialRecord.User.struct_index).c_completed = 1;
+            disp('stimulus set to complete, should not be repeated');
+    elseif TrialRecord.User.structure(TrialRecord.User.struct_index).a_success ||... 
+        TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails == 1        
+            TrialRecord.User.structure(TrialRecord.User.struct_index).a_completed = 1;
+            disp('stimulus set to complete, should not be repeated');
+    elseif TrialRecord.User.structure(TrialRecord.User.struct_index).p_success ||... 
+        TrialRecord.User.structure(TrialRecord.User.struct_index).p_fails == 1        
+            TrialRecord.User.structure(TrialRecord.User.struct_index).p_completed = 1;
+            disp('stimulus set to complete, should not be repeated');
     end
 else
     if TrialRecord.User.structure(TrialRecord.User.struct_index).c_success == 1 ...
@@ -483,4 +491,5 @@ bhv_variable('size_progression', TrialRecord.User.size_progression,...
     'structure', TrialRecord.User.structure, ...
     'completed_stim', TrialRecord.User.completed_stimuli,...
     'random_condition_order_index', TrialRecord.User.random_condition_order_index,...
-    'repeat', TrialRecord.User.repeat);
+    'repeat', TrialRecord.User.repeat,...
+    'test_trial', TrialRecord.User.test_trial);
