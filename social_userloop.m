@@ -34,7 +34,7 @@ end
 %% constants
 max_repeats_condition = 3;
 % progression
-TrialRecord.User.blocksize = 10;                                             % The TrialRecord.User.blocksize is the number of animations the monkey has to complete.
+TrialRecord.User.blocksize = 20;                                            % The TrialRecord.User.blocksize is the number of animations the monkey has to complete.
                                                                             %%% maybe later create a blocksize as a function of previous performance to quickly skip to his level when starting again.
 
 succes_threshold = 0.80;                                                    % if performance is bigger than or equal to this, progression number + 1
@@ -51,10 +51,10 @@ TrialRecord.User.category_progression_factor = ...
                                                                             % consolidation_trials = the number of trials to consolidate the current size progression,
                                                                             % is the difference between size and category progression * progression number 
 TrialRecord.User.max_c_progression_number = TrialRecord.User.category_progression_factor * 2 ...
-    + TrialRecord.User.size_progression_factor;                             % last button active + at final size
+    - 1;                                                                    % last button active + at final size
 % TrialRecord.User.max_ap_progression_number = TrialRecord.User.agent_patient_progression_factor * 1 + ...
 %     TrialRecord.User.size_progression_factor;
-TrialRecord.User.min_c_progression_number = TrialRecord.User.category_progression_factor;    % at leat category progression factor because I never want to show 1 button again
+TrialRecord.User.min_c_progression_number = TrialRecord.User.start_block;   % at leat category progression factor because I never want to show 1 button again
 % TrialRecord.User.min_ap_progression_number = TrialRecord.User.category_progression_factor;
 
 % training
@@ -604,12 +604,14 @@ TrialRecord.User.frame = strcat('D:\onedrive\OneDrive - KU Leuven\social_interac
     TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', ...
     TrialRecord.User.structure(TrialRecord.User.struct_index).frames);      % and frame
 
-if strncmp(TrialRecord.User.structure(TrialRecord.User.struct_index).folder, 'gen', 3)
-    TrialRecord.User.test_trial = true;
-    disp(['test_trial' string(TrialRecord.User.test_trial)]);
-else
-    TrialRecord.User.test_trial = false;
-    disp(['test_trial' string(TrialRecord.User.test_trial)]);
+if TrialRecord.User.generalizing
+    if strncmp(TrialRecord.User.structure(TrialRecord.User.struct_index).folder, 'gen', 3)
+        TrialRecord.User.test_trial = true;
+        disp(['test_trial' string(TrialRecord.User.test_trial)]);
+    else
+        TrialRecord.User.test_trial = false;
+        disp(['test_trial' string(TrialRecord.User.test_trial)]);
+    end
 end
 % creating condition
 C = {'sqr([2 1], [1 0 0], 0, 0, -1)'};

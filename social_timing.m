@@ -275,7 +275,7 @@ end
 
 
 if TrialRecord.CurrentTrialNumber > 1
-    TrialRecord.User.reward_factors = 1:3;
+    TrialRecord.User.reward_factors = linspace(1,2,3); %( 1:3)
     if TrialRecord.TrialErrors(end) == 0 && TrialRecord.User.reward_index < 4 ...
             && ~TrialRecord.User.test_trial
         TrialRecord.User.reward_multiplicator = TrialRecord.User.reward_multiplicator + ...
@@ -302,9 +302,9 @@ if TrialRecord.User.training_categorization ||...
     - TrialRecord.User.start_block;
     category_bonus = 0;
     if TrialRecord.CurrentBlock >= (3*TrialRecord.User.category_progression_factor-1)
-        category_bonus = 200;                                                   % bonus when he reaches extra button ( check thism should be zhen he gi9ves correct answer to equal sized buttons )
+        category_bonus = 100;                                                   % bonus when he reaches extra button ( check thism should be zhen he gi9ves correct answer to equal sized buttons )
     elseif TrialRecord.CurrentBlock >= (2*TrialRecord.User.category_progression_factor-1)
-        category_bonus = 150;
+        category_bonus = 75;
     end
     
     progression_relative_start = TrialRecord.CurrentBlock - ...
