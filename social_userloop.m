@@ -12,7 +12,7 @@ persistent timing_filenames_retrieved
     end
 %% initializing for first trial
 TrialRecord.User.start_block = 40;                                               % the progression number to start training with
-TrialRecord.User.generalizing = false;
+TrialRecord.User.generalizing = true;
 
 if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.random_condition_order = 1;
@@ -27,6 +27,7 @@ if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.c_structure_completion = 0;
     TrialRecord.User.a_structure_completion = 0;
     TrialRecord.User.p_structure_completion = 0;
+    TrialRecord.User.test_trial_counter = 0;
 else
     previous_sum_buttons = TrialRecord.User.current_sum_buttons;      % calculations of previous sum categories
 %     TrialRecord.NextBlock = TrialRecord.CurrentBlock;

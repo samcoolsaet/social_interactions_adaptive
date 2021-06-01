@@ -274,14 +274,16 @@ end
 % disp(reward_multiplicator);
 
 
-if TrialRecord.CurrentTrialNumber > 1
-    TrialRecord.User.reward_factors = linspace(1,2,3); %( 1:3)
-    if TrialRecord.TrialErrors(end) == 0 && TrialRecord.User.reward_index < 4 ...
+if TrialRecord.CurrentTrialNumber > (1+TrialRecord.User.test_trial_counter)
+    TrialRecord.User.reward_factors = linspace(1,2,3);
+    if TrialRecord.TrialErrors(end-TrialRecord.User.test_trial_counter)...
+            == 0 && TrialRecord.User.reward_index < 4 ...
             && ~TrialRecord.User.test_trial
         TrialRecord.User.reward_multiplicator = TrialRecord.User.reward_multiplicator + ...
             ( TrialRecord.User.reward_factors(TrialRecord.User.reward_index)^2 * 0.2 );
         TrialRecord.User.reward_index = TrialRecord.User.reward_index + 1;
-    elseif TrialRecord.TrialErrors(end) ~= 0 && ~TrialRecord.User.test_trial
+    elseif TrialRecord.TrialErrors(end-TrialRecord.User.test_trial_counter)...
+            ~= 0 && ~TrialRecord.User.test_trial
         TrialRecord.User.reward_multiplicator = 1;
         TrialRecord.User.reward_index = 1;
     end
@@ -416,7 +418,11 @@ elseif TrialRecord.User.patienting & TrialRecord.User.current_sum_buttons ~= 1
 end
 if TrialRecord.User.test_trial
     reward = true;
+    TrialRecord.User.test_trial_counter = TrialRecord.User.test_trial_counter + 1;
+else
+    TrialRecord.User.test_trial_counter = 0;
 end
+disp(['testtrialcounter' string(TrialRecord.User.test_trial_counter)]);
 
 if reward
     sound(y1, fs1);
