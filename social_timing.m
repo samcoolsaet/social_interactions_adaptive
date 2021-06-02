@@ -5,7 +5,7 @@ hotkey('r', 'goodmonkey(reward_dur, ''juiceline'', MLConfig.RewardFuncArgs.Juice
 hotkey('p', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock + 1;');
 hotkey('o', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock + (TrialRecord.User.size_progression_factor - TrialRecord.User.size_progression)+1;');
 hotkey('l', 'TrialRecord.User.progression_number = TrialRecord.CurrentBlock - TrialRecord.User.size_progression;');
-hotkey('m', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock - 1;;');
+hotkey('m', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock - 1;');
 bhv_code(1, 'run_engagement_scene', 2, 'run_video', 3, 'run_answer_scene', 5, 'end_aswer_scene');
 %% constants
 touch_threshold = 2;
@@ -261,26 +261,13 @@ end
 %% evaluate
 
 % reward multiplier goes up whenn he gets trials right in a row
-% reward_multiplicator = 1;
-% if TrialRecord.CurrentTrialNumber > 6
-%     for i = 0:3
-%         if TrialRecord.TrialErrors(end-i) ~= 0
-%             break
-%         end
-%     end
-% reward_multiplicator = reward_multiplicator + ( i^2 * 0.2 );
-% end
-% disp('reward_multiplicator');
-% disp(reward_multiplicator);
-
-
 if TrialRecord.CurrentTrialNumber > (1+TrialRecord.User.test_trial_counter)
-    TrialRecord.User.reward_factors = linspace(1,2,3);
+    TrialRecord.User.reward_factors = linspace(1,2,4);
     if TrialRecord.TrialErrors(end-TrialRecord.User.test_trial_counter)...
             == 0 && TrialRecord.User.reward_index < 4 ...
             && ~TrialRecord.User.test_trial
         TrialRecord.User.reward_multiplicator = TrialRecord.User.reward_multiplicator + ...
-            ( TrialRecord.User.reward_factors(TrialRecord.User.reward_index)^2 * 0.2 );
+            ( TrialRecord.User.reward_factors(TrialRecord.User.reward_index)^2 * 0.15 );
         TrialRecord.User.reward_index = TrialRecord.User.reward_index + 1;
     elseif TrialRecord.TrialErrors(end-TrialRecord.User.test_trial_counter)...
             ~= 0 && ~TrialRecord.User.test_trial
