@@ -11,7 +11,7 @@ persistent timing_filenames_retrieved
     return
     end
 %% initializing for first trial
-TrialRecord.User.start_block = 40;                                               % the progression number to start training with
+TrialRecord.User.start_block = 41;                                               % the progression number to start training with
 TrialRecord.User.generalizing = true;
 
 if TrialRecord.CurrentTrialNumber == 0
@@ -51,7 +51,7 @@ TrialRecord.User.category_progression_factor = ...
                                                                             % progression_trials % the number of trials needed to get to the final size
                                                                             % consolidation_trials = the number of trials to consolidate the current size progression,
                                                                             % is the difference between size and category progression * progression number 
-TrialRecord.User.max_c_progression_number = TrialRecord.User.category_progression_factor * 2 ...
+TrialRecord.User.max_c_progression_number = TrialRecord.User.category_progression_factor * 3 ...
     - 1;                                                                    % last button active + at final size
 % TrialRecord.User.max_ap_progression_number = TrialRecord.User.agent_patient_progression_factor * 1 + ...
 %     TrialRecord.User.size_progression_factor;
@@ -215,10 +215,10 @@ if TrialRecord.CurrentTrialNumber == 0
     % dir() gives a struct of the contents of the path
     % I CAN LINK THE GENERALIZATION STIMULI TO A DIFFERENT FOLDER AND THEN
     % MAKE A LINK WITH THE FOLDER IN THE STRUCT
-    chasing_struct = dir('C:\sam\stimuli\chasing');
-    grooming_struct = dir('C:\sam\stimuli\grooming');
-    mounting_struct = dir('C:\sam\stimuli\mounting');
-    holding_struct = dir('C:\sam\stimuli\holding');
+    chasing_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\chasing');
+    grooming_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\grooming');
+    mounting_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\mounting');
+    holding_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\holding');
     
     chasing_path = regexp(chasing_struct(1).folder,filesep,'split');
     grooming_path = regexp(grooming_struct(1).folder,filesep,'split');
@@ -244,10 +244,10 @@ if TrialRecord.CurrentTrialNumber == 0
     
 
     % analogous for the frames
-    chasing_frame_struct = dir('C:\sam\frames\chasing');
-    grooming_frame_struct = dir('C:\sam\frames\grooming');
-    mounting_frame_struct = dir('C:\sam\frames\mounting');
-    holding_frame_struct = dir('C:\sam\frames\holding');
+    chasing_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\chasing');
+    grooming_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\grooming');
+    mounting_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\mounting');
+    holding_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\holding');
 
     TrialRecord.User.chasing_frame_list = {chasing_frame_struct.name};
     TrialRecord.User.grooming_frame_list = {grooming_frame_struct.name};
@@ -260,10 +260,10 @@ if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.holding_frame_list(1:2) = [];
 
 if TrialRecord.User.generalizing
-    gen_chasing_struct = dir('C:\sam\stimuli\gen_chasing');
-    gen_grooming_struct = dir('C:\sam\stimuli\gen_grooming');
-    gen_mounting_struct = dir('C:\sam\stimuli\gen_mounting');
-    gen_holding_struct = dir('C:\sam\stimuli\gen_holding');
+    gen_chasing_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\gen_chasing');
+    gen_grooming_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\gen_grooming');
+    gen_mounting_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\gen_mounting');
+    gen_holding_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\gen_holding');
     
     gen_chasing_path = regexp(gen_chasing_struct(1).folder,filesep,'split');
     gen_grooming_path = regexp(gen_grooming_struct(1).folder,filesep,'split');
@@ -285,10 +285,10 @@ if TrialRecord.User.generalizing
     TrialRecord.User.gen_mounting_list(1:2) = [];
     TrialRecord.User.gen_holding_list(1:2) = [];
     
-    gen_chasing_frame_struct = dir('C:\sam\frames\gen_chasing');
-    gen_grooming_frame_struct = dir('C:\sam\frames\gen_grooming');
-    gen_mounting_frame_struct = dir('C:\sam\frames\gen_mounting');
-    gen_holding_frame_struct = dir('C:\sam\frames\gen_holding');
+    gen_chasing_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\gen_chasing');
+    gen_grooming_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\gen_grooming');
+    gen_mounting_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\gen_mounting');
+    gen_holding_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\gen_holding');
     
     TrialRecord.User.gen_chasing_frame_list = {gen_chasing_frame_struct.name};
     TrialRecord.User.gen_grooming_frame_list = {gen_grooming_frame_struct.name};
@@ -327,20 +327,8 @@ cum_length = cumsum([length(TrialRecord.User.chasing_list) length(TrialRecord.Us
     length(TrialRecord.User.grooming_list) length(TrialRecord.User.gen_grooming_list)...
     length(TrialRecord.User.mounting_list) length(TrialRecord.User.gen_mounting_list)...
     length(TrialRecord.User.holding_list) length(TrialRecord.User.gen_holding_list)]);
+
 % creating useable stimulus list depending on the switches
-% if TrialRecord.User.holding_on || TrialRecord.User.agent_on || TrialRecord.User.patient_on
-%     stimulus_list = TrialRecord.User.general_stimulus_list;
-%     frame_list = TrialRecord.User.general_frame_list;
-% elseif  ~TrialRecord.User.holding_on && TrialRecord.User.mounting_on
-%     stimulus_list = TrialRecord.User.general_stimulus_list(1, 1:(end-length(TrialRecord.User.holding_list)));
-%     frame_list = TrialRecord.User.general_frame_list(1, 1:(end-length(TrialRecord.User.holding_frame_list)));
-% elseif ~TrialRecord.User.mounting_on && TrialRecord.User.grooming_on
-%     stimulus_list = TrialRecord.User.general_stimulus_list(1, 1:(length(TrialRecord.User.chasing_list)+length(TrialRecord.User.grooming_list)));
-%     frame_list = TrialRecord.User.general_frame_list(1, 1:(length(TrialRecord.User.chasing_frame_list)+length(TrialRecord.User.grooming_frame_list)));
-% elseif ~TrialRecord.User.grooming_on && TrialRecord.User.chasing_on
-%     stimulus_list = TrialRecord.User.general_stimulus_list(1, 1:length(TrialRecord.User.chasing_list));
-%     frame_list = TrialRecord.User.general_frame_list(1, 1:length(TrialRecord.User.chasing_frame_list));
-% end
 
 if TrialRecord.User.holding_on || TrialRecord.User.agent_on || TrialRecord.User.patient_on
     stimulus_list = TrialRecord.User.general_stimulus_list;
@@ -374,21 +362,6 @@ if TrialRecord.User.current_sum_buttons ~= previous_sum_buttons             % th
         TrialRecord.User.structure(i).p_fails = 0;
         TrialRecord.User.structure(i).p_success = 0;
         TrialRecord.User.structure(i).p_completed = 0;
-%         if i <= length(TrialRecord.User.chasing_list)
-%             TrialRecord.User.structure(i).folder = 'chasing';
-%             TrialRecord.User.structure(i).condition = [1 5 6];
-%         elseif i <= length(TrialRecord.User.chasing_list) + ... 
-%                 length(TrialRecord.User.grooming_list)
-%             TrialRecord.User.structure(i).folder = 'grooming';
-%             TrialRecord.User.structure(i).condition = [2 5 6];
-%         elseif i <= length(TrialRecord.User.chasing_list) + ... 
-%                 length(TrialRecord.User.grooming_list) + length(TrialRecord.User.mounting_list)
-%             TrialRecord.User.structure(i).folder = 'mounting';
-%             TrialRecord.User.structure(i).condition = [3 5 6];
-%         elseif i <= length(TrialRecord.User.general_stimulus_list)
-%             TrialRecord.User.structure(i).folder = 'holding';
-%             TrialRecord.User.structure(i).condition = [4 5 6];
-%         end
         if i <= cum_length(1)
             TrialRecord.User.structure(i).folder = TrialRecord.User.chasing_folder;
             TrialRecord.User.structure(i).condition = [1 5 6];
@@ -490,7 +463,7 @@ if ((TrialRecord.User.random_condition_order_index...                        % i
 else
     disp('did not reset random condition order');
 end
-disp(TrialRecord.User.random_condition_order);
+% disp(TrialRecord.User.random_condition_order);
 
 if (~TrialRecord.User.repeat && TrialRecord.User.engaged) || ...
         TrialRecord.User.current_sum_buttons ~= previous_sum_buttons        % engaged refers to return when time limit for engagement scene is reached
@@ -598,10 +571,10 @@ else
     disp('condition not found');
 end
 
-TrialRecord.User.movie = strcat('C:\sam\stimuli\',... 
+TrialRecord.User.movie = strcat('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\',... 
     TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', ...
     TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli);     % complete path of the animation
-TrialRecord.User.frame = strcat('C:\sam\frames\',... 
+TrialRecord.User.frame = strcat('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\',... 
     TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', ...
     TrialRecord.User.structure(TrialRecord.User.struct_index).frames);      % and frame
 
