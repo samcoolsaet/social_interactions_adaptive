@@ -1,4 +1,4 @@
-function [bitmap] = FrameCreator()
+function [bitmap, origin] = FrameCreator(name, condition)
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for frame...
 % % img_size in degrees = 15*9, frames sizes (x, y), locations
@@ -19,26 +19,41 @@ function [bitmap] = FrameCreator()
 % [width,height,refresh_rate] = mglgetadapterdisplaymode(2)
 % info = mglgetadapteridentifier
 % rect = mglgetadapterrect(2)
-% 
-origin = [400 300];
-x_length = 100;
-y_length = 100;
+%
+
+% TrialRecord.User.structure(TrialRecord.User.struct_index).frames = name as input
+
+load('inventory.mat');
+
+identify_frame_inventory = strcmp([inventory.name], name);
+inventory_index = find(identify_frame_inventory==1);
+
+if condition == 5
+    origin = inventory(inventory_index).a_origin;
+    width = inventory(inventory_index).a_width;
+    height = inventory(inventory_index).a_height;
+elseif condition == 6
+    origin = inventory(inventory_index).p_origin;
+    width = inventory(inventory_index).p_width;
+    height = inventory(inventory_index).p_height;
+else
+    disp('condition not found');
 line_thickness = 5;
 
-alpha = zeros(x_length, y_length);
-red = zeros(x_length, y_length);
-green = zeros(x_length, y_length);
-blue = zeros(x_length, y_length);
+alpha = zeros(width, height);
+red = zeros(width, height);
+green = zeros(width, height);
+blue = zeros(width, height);
 
-red(1:line_thickness,:) = ones(line_thickness, x_length);
-red(end-(line_thickness-1):end,:) = ones(line_thickness, x_length);
-red(:,1:line_thickness) = ones(y_length, line_thickness);
-red(:,end-(line_thickness-1):end) = ones(y_length, line_thickness);
+red(1:line_thickness,:) = ones(line_thickness, width);
+red(end-(line_thickness-1):end,:) = ones(line_thickness, width);
+red(:,1:line_thickness) = ones(height, line_thickness);
+red(:,end-(line_thickness-1):end) = ones(height, line_thickness);
 
-alpha(1:line_thickness,:) = ones(line_thickness, x_length);
-alpha(end-(line_thickness-1):end,:) = ones(line_thickness, x_length);
-alpha(:,1:line_thickness) = ones(y_length, line_thickness);
-alpha(:,end-(line_thickness-1):end) = ones(y_length, line_thickness);
+alpha(1:line_thickness,:) = ones(line_thickness, width);
+alpha(end-(line_thickness-1):end,:) = ones(line_thickness, width);
+alpha(:,1:line_thickness) = ones(height, line_thickness);
+alpha(:,end-(line_thickness-1):end) = ones(height, line_thickness);
 
 
 bitmap = cat(3, alpha, red, green, blue);
