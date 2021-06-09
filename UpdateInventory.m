@@ -10,9 +10,10 @@ holding_frames = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frame
 holding_frames(1:2) = [];
 
 frame_list = horzcat({chasing_frames.name},{grooming_frames.name},{mounting_frames.name},{holding_frames.name});
+frame_list = string(frame_list);
 
 for i = 1:length(frame_list)
-    if ~ismember(frame_list(i), {inventory.name})
+    if ~ismember(frame_list(i), string({inventory.name}))
         updated_inventory(end+1).name = frame_list(i);
     end
 end

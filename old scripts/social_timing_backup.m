@@ -181,9 +181,10 @@ mov.List = { TrialRecord.User.movie, [0 0], 0, 1.25, 90 };   % movie filename
 % tc = TimeCounter(mov);
 img = ImageGraphic(null_);
 img.List = { TrialRecord.User.frame, [0 0], 0, 1.25, 90 };
-% [bitmap, origin] = FrameCreator(TrialRecord.User.structure(TrialRecord.User.struct_index).frames, TrialRecord.CurrentCondition); % in framecreator, give input voor length and
+% bitmap = FrameCreator; % in framecreator, give input voor length and
 % width. length en width placed here
-% img.List = { bitmap, origin, 0, 1.25, 90;... % origin from inventory is placed here
+% img.List = { bitmap, [0 0], 0, 1, 90;... origin from inventory is placed
+% here
 %     TrialRecord.User.frame, [0 0], 0, 1.25, 90};
 
 %% constructing scenes
@@ -222,12 +223,6 @@ con3.add(trial_box);
 con3.add(cam);
 %% running scenes
 % run engagement scene
-
-tf = istouching;
-while istouching  % while touching, do not proceed to the buttons
-    idle(2000);
-end
-
 scene1 = create_scene(con1);
 run_scene(scene1, 1);
 if tc_engagement.Success
@@ -244,10 +239,10 @@ scene2 = create_scene(con2);
 run_scene(scene2, 2);
 
 % run frame and answering scene
-% tf = istouching;
-% while istouching  % while touching, do not proceed to the buttons
-%     idle(2000);
-% end
+tf = istouching;
+while istouching  % while touching, do not proceed to the buttons
+    idle(2000);
+end
 if TrialRecord.User.categorizing
     set_bgcolor([1 0.5 1]);   % change the background color  
 elseif TrialRecord.User.agenting || TrialRecord.User.patienting
@@ -294,12 +289,12 @@ if TrialRecord.User.training_categorization ||...
     max_reward = 150;
     min_reward = 100;
     reward_window = max_reward - min_reward;
-    progression_goal_window = (3*TrialRecord.User.button_progression_factor-1)...
+    progression_goal_window = (3*TrialRecord.User.category_progression_factor-1)...
     - TrialRecord.User.start_block;
     category_bonus = 0;
-    if TrialRecord.CurrentBlock >= (3*TrialRecord.User.button_progression_factor-1)
+    if TrialRecord.CurrentBlock >= (3*TrialRecord.User.category_progression_factor-1)
         category_bonus = 100;                                                   % bonus when he reaches extra button ( check thism should be zhen he gi9ves correct answer to equal sized buttons )
-    elseif TrialRecord.CurrentBlock >= (2*TrialRecord.User.button_progression_factor-1)
+    elseif TrialRecord.CurrentBlock >= (2*TrialRecord.User.category_progression_factor-1)
         category_bonus = 75;
     end
     
@@ -482,7 +477,7 @@ TrialRecord.User.structure_completion = mean([TrialRecord.User.structure.c_compl
 TrialRecord.User.completed_stimuli = sum([TrialRecord.User.structure.c_completed] + [TrialRecord.User.structure.a_completed] + [TrialRecord.User.structure.p_completed], 'all');
 
 bhv_variable('size_progression', TrialRecord.User.size_progression,...
-    'button_progression', TrialRecord.User.button_progression,...
+    'category_progression', TrialRecord.User.category_progression,...
     'performance_previous_block', TrialRecord.User.performance,...
     'stimulus_name', TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli,...
     'structure_completion', TrialRecord.User.structure_completion, ...
