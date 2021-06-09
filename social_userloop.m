@@ -51,8 +51,8 @@ TrialRecord.User.max_block = TrialRecord.User.button_progression_factor * 3 ...
 TrialRecord.User.min_block = TrialRecord.User.start_block;
 
 % training
-TrialRecord.User.training_categorization = false;                            % complete task or training
-TrialRecord.User.training_agent_patient = true;
+TrialRecord.User.training_categorization = true;                            % complete task or training
+TrialRecord.User.training_agent_patient = false;
 
 % fixed constants
 TrialRecord.User.chasing_on = false;                                        % all false for script to work

@@ -212,6 +212,17 @@ con2 = Concurrent(tc_movie);
 con2.add(mov)
 con2.add(cam);
 
+% if agent patient, run the frame scene
+if TrialRecord.User.agenting || TrialRecord.User.patienting
+    frame_or = OrAdapter(frame_touch);
+    frame_or.add(tc_answer);
+    con4 = Concurrent(or);
+    con4.add(img);
+    con4.add(trial_box);
+    con4.add(cam);
+end
+
+
 % showing buttons and adding touch targets. restricted by answer
 % timecounter
 or = OrAdapter(touch);
