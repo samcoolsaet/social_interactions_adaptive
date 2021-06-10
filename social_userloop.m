@@ -51,8 +51,8 @@ TrialRecord.User.max_block = TrialRecord.User.button_progression_factor * 3 ...
 TrialRecord.User.min_block = TrialRecord.User.start_block;
 
 % training
-TrialRecord.User.training_categorization = false;                            % complete task or training
-TrialRecord.User.training_agent_patient = true;
+TrialRecord.User.training_categorization = true;                            % complete task or training
+TrialRecord.User.training_agent_patient = false;
 
 % fixed constants
 TrialRecord.User.chasing_on = false;                                        % all false for script to work
@@ -174,10 +174,10 @@ TrialRecord.User.current_sum_buttons = sum([TrialRecord.User.chasing_on, ... % d
 % I want these variables to be fixed throughout the run
 if TrialRecord.CurrentTrialNumber == 0
     % dir() gives a struct of the contents of the path
-    chasing_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\chasing');
-    grooming_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\grooming');
-    mounting_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\mounting');
-    holding_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\holding');
+    chasing_struct = dir('C:\sam\stimuli\chasing');
+    grooming_struct = dir('C:\sam\stimuli\grooming');
+    mounting_struct = dir('C:\sam\stimuli\mounting');
+    holding_struct = dir('C:\sam\stimuli\holding');
     
     chasing_path = regexp(chasing_struct(1).folder,filesep,'split');
     grooming_path = regexp(grooming_struct(1).folder,filesep,'split');
@@ -203,10 +203,10 @@ if TrialRecord.CurrentTrialNumber == 0
     
 
     % analogous for the frames
-    chasing_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\chasing');
-    grooming_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\grooming');
-    mounting_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\mounting');
-    holding_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\holding');
+    chasing_frame_struct = dir('C:\sam\frames\chasing');
+    grooming_frame_struct = dir('C:\sam\frames\grooming');
+    mounting_frame_struct = dir('C:\sam\frames\mounting');
+    holding_frame_struct = dir('C:\sam\frames\holding');
 
     TrialRecord.User.chasing_frame_list = {chasing_frame_struct.name};
     TrialRecord.User.grooming_frame_list = {grooming_frame_struct.name};
@@ -219,10 +219,10 @@ if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.holding_frame_list(1:2) = [];
 
 if TrialRecord.User.generalizing
-    gen_chasing_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\gen_chasing');
-    gen_grooming_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\gen_grooming');
-    gen_mounting_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\gen_mounting');
-    gen_holding_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\gen_holding');
+    gen_chasing_struct = dir('C:\sam\stimuli\gen_chasing');
+    gen_grooming_struct = dir('C:\sam\stimuli\gen_grooming');
+    gen_mounting_struct = dir('C:\sam\stimuli\gen_mounting');
+    gen_holding_struct = dir('C:\sam\stimuli\gen_holding');
     
     gen_chasing_path = regexp(gen_chasing_struct(1).folder,filesep,'split');
     gen_grooming_path = regexp(gen_grooming_struct(1).folder,filesep,'split');
@@ -244,10 +244,10 @@ if TrialRecord.User.generalizing
     TrialRecord.User.gen_mounting_list(1:2) = [];
     TrialRecord.User.gen_holding_list(1:2) = [];
     
-    gen_chasing_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\gen_chasing');
-    gen_grooming_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\gen_grooming');
-    gen_mounting_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\gen_mounting');
-    gen_holding_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\gen_holding');
+    gen_chasing_frame_struct = dir('C:\sam\frames\gen_chasing');
+    gen_grooming_frame_struct = dir('C:\sam\frames\gen_grooming');
+    gen_mounting_frame_struct = dir('C:\sam\frames\gen_mounting');
+    gen_holding_frame_struct = dir('C:\sam\frames\gen_holding');
     
     TrialRecord.User.gen_chasing_frame_list = {gen_chasing_frame_struct.name};
     TrialRecord.User.gen_grooming_frame_list = {gen_grooming_frame_struct.name};
@@ -530,10 +530,10 @@ else
     disp('condition not found');
 end
 
-TrialRecord.User.movie = strcat('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\',... 
+TrialRecord.User.movie = strcat('C:\sam\stimuli\',... 
     TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', ...
     TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli);     % complete path of the animation
-TrialRecord.User.frame = strcat('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\',... 
+TrialRecord.User.frame = strcat('C:\sam\frames\',... 
     TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', ...
     TrialRecord.User.structure(TrialRecord.User.struct_index).frames);      % and frame
 
