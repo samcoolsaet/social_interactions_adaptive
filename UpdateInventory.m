@@ -29,7 +29,7 @@ for i = 1:length(inventory)
 end
 % Keeping this into account, the center ( where degrees start 0 ) is [144 256] in pixels
 % to centralize the source to the middle of the screen in pixels, I would have have to substract the center [ 320 180 ]from the original pixel coordinates.
-centralized_pixels = zeros(1, length(inventory),2);
+centralized_pixels = zeros(2, length(inventory),2);
 for i = 1:length(inventory)
     if ~isempty(inventory(i).a_origin)
         centralized_pixels(1,i,1:2) = [(tilted_pixels(1,i,1)-144) (256-tilted_pixels(1,i,2))];
@@ -42,5 +42,8 @@ for i = 1:length(inventory)
     if ~isempty(inventory(i).a_origin)
         degrees(1,i,1:2) = [centralized_pixels(1,i,1)/pix_per_deg centralized_pixels(1,i,2)/pix_per_deg]*1.25; % I'm scaling images up with 1.25, which makes the size 640*360 during the task
     end
+end
+for i = 1:length(inventory)
+    inventory(i).a_degrees = degrees(1,i,:);
 end
 end
