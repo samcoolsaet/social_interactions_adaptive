@@ -38,6 +38,10 @@ elseif condition == 6
     height = inventory(inventory_index).p_height;
 else
     disp('condition not found');
+end
+
+% pix_per_deg =  MLConfig.PixelsPerDegree.
+
 line_thickness = 5;
 
 alpha = zeros(width, height);
