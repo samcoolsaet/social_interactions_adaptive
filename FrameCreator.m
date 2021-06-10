@@ -29,11 +29,11 @@ identify_frame_inventory = strcmp([inventory.name], name);
 inventory_index = find(identify_frame_inventory==1);
 
 if condition == 5
-    origin = inventory(inventory_index).a_origin;
+    origin = inventory(inventory_index).a_degrees;
     width = inventory(inventory_index).a_width;
     height = inventory(inventory_index).a_height;
 elseif condition == 6
-    origin = inventory(inventory_index).p_origin;
+    origin = inventory(inventory_index).p_degrees;
     width = inventory(inventory_index).p_width;
     height = inventory(inventory_index).p_height;
 else
@@ -44,10 +44,10 @@ end
 
 line_thickness = 5;
 
-alpha = zeros(width, height);
-red = zeros(width, height);
-green = zeros(width, height);
-blue = zeros(width, height);
+alpha = zeros(height, width);
+red = zeros(height, width);
+green = zeros(height, width);
+blue = zeros(height, width);
 
 red(1:line_thickness,:) = ones(line_thickness, width);
 red(end-(line_thickness-1):end,:) = ones(line_thickness, width);

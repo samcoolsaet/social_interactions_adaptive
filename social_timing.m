@@ -180,11 +180,11 @@ mov = MovieGraphic(fix);
 mov.List = { TrialRecord.User.movie, [0 0], 0, 1.25, 90 };   % movie filename
 % tc = TimeCounter(mov);
 img = ImageGraphic(null_);
-img.List = { TrialRecord.User.frame, [0 0], 0, 1.25, 90 };
-% [bitmap, origin] = FrameCreator(TrialRecord.User.structure(TrialRecord.User.struct_index).frames, TrialRecord.CurrentCondition); % in framecreator, give input voor length and
+% img.List = { TrialRecord.User.frame, [0 0], 0, 1.25, 90 };
+[bitmap, origin] = FrameCreator(TrialRecord.User.structure(TrialRecord.User.struct_index).frames, TrialRecord.CurrentCondition); % in framecreator, give input voor length and
 % width. length en width placed here
-% img.List = { bitmap, origin, 0, 1.25, 90;... % origin from inventory is placed here
-%     TrialRecord.User.frame, [0 0], 0, 1.25, 90};
+img.List = { bitmap, origin, 0, 1.25, 90;... % origin from inventory is placed here
+    TrialRecord.User.frame, [0 0], 0, 1.25, 90};
 
 %% constructing scenes
 % setting timecounter for duration of animation in first scene and time to
