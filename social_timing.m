@@ -180,11 +180,19 @@ mov = MovieGraphic(fix);
 mov.List = { TrialRecord.User.movie, [0 0], 0, 1.25, 90 };   % movie filename
 % tc = TimeCounter(mov);
 img = ImageGraphic(null_);
-img.List = { TrialRecord.User.frame, [0 0], 0, 1.25, 90 };
-% [bitmap, origin] = FrameCreator(TrialRecord.User.structure(TrialRecord.User.struct_index).frames, TrialRecord.CurrentCondition); % in framecreator, give input voor length and
-% width. length en width placed here
-% img.List = { bitmap, origin, 0, 1.25, 90;... % origin from inventory is placed here
-%     TrialRecord.User.frame, [0 0], 0, 1.25, 90};
+if TrialRecord.User.categorizing
+    img.List = { TrialRecord.User.frame, [0 0], 0, 1.25, 90 };
+elseif TrialRecord.User.agenting || TrialRecord.User.patienting
+    [bitmap, origin, width, height] = FrameCreator(TrialRecord.User.structure(TrialRecord.User.struct_index).frames, TrialRecord.CurrentCondition); % in framecreator, give input voor length and
+    img.List = { bitmap, origin, 0, 1.25, 90;... % origin from inventory is placed here
+    TrialRecord.User.frame, [0 0], 0, 1.25, 90};
+
+    frame_touch = SingleTarget(touch_);
+    frame_touch.Target = origin;
+    frame_touch.Threshold = [height width];
+else
+    disp('neither categorizing, nor agenting patienting');
+end
 
 %% constructing scenes
 % setting timecounter for duration of animation in first scene and time to
@@ -211,6 +219,16 @@ con1.add(cam);
 con2 = Concurrent(tc_movie);
 con2.add(mov)
 con2.add(cam);
+
+% if agent patient, run the frame scene
+if TrialRecord.User.agenting || TrialRecord.User.patienting
+    frame_or = OrAdapter(frame_touch);
+    frame_or.add(tc_answer);
+    con4 = Concurrent(frame_or);
+    con4.add(img);
+    con4.add(cam);
+end
+
 
 % showing buttons and adding touch targets. restricted by answer
 % timecounter
@@ -252,6 +270,12 @@ if TrialRecord.User.categorizing
     set_bgcolor([1 0.5 1]);   % change the background color  
 elseif TrialRecord.User.agenting || TrialRecord.User.patienting
     set_bgcolor([1 1 1]);
+end
+
+if TrialRecord.User.agenting || TrialRecord.User.patienting
+    scene4 = create_scene(con4);
+    run_scene(scene4, 4);
+%     find a trialerror for when the frametouching times out
 end
 
 scene3 = create_scene(con3);
