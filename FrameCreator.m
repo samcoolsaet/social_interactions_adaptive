@@ -1,4 +1,4 @@
-function [bitmap, origin] = FrameCreator(name, condition)
+function [bitmap, origin, width_degrees, height_degrees] = FrameCreator(name, condition)
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for frame...
 % % img_size in degrees = 15*9, frames sizes (x, y), locations
@@ -27,6 +27,7 @@ load('inventory.mat');
 
 identify_frame_inventory = strcmp([inventory.name], name);
 inventory_index = find(identify_frame_inventory==1);
+pix_per_deg = 26.6462;
 
 if condition == 5
     origin = [inventory(inventory_index).a_degrees(:,:,1) inventory(inventory_index).a_degrees(:,:,2)];
@@ -39,6 +40,9 @@ elseif condition == 6
 else
     disp('condition not found');
 end
+
+width_degrees = width/pix_per_deg;
+height_degrees = height/pix_per_deg;
 
 % pix_per_deg =  MLConfig.PixelsPerDegree.
 

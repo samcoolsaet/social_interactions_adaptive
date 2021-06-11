@@ -221,13 +221,14 @@ con2.add(mov)
 con2.add(cam);
 
 % if agent patient, run the frame scene
-if TrialRecord.User.agenting || TrialRecord.User.patienting
-    frame_or = OrAdapter(frame_touch);
-    frame_or.add(tc_answer);
-    con4 = Concurrent(frame_or);
-    con4.add(img);
-    con4.add(cam);
-end
+% if TrialRecord.User.agenting || TrialRecord.User.patienting
+%     frame_or = OrAdapter(frame_touch);
+%     frame_or.add(tc_answer);
+%     con4 = Concurrent(or);
+%     con4.add(img);
+%     con4.add(trial_box);
+%     con4.add(cam);
+% end
 
 
 % showing buttons and adding touch targets. restricted by answer
@@ -270,12 +271,6 @@ if TrialRecord.User.categorizing
     set_bgcolor([1 0.5 1]);   % change the background color  
 elseif TrialRecord.User.agenting || TrialRecord.User.patienting
     set_bgcolor([1 1 1]);
-end
-
-if TrialRecord.User.agenting || TrialRecord.User.patienting
-    scene4 = create_scene(con4);
-    run_scene(scene4, 4);
-%     find a trialerror for when the frametouching times out
 end
 
 scene3 = create_scene(con3);
