@@ -1,8 +1,13 @@
 function [conditions_array, rnd_condition_order] = conditionOrder(conditions_array, conditions, rnd_condition_order, max_repeats)
 
-if max(conditions_array(2,:)) > 4*(sum(conditions_array(2,:))-max(conditions_array(2,:))) % herbekijken dit
-    
+if sum(conditions_array(2,:)) > (4*min(conditions_array(2,:))+3)  % this formula ensures that it is mathematical possible to create a list with the restriction of 3 of the same consecutive conditions
+    disp('starting proportions do not allow the restricted randomization');
+end
 
+ik moet in beide stappen de controlecheck uitvoeren die hierboven ook vermeld staat op de new_condition_array.
+alleen, als dit goed is, kan ik de stap behouden en moet ze niet opnieuw gedaan worden
+new_conditions_array = conditions_array;
+repetition = true;
 if ~exist(rnd_condition_order)
     rnd_condition_order = ...                      
             conditions(randperm(length(conditions), 10));
@@ -19,12 +24,21 @@ if ~exist(rnd_condition_order)
     unique_condition_order = unique(rnd_condition_order);   
     count_conditions  = histc(rnd_condition_order, unique_condition_order);
     for i = 1:length(unique_condition_order)
-        conditions_array(2, find(conditions_array(1,:)==unique_condition_order(i))) = ...
-            conditions_array(2, find(conditions_array(1,:)==unique_condition_order(i))) - count_conditions(i);
+        new_conditions_array(2, find(new_conditions_array(1,:)==unique_condition_order(i))) = ...
+            new_conditions_array(2, find(new_conditions_array(1,:)==unique_condition_order(i))) - count_conditions(i);
     end
 else
     rnd_condition_order = ...
-        [rnd_condition_order(2:10) conditions_array(1, randperm(length(conditions_array(1,:)), 1))];
+        [rnd_condition_order(2:10) new_conditions_array(1, randperm(length(new_conditions_array(1,:)), 1))];
+    while repetition
+        if sum(new_conditions_array(2,:)) > (4*min(new_conditions_array(2,:))+3)
+            disp('something went wrond in running down all the conditions')
+        else
+            repetition = false;
+        end
+    end
+end
+    
     % de conditie met het meest condities over mag er nooit meer dan 4x
     % meer over hebben dan de som van de rest + max repeats? bvb voor lijst van 10 wordt
     % het pas een probleem als er 8 van 1 soort zijn? klopt dit? ja blijkt
