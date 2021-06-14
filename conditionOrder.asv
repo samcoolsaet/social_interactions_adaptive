@@ -52,8 +52,6 @@ else
             repetition = false;
         end
     end
-    new_conditions_array(2, find(new_conditions_array(1,:)==rnd_condition_order(end))) = ...
-        new_conditions_array(2, find(new_conditions_array(1,:)==rnd_condition_order(end))) - 1;
 end
     
     % de conditie met het meest condities over mag er nooit meer dan 4x
