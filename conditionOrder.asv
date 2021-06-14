@@ -16,29 +16,13 @@ if ~exist('rnd_condition_order','var')
             conditions(randperm(length(conditions), 10));
     repetitions = true;
     while repetitions || repetition
-        for i = 4:length(rnd_condition_order)
-            if sum(rnd_condition_order(i-3:i)==rnd_condition_order(i)) == 4
-                rnd_condition_order = conditions(randperm(length(conditions), 10));
-            else
-                repetitions = false;
-            end
+        new_conditions_array = conditions_array;
+        unique_condition_order = unique(rnd_condition_order);   
+        count_conditions  = histc(rnd_condition_order, unique_condition_order);
+        for i = 1:length(unique_condition_order)
+            new_conditions_array(2, find(new_conditions_array(1,:)==unique_condition_order(i))) = ...
+                new_conditions_array(2, find(new_conditions_array(1,:)==unique_condition_order(i))) - count_conditions(i);
         end
-        if sum(conditions_array(2,:)) > (4*min(conditions_array(2,:))+3)
-            rnd_condition_order = conditions(randperm(length(conditions), 10));
-        else
-            repetition = false;
-        end
-    end
-    unique_condition_order = unique(rnd_condition_order);   
-    count_conditions  = histc(rnd_condition_order, unique_condition_order);
-    for i = 1:length(unique_condition_order)
-        new_conditions_array(2, find(new_conditions_array(1,:)==unique_condition_order(i))) = ...
-            new_conditions_array(2, find(new_conditions_array(1,:)==unique_condition_order(i))) - count_conditions(i);
-    end
-else
-    rnd_condition_order = ...
-        [rnd_condition_order(2:10) new_conditions_array(1, randperm(length(new_conditions_array(1,:)), 1))];
-    while repetitions || repetition
         for i = 4:length(rnd_condition_order)
             if sum(rnd_condition_order(i-3:i)==rnd_condition_order(i)) == 4
                 rnd_condition_order = conditions(randperm(length(conditions), 10));
@@ -47,12 +31,36 @@ else
             end
         end
         if sum(new_conditions_array(2,:)) > (4*min(new_conditions_array(2,:))+3)
-            disp('something went wrond in running down all the conditions')
+            rnd_condition_order = conditions(randperm(length(conditions), 10));
+        else
+            repetition = false;
+        end
+    end
+    conditions_array = new_conditions_array;
+else
+    rnd_condition_order = ...
+        [rnd_condition_order(2:10) new_conditions_array(1, randperm(length(new_conditions_array(1,:)), 1))];
+    while repetitions || repetition
+        new_conditions_array = conditions_array;
+        new_conditions_array(2, find(new_conditions_array(1,:)==rnd_condition_order(end))) = ...
+            new_conditions_array(2, find(new_conditions_array(1,:)==rnd_condition_order(end))) - 1;
+        for i = 4:length(rnd_condition_order)
+            if sum(rnd_condition_order(i-3:i)==rnd_condition_order(i)) == 4
+                rnd_condition_order = ...
+                    [rnd_condition_order(1:9) new_conditions_array(1, randperm(length(new_conditions_array(1,:)), 1))];
+            else
+                repetitions = false;
+            end
+        end
+        if sum(new_conditions_array(2,:)) > (4*min(new_conditions_array(2,:))+3)
+            rnd_condition_order = ...
+                [rnd_condition_order(1:9) new_conditions_array(1, randperm(length(new_conditions_array(1,:)), 1))];
         else
             repetition = false;
         end
     end
 end
+conditions_array = new_conditions_array;
     
     % de conditie met het meest condities over mag er nooit meer dan 4x
     % meer over hebben dan de som van de rest + max repeats? bvb voor lijst van 10 wordt
