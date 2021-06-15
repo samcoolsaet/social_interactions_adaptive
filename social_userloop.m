@@ -1,4 +1,4 @@
-function [C,timingfile,userdefined_trialholder] = social_userloop(MLConfig,TrialRecord)
+  function [C,timingfile,userdefined_trialholder] = social_userloop(MLConfig,TrialRecord)
 %% template
 % return values
 C = [];
