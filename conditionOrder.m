@@ -8,7 +8,7 @@ end
 
 new_conditions_array = conditions_array;
 repetition = true;
-if ~exist('rnd_condition_order','var')
+if isempty(rnd_condition_order)
     rnd_condition_order = ...                      
             conditions(randperm(length(conditions), 10));
     repetitions = true;
@@ -58,5 +58,6 @@ else
     end
 end
 conditions_array = new_conditions_array;
+
 end
 
