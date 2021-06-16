@@ -226,9 +226,9 @@ con2.add(cam);
 if TrialRecord.User.agenting || TrialRecord.User.patienting
     frame_or = OrAdapter(frame_touch);
     frame_or.add(tc_frame);
-    con4 = Concurrent(frame_or);
-    con4.add(img);
-    con4.add(cam);
+    con5 = Concurrent(frame_or);
+    con5.add(img);
+    con5.add(cam);
 end
 
 
@@ -270,8 +270,8 @@ elseif TrialRecord.User.agenting || TrialRecord.User.patienting
 end
 
 if TrialRecord.User.agenting || TrialRecord.User.patienting
-    scene4 = create_scene(con4);
-    run_scene(scene4, 4);
+    scene5 = create_scene(con5);
+    run_scene(scene5, 4);
 %     find a trialerror for when the frametouching times out
 end
 if TrialRecord.User.categorizing || ~tc_frame.Success

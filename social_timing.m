@@ -8,7 +8,7 @@ hotkey('o', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock + 5;');
 % hotkey('l', 'TrialRecord.User.progression_number = TrialRecord.CurrentBlock - TrialRecord.User.size_progression;');
 hotkey('l', 'TrialRecord.User.progression_number = TrialRecord.CurrentBlock - 5;');
 hotkey('m', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock - 1;');
-bhv_code(1, 'run_engagement_scene', 2, 'run_video', 3, 'run_answer_scene', 5, 'end_aswer_scene');
+bhv_code(1, 'run_engagement_scene', 2, 'run_video', 3, 'run_answer_scene', 5, 'end_aswer_scene', 4, 'run_frame_scene');
 %% constants
 touch_threshold = 2;
 standard_button_size = 2;                                                   % final button size
@@ -273,8 +273,8 @@ elseif TrialRecord.User.agenting || TrialRecord.User.patienting
 end
 
 if TrialRecord.User.agenting || TrialRecord.User.patienting
-    scene4 = create_scene(con4);
-    run_scene(scene4, 4);
+    scene5 = create_scene(con4);
+    run_scene(scene5, 4);
 %     find a trialerror for when the frametouching times out
 end
 
@@ -458,7 +458,7 @@ reward_scene.DurationUnit = 'msec';
 con4 = Concurrent(reward_scene);
 con4.add(cam);
 scene4 = create_scene(con4);
-run_scene(scene4);
+run_scene(scene4, 5);
 if TrialRecord.User.test_trial
     if TrialRecord.User.structure(TrialRecord.User.struct_index).c_success ||... 
         TrialRecord.User.structure(TrialRecord.User.struct_index).c_fails == 1        
