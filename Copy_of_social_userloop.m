@@ -11,7 +11,7 @@ persistent timing_filenames_retrieved
     return
     end
 %% initializing for first trial
-TrialRecord.User.start_block = 41;                                               % the progression number to start training with
+TrialRecord.User.start_block = 42;                                               % the progression number to start training with
 TrialRecord.User.generalizing = true;
 
 if TrialRecord.CurrentTrialNumber == 0
@@ -50,8 +50,8 @@ TrialRecord.User.max_block = TrialRecord.User.button_progression_factor * 3 ...
 TrialRecord.User.min_block = TrialRecord.User.start_block;
 
 % training
-TrialRecord.User.training_categorization = false;                            % complete task or training
-TrialRecord.User.training_agent_patient = true;
+TrialRecord.User.training_categorization = true;                            % complete task or training
+TrialRecord.User.training_agent_patient = false;
 
 % fixed constants
 TrialRecord.User.chasing_on = false;                                        % all false for script to work

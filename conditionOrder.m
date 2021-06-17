@@ -1,12 +1,13 @@
 function [conditions_array, rnd_condition_order] = conditionOrder(conditions_array, conditions, max_repeats, rnd_condition_order)
 % [conditions_array, rnd_condition_order] = conditionOrder(conditions_array, conditions, max_repeats, rnd_condition_order)
-if sum(conditions_array(2,:)) > (4*min(conditions_array(2,:))+max_repeats)  % this formula ensures that it is mathematical possible to create a list with the restriction of max_repeats of the same consecutive conditions
+if sum(conditions_array(2,:)) > (4*(sum(conditions_array(2,:))-max(conditions_array(2,:)))+max_repeats)  % this formula ensures that it is mathematical possible to create a list with the restriction of max_repeats of the same consecutive conditions
     disp('starting proportions do not allow the restricted randomization');
 end
 
 % nu moet ik nog iets maken als we op het einde aangekomen zijn ook.
+% conditions moeten ook geupdated worden of hij gaat in het negatief
 
-new_conditions_array = conditions_array;
+new_conditions_array = conditions_array;    
 repetition = true;
 if isempty(rnd_condition_order)
     rnd_condition_order = ...                      
@@ -27,7 +28,8 @@ if isempty(rnd_condition_order)
                 repetitions = false;
             end
         end
-        if sum(new_conditions_array(2,:)) > (4*min(new_conditions_array(2,:))+max_repeats)
+        if sum(new_conditions_array(2,:)) > (4*(sum(new_conditions_array(2,:))-max(new_conditions_array(2,:)))+max_repeats) || ...
+                any(new_conditions_array(2,:)<0)
             rnd_condition_order = conditions(randperm(length(conditions), 10));
         else
             repetition = false;
@@ -49,7 +51,8 @@ else
                 repetitions = false;
             end
         end
-        if sum(new_conditions_array(2,:)) > (4*min(new_conditions_array(2,:))+max_repeats)
+        if sum(new_conditions_array(2,:)) > (4*(sum(new_conditions_array(2,:))-max(new_conditions_array(2,:)))+max_repeats) || ...
+                any(new_conditions_array(2,:)<0)
             rnd_condition_order = ...
                 [rnd_condition_order(1:9) new_conditions_array(1, randperm(length(new_conditions_array(1,:)), 1))];
         else
