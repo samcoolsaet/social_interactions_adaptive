@@ -11,7 +11,7 @@ persistent timing_filenames_retrieved
     return
     end
 %% initializing for first trial
-TrialRecord.User.start_block = 42;                                               % the progression number to start training with
+TrialRecord.User.start_block = 61;                                               % the progression number to start training with
 TrialRecord.User.generalizing = true;
 
 if TrialRecord.CurrentTrialNumber == 0

@@ -1,13 +1,14 @@
 [y3, fs3] = audioread('alarm.wav');
-% hotkey('k','sound(y3, fs3); TrialRecord.User.engaged = false; trialerror(8); return;');
 hotkey('x', 'escape_screen(); assignin(''caller'',''continue_'',false);');
 hotkey('r', 'goodmonkey(reward_dur, ''juiceline'', MLConfig.RewardFuncArgs.JuiceLine, ''eventmarker'', 14, ''nonblocking'', 1);');   % manual reward
 hotkey('p', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock + 1;');
 % hotkey('o', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock + (TrialRecord.User.size_progression_factor - TrialRecord.User.size_progression)+1;');
 hotkey('o', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock + 5;');
 % hotkey('l', 'TrialRecord.User.progression_number = TrialRecord.CurrentBlock - TrialRecord.User.size_progression;');
-hotkey('l', 'TrialRecord.User.progression_number = TrialRecord.CurrentBlock - 5;');
+hotkey('l', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock - 5;');
 hotkey('m', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock - 1;');
+hotkey('y', 'sound(y3, fs3);');
+% hotkey('k', 'TrialRecord.User.engaged = false; trialerror(8); return;');
 bhv_code(1, 'run_engagement_scene', 2, 'run_video', 3, 'run_answer_scene', 5, 'end_aswer_scene');
 %% constants
 touch_threshold = 2;
@@ -294,7 +295,7 @@ if TrialRecord.CurrentTrialNumber > (1+TrialRecord.User.test_trial_counter)
             == 0 && TrialRecord.User.reward_index < 5 ...
             && ~TrialRecord.User.test_trial
         TrialRecord.User.reward_multiplicator = TrialRecord.User.reward_multiplicator + ...
-            ( TrialRecord.User.reward_factors(TrialRecord.User.reward_index)^2 * 0.18 );
+            ( TrialRecord.User.reward_factors(TrialRecord.User.reward_index)^2 * 0.6 );
         TrialRecord.User.reward_index = TrialRecord.User.reward_index + 1;
     elseif TrialRecord.TrialErrors(end-TrialRecord.User.test_trial_counter)...
             ~= 0 && ~TrialRecord.User.test_trial
@@ -311,17 +312,17 @@ disp(['reward_multiplicator' string(TrialRecord.User.reward_multiplicator)]);
 if TrialRecord.User.training_categorization ||...
         TrialRecord.User.training_agent_patient
     random_portion = randi(25, 1);
-    max_reward = 150;
-    min_reward = 100;
+    max_reward = 100;
+    min_reward = 50;
     reward_window = max_reward - min_reward;
     progression_goal_window = (3*TrialRecord.User.button_progression_factor-1)...
     - TrialRecord.User.start_block;
     category_bonus = 0;
-    if TrialRecord.CurrentBlock >= (3*TrialRecord.User.button_progression_factor-1)
-        category_bonus = 100;                                                   % bonus when he reaches extra button ( check thism should be zhen he gi9ves correct answer to equal sized buttons )
-    elseif TrialRecord.CurrentBlock >= (2*TrialRecord.User.button_progression_factor-1)
-        category_bonus = 75;
-    end
+%     if TrialRecord.CurrentBlock >= (3*TrialRecord.User.button_progression_factor-1)
+%         category_bonus = 100;                                                   % bonus when he reaches extra button ( check thism should be zhen he gi9ves correct answer to equal sized buttons )
+%     elseif TrialRecord.CurrentBlock >= (2*TrialRecord.User.button_progression_factor-1)
+%         category_bonus = 75;
+%     end
     
     progression_relative_start = TrialRecord.CurrentBlock - ...
         TrialRecord.User.start_block;                          % reward goes from min to max over x progression numbers
