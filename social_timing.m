@@ -298,7 +298,7 @@ if TrialRecord.CurrentTrialNumber > (1+TrialRecord.User.test_trial_counter)
             == 0 && TrialRecord.User.reward_index < 5 ...
             && ~TrialRecord.User.test_trial
         TrialRecord.User.reward_multiplicator = TrialRecord.User.reward_multiplicator + ...
-            ( TrialRecord.User.reward_factors(TrialRecord.User.reward_index)^2 * 0.18 );
+            ( TrialRecord.User.reward_factors(TrialRecord.User.reward_index)^2 * 0.6 );
         TrialRecord.User.reward_index = TrialRecord.User.reward_index + 1;
     elseif TrialRecord.TrialErrors(end-TrialRecord.User.test_trial_counter)...
             ~= 0 && ~TrialRecord.User.test_trial
@@ -315,17 +315,17 @@ disp(['reward_multiplicator' string(TrialRecord.User.reward_multiplicator)]);
 if TrialRecord.User.training_categorization ||...
         TrialRecord.User.training_agent_patient
     random_portion = randi(25, 1);
-    max_reward = 150;
-    min_reward = 100;
+    max_reward = 100;
+    min_reward = 50;
     reward_window = max_reward - min_reward;
     progression_goal_window = (3*TrialRecord.User.button_progression_factor-1)...
     - TrialRecord.User.start_block;
     category_bonus = 0;
-    if TrialRecord.CurrentBlock >= (3*TrialRecord.User.button_progression_factor-1)
-        category_bonus = 100;                                                   % bonus when he reaches extra button ( check thism should be zhen he gi9ves correct answer to equal sized buttons )
-    elseif TrialRecord.CurrentBlock >= (2*TrialRecord.User.button_progression_factor-1)
-        category_bonus = 75;
-    end
+%     if TrialRecord.CurrentBlock >= (3*TrialRecord.User.button_progression_factor-1)
+%         category_bonus = 100;                                                   % bonus when he reaches extra button ( check thism should be zhen he gi9ves correct answer to equal sized buttons )
+%     elseif TrialRecord.CurrentBlock >= (2*TrialRecord.User.button_progression_factor-1)
+%         category_bonus = 75;
+%     end
     
     progression_relative_start = TrialRecord.CurrentBlock - ...
         TrialRecord.User.start_block;                          % reward goes from min to max over x progression numbers
@@ -458,7 +458,7 @@ reward_scene.DurationUnit = 'msec';
 con4 = Concurrent(reward_scene);
 con4.add(cam);
 scene4 = create_scene(con4);
-run_scene(scene4);
+run_scene(scene4, 5);
 if TrialRecord.User.test_trial
     if TrialRecord.User.structure(TrialRecord.User.struct_index).c_success ||... 
         TrialRecord.User.structure(TrialRecord.User.struct_index).c_fails == 1        
