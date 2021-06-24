@@ -317,48 +317,52 @@ end
 
 %% create an empty structure
 if TrialRecord.User.current_sum_buttons ~= previous_sum_buttons             % this comes dozn to: on start and zhen button added within training
-    TrialRecord.User.structure = struct('stimuli', {}, 'frames', {}, 'c_fails', {}, ... 
-        'c_success', {},'c_completed', {}, 'a_fails', {}, 'a_success', {}, ...
-        'a_completed', {}, 'p_fails', {}, 'p_success', {}, 'p_completed', {}, 'folder', {}, 'condition', {});
-    for i = 1:length(stimulus_list)
-        TrialRecord.User.structure(i).stimuli = stimulus_list(i);
-        TrialRecord.User.structure(i).frames = frame_list(i);
-        TrialRecord.User.structure(i).c_fails = 0;
-        TrialRecord.User.structure(i).c_success = 0;
-        TrialRecord.User.structure(i).c_completed = 0;
-        TrialRecord.User.structure(i).a_fails = 0;
-        TrialRecord.User.structure(i).a_success = 0;
-        TrialRecord.User.structure(i).a_completed = 0;
-        TrialRecord.User.structure(i).p_fails = 0;
-        TrialRecord.User.structure(i).p_success = 0;
-        TrialRecord.User.structure(i).p_completed = 0;
-        if i <= cum_length(1)
-            TrialRecord.User.structure(i).folder = TrialRecord.User.chasing_folder;
-            TrialRecord.User.structure(i).condition = [1 5 6];
-        elseif i <= cum_length(2)
-            TrialRecord.User.structure(i).folder = TrialRecord.User.gen_chasing_folder;
-            TrialRecord.User.structure(i).condition = [1 5 6];
-        elseif i <= cum_length(3)
-            TrialRecord.User.structure(i).folder = TrialRecord.User.grooming_folder;
-            TrialRecord.User.structure(i).condition = [2 5 6];
-        elseif i <= cum_length(4)
-            TrialRecord.User.structure(i).folder = TrialRecord.User.gen_grooming_folder;
-            TrialRecord.User.structure(i).condition = [2 5 6];
-        elseif i <= cum_length(5)
-            TrialRecord.User.structure(i).folder = TrialRecord.User.mounting_folder;
-            TrialRecord.User.structure(i).condition = [3 5 6];
-        elseif i <= cum_length(6)
-            TrialRecord.User.structure(i).folder = TrialRecord.User.gen_mounting_folder;
-            TrialRecord.User.structure(i).condition = [3 5 6];
-        elseif i <= cum_length(7)
-            TrialRecord.User.structure(i).folder = TrialRecord.User.holding_folder;
-            TrialRecord.User.structure(i).condition = [4 5 6];
-        elseif i <= cum_length(8)
-            TrialRecord.User.structure(i).folder = TrialRecord.User.gen_holding_folder;
-            TrialRecord.User.structure(i).condition = [4 5 6];
-        end
-    end
-    disp('new structure made');
+    [TrialRecord.User.structure] = createStructure(stimulus_list, frame_list, cum_length, TrialRecord.User.chasing_folder,...
+    TrialRecord.User.gen_chasing_folder, TrialRecord.User.grooming_folder, TrialRecord.User.gen_grooming_folder, ...
+    TrialRecord.User.mounting_folder, TrialRecord.User.gen_mounting_folder,...
+    TrialRecord.User.holding_folder, TrialRecord.User.gen_holding_folder);
+%     TrialRecord.User.structure = struct('stimuli', {}, 'frames', {}, 'c_fails', {}, ... 
+%         'c_success', {},'c_completed', {}, 'a_fails', {}, 'a_success', {}, ...
+%         'a_completed', {}, 'p_fails', {}, 'p_success', {}, 'p_completed', {}, 'folder', {}, 'condition', {});
+%     for i = 1:length(stimulus_list)
+%         TrialRecord.User.structure(i).stimuli = stimulus_list(i);
+%         TrialRecord.User.structure(i).frames = frame_list(i);
+%         TrialRecord.User.structure(i).c_fails = 0;
+%         TrialRecord.User.structure(i).c_success = 0;
+%         TrialRecord.User.structure(i).c_completed = 0;
+%         TrialRecord.User.structure(i).a_fails = 0;
+%         TrialRecord.User.structure(i).a_success = 0;
+%         TrialRecord.User.structure(i).a_completed = 0;
+%         TrialRecord.User.structure(i).p_fails = 0;
+%         TrialRecord.User.structure(i).p_success = 0;
+%         TrialRecord.User.structure(i).p_completed = 0;
+%         if i <= cum_length(1)
+%             TrialRecord.User.structure(i).folder = TrialRecord.User.chasing_folder;
+%             TrialRecord.User.structure(i).condition = [1 5 6];
+%         elseif i <= cum_length(2)
+%             TrialRecord.User.structure(i).folder = TrialRecord.User.gen_chasing_folder;
+%             TrialRecord.User.structure(i).condition = [1 5 6];
+%         elseif i <= cum_length(3)
+%             TrialRecord.User.structure(i).folder = TrialRecord.User.grooming_folder;
+%             TrialRecord.User.structure(i).condition = [2 5 6];
+%         elseif i <= cum_length(4)
+%             TrialRecord.User.structure(i).folder = TrialRecord.User.gen_grooming_folder;
+%             TrialRecord.User.structure(i).condition = [2 5 6];
+%         elseif i <= cum_length(5)
+%             TrialRecord.User.structure(i).folder = TrialRecord.User.mounting_folder;
+%             TrialRecord.User.structure(i).condition = [3 5 6];
+%         elseif i <= cum_length(6)
+%             TrialRecord.User.structure(i).folder = TrialRecord.User.gen_mounting_folder;
+%             TrialRecord.User.structure(i).condition = [3 5 6];
+%         elseif i <= cum_length(7)
+%             TrialRecord.User.structure(i).folder = TrialRecord.User.holding_folder;
+%             TrialRecord.User.structure(i).condition = [4 5 6];
+%         elseif i <= cum_length(8)
+%             TrialRecord.User.structure(i).folder = TrialRecord.User.gen_holding_folder;
+%             TrialRecord.User.structure(i).condition = [4 5 6];
+%         end
+%     end
+%     disp('new structure made');
 end
 %% create a random condition order with a restriction of max consecutive conditions and a precaution for overlap across structure resets 
 
