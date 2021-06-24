@@ -73,32 +73,34 @@ TrialRecord.User.mounting = false;
 
 %% determining next block and difficulty based on a general progression number %%%%%% maybe create a vector with the length of trialerrors but displaying the stimulus sequence numbers, this way I can keep track of actual fails and just going on when failing because the number of repeats hits the limit
 if TrialRecord.User.completed_stimuli == TrialRecord.User.blocksize             % if ze have completed a blocksize of stimuli, evaluate
-    indexes_used_c_stimuli = find([TrialRecord.User.structure.c_completed]==1); % find the completed stimuli
-    indexes_used_a_stimuli = find([TrialRecord.User.structure.a_completed]==1); % 
-    indexes_used_p_stimuli = find([TrialRecord.User.structure.p_completed]==1); %
-    fails = [TrialRecord.User.structure(indexes_used_c_stimuli).c_fails...      % isolate the fails field of these completed stimuli
-        TrialRecord.User.structure(indexes_used_a_stimuli).a_fails...
-        TrialRecord.User.structure(indexes_used_p_stimuli).p_fails];
-    corrects = (fails == 0);                                                % correct for the first time means that there are no fails
-    TrialRecord.User.performance = mean(corrects);                          % performance is the corrects/completed stimuli
-    if TrialRecord.User.performance >= succes_threshold                     % if performance is over the threshold, add a progression number
-            TrialRecord.NextBlock = ... 
-                TrialRecord.CurrentBlock + 1;
-    elseif TrialRecord.User.performance <= fail_threshold                   % if performance is under the threshold and progression number is not already at the min progression number, substract a progression number
-        TrialRecord.NextBlock = ... 
-            TrialRecord.CurrentBlock - 1;
-    end
-    [TrialRecord.User.structure(indexes_used_c_stimuli).c_success] = deal(0);   % reset all the completed stimuli
-    [TrialRecord.User.structure(indexes_used_c_stimuli).c_fails] = deal(0);     % this way, the data of the used, but not completed ones stays in there
-    [TrialRecord.User.structure(indexes_used_c_stimuli).c_completed] = deal(0);
-    [TrialRecord.User.structure(indexes_used_a_stimuli).a_success] = deal(0);
-    [TrialRecord.User.structure(indexes_used_a_stimuli).a_fails] = deal(0);
-    [TrialRecord.User.structure(indexes_used_c_stimuli).a_completed] = deal(0);
-    [TrialRecord.User.structure(indexes_used_p_stimuli).p_success] = deal(0);
-    [TrialRecord.User.structure(indexes_used_p_stimuli).p_fails] = deal(0);
-    [TrialRecord.User.structure(indexes_used_c_stimuli).p_completed] = deal(0);
-    disp(['performance:' string(TrialRecord.User.performance)]);
-    disp('last blocksize reset in struct');
+    [TrialRecord.User.structure, TrialRecord.User.performance, TrialRecord.NextBlock] = ...
+        evaluate(TrialRecord.User.structure, TrialRecord.CurrentBlock);
+%     indexes_used_c_stimuli = find([TrialRecord.User.structure.c_completed]==1); % find the completed stimuli
+%     indexes_used_a_stimuli = find([TrialRecord.User.structure.a_completed]==1); % 
+%     indexes_used_p_stimuli = find([TrialRecord.User.structure.p_completed]==1); %
+%     fails = [TrialRecord.User.structure(indexes_used_c_stimuli).c_fails...      % isolate the fails field of these completed stimuli
+%         TrialRecord.User.structure(indexes_used_a_stimuli).a_fails...
+%         TrialRecord.User.structure(indexes_used_p_stimuli).p_fails];
+%     corrects = (fails == 0);                                                % correct for the first time means that there are no fails
+%     TrialRecord.User.performance = mean(corrects);                          % performance is the corrects/completed stimuli
+%     if TrialRecord.User.performance >= succes_threshold                     % if performance is over the threshold, add a progression number
+%             TrialRecord.NextBlock = ... 
+%                 TrialRecord.CurrentBlock + 1;
+%     elseif TrialRecord.User.performance <= fail_threshold                   % if performance is under the threshold and progression number is not already at the min progression number, substract a progression number
+%         TrialRecord.NextBlock = ... 
+%             TrialRecord.CurrentBlock - 1;
+%     end
+%     [TrialRecord.User.structure(indexes_used_c_stimuli).c_success] = deal(0);   % reset all the completed stimuli
+%     [TrialRecord.User.structure(indexes_used_c_stimuli).c_fails] = deal(0);     % this way, the data of the used, but not completed ones stays in there
+%     [TrialRecord.User.structure(indexes_used_c_stimuli).c_completed] = deal(0);
+%     [TrialRecord.User.structure(indexes_used_a_stimuli).a_success] = deal(0);
+%     [TrialRecord.User.structure(indexes_used_a_stimuli).a_fails] = deal(0);
+%     [TrialRecord.User.structure(indexes_used_c_stimuli).a_completed] = deal(0);
+%     [TrialRecord.User.structure(indexes_used_p_stimuli).p_success] = deal(0);
+%     [TrialRecord.User.structure(indexes_used_p_stimuli).p_fails] = deal(0);
+%     [TrialRecord.User.structure(indexes_used_c_stimuli).p_completed] = deal(0);
+%     disp(['performance:' string(TrialRecord.User.performance)]);
+%     disp('last blocksize reset in struct');
 end
 
 if TrialRecord.NextBlock > TrialRecord.User.max_block
