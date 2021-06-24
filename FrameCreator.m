@@ -1,28 +1,4 @@
 function [bitmap, origin, width_degrees, height_degrees] = FrameCreator(name, condition)
-
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for frame...
-% % img_size in degrees = 15*9, frames sizes (x, y), locations
-% % open the file
-% fid=fopen('frames.txt'); 
-% % set linenum to the desired line number that you want to import
-% linenum = 1;
-% % use '%s' if you want to read in the entire line or use '%f' if you want to read only the first numeric value
-% C = textscan(fid,'%s',4, 'delimiter',';', 'headerlines',linenum-1)
-% dimensions = C{1, 1}{2, 1}
-% x_degree = C{1, 1}{3, 1}
-% y_degree = C{1, 1}{4, 1}
-% frewind(fid)
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% 
-% count = mglgetadaptercount
-% [width,height,refresh_rate] = mglgetadapterdisplaymode(2)
-% info = mglgetadapteridentifier
-% rect = mglgetadapterrect(2)
-%
-
-% TrialRecord.User.structure(TrialRecord.User.struct_index).frames = name as input
-
 load('inventory.mat');
 
 identify_frame_inventory = strcmp([inventory.name], name);
