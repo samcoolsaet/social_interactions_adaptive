@@ -69,7 +69,5 @@ end
     end
 rnd_condition_order = rnd_condition_order_test;
 conditions_array = new_conditions_array;
-%%%%%%%%%%%%%%%%%%% ik voeg nog altijd de verkeerde cijfers toe aan mijn
-%%%%%%%%%%%%%%%%%%% rnd_condition_order!!!!
 % disp([rnd_condition_order(end)  conditions_array(1, find(new_conditions_array(1,:)==rnd_condition_order(end)))]);
 % end

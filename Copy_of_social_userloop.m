@@ -74,33 +74,7 @@ TrialRecord.User.mounting = false;
 %% determining next block and difficulty based on a general progression number %%%%%% maybe create a vector with the length of trialerrors but displaying the stimulus sequence numbers, this way I can keep track of actual fails and just going on when failing because the number of repeats hits the limit
 if TrialRecord.User.completed_stimuli == TrialRecord.User.blocksize             % if ze have completed a blocksize of stimuli, evaluate
     [TrialRecord.User.structure, TrialRecord.User.performance, TrialRecord.NextBlock] = ...
-        evaluate(TrialRecord.User.structure, TrialRecord.CurrentBlock);
-%     indexes_used_c_stimuli = find([TrialRecord.User.structure.c_completed]==1); % find the completed stimuli
-%     indexes_used_a_stimuli = find([TrialRecord.User.structure.a_completed]==1); % 
-%     indexes_used_p_stimuli = find([TrialRecord.User.structure.p_completed]==1); %
-%     fails = [TrialRecord.User.structure(indexes_used_c_stimuli).c_fails...      % isolate the fails field of these completed stimuli
-%         TrialRecord.User.structure(indexes_used_a_stimuli).a_fails...
-%         TrialRecord.User.structure(indexes_used_p_stimuli).p_fails];
-%     corrects = (fails == 0);                                                % correct for the first time means that there are no fails
-%     TrialRecord.User.performance = mean(corrects);                          % performance is the corrects/completed stimuli
-%     if TrialRecord.User.performance >= succes_threshold                     % if performance is over the threshold, add a progression number
-%             TrialRecord.NextBlock = ... 
-%                 TrialRecord.CurrentBlock + 1;
-%     elseif TrialRecord.User.performance <= fail_threshold                   % if performance is under the threshold and progression number is not already at the min progression number, substract a progression number
-%         TrialRecord.NextBlock = ... 
-%             TrialRecord.CurrentBlock - 1;
-%     end
-%     [TrialRecord.User.structure(indexes_used_c_stimuli).c_success] = deal(0);   % reset all the completed stimuli
-%     [TrialRecord.User.structure(indexes_used_c_stimuli).c_fails] = deal(0);     % this way, the data of the used, but not completed ones stays in there
-%     [TrialRecord.User.structure(indexes_used_c_stimuli).c_completed] = deal(0);
-%     [TrialRecord.User.structure(indexes_used_a_stimuli).a_success] = deal(0);
-%     [TrialRecord.User.structure(indexes_used_a_stimuli).a_fails] = deal(0);
-%     [TrialRecord.User.structure(indexes_used_c_stimuli).a_completed] = deal(0);
-%     [TrialRecord.User.structure(indexes_used_p_stimuli).p_success] = deal(0);
-%     [TrialRecord.User.structure(indexes_used_p_stimuli).p_fails] = deal(0);
-%     [TrialRecord.User.structure(indexes_used_c_stimuli).p_completed] = deal(0);
-%     disp(['performance:' string(TrialRecord.User.performance)]);
-%     disp('last blocksize reset in struct');
+        evaluate(TrialRecord.User.structure, TrialRecord.CurrentBlock, succes_threshold, fail_threshold);
 end
 
 if TrialRecord.NextBlock > TrialRecord.User.max_block
@@ -110,9 +84,6 @@ elseif TrialRecord.NextBlock < TrialRecord.User.min_block
     TrialRecord.NextBlock = TrialRecord.User.min_block;
     disp(['min block reached' string(TrialRecord.User.min_block)]);
 end
-
-% TrialRecord.NextBlock = TrialRecord.User.progression_number;            % blocknumber is now based on progression, so that I can easily keep track of everything
-
 % setting independant category and button progression based on progression
 % number
 TrialRecord.User.button_progression = ...                                 % the category progression factor, which should be at least bigger than the size progression factor in order 
@@ -186,114 +157,6 @@ if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.general_stimulus_list, TrialRecord.User.general_frame_list] = ...
     stimulusList('D:\onedrive\OneDrive - KU Leuven\social_interactions', TrialRecord.User.generalizing);
 end
-%     % dir() gives a struct of the contents of the path
-%     chasing_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\chasing');
-%     grooming_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\grooming');
-%     mounting_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\mounting');
-%     holding_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\holding');
-%     
-%     chasing_path = regexp(chasing_struct(1).folder,filesep,'split');
-%     grooming_path = regexp(grooming_struct(1).folder,filesep,'split');
-%     mounting_path = regexp(mounting_struct(1).folder,filesep,'split');
-%     holding_path = regexp(holding_struct(1).folder,filesep,'split');
-%     
-%     TrialRecord.User.chasing_folder = chasing_path{1, end};
-%     TrialRecord.User.grooming_folder = grooming_path{1, end};
-%     TrialRecord.User.mounting_folder = mounting_path{1, end};
-%     TrialRecord.User.holding_folder = holding_path{1, end};
-%     
-%     % isolating the name field
-%     TrialRecord.User.chasing_list = {chasing_struct.name};
-%     TrialRecord.User.grooming_list = {grooming_struct.name};
-%     TrialRecord.User.mounting_list = {mounting_struct.name};
-%     TrialRecord.User.holding_list = {holding_struct.name};
-%     
-%     % deleting the 2 empty spots from the name field
-%     TrialRecord.User.chasing_list(1:2) = [];
-%     TrialRecord.User.grooming_list(1:2) = [];
-%     TrialRecord.User.mounting_list(1:2) = [];
-%     TrialRecord.User.holding_list(1:2) = [];
-%     
-% 
-%     % analogous for the frames
-%     chasing_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\chasing');
-%     grooming_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\grooming');
-%     mounting_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\mounting');
-%     holding_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\holding');
-% 
-%     TrialRecord.User.chasing_frame_list = {chasing_frame_struct.name};
-%     TrialRecord.User.grooming_frame_list = {grooming_frame_struct.name};
-%     TrialRecord.User.mounting_frame_list = {mounting_frame_struct.name};
-%     TrialRecord.User.holding_frame_list = {holding_frame_struct.name};
-% 
-%     TrialRecord.User.chasing_frame_list(1:2) = [];
-%     TrialRecord.User.grooming_frame_list(1:2) = [];
-%     TrialRecord.User.mounting_frame_list(1:2) = [];
-%     TrialRecord.User.holding_frame_list(1:2) = [];
-% 
-% if TrialRecord.User.generalizing
-%     gen_chasing_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\gen_chasing');
-%     gen_grooming_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\gen_grooming');
-%     gen_mounting_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\gen_mounting');
-%     gen_holding_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\gen_holding');
-%     
-%     gen_chasing_path = regexp(gen_chasing_struct(1).folder,filesep,'split');
-%     gen_grooming_path = regexp(gen_grooming_struct(1).folder,filesep,'split');
-%     gen_mounting_path = regexp(gen_mounting_struct(1).folder,filesep,'split');
-%     gen_holding_path = regexp(gen_holding_struct(1).folder,filesep,'split');
-%     
-%     TrialRecord.User.gen_chasing_folder = gen_chasing_path{1, end};
-%     TrialRecord.User.gen_grooming_folder = gen_grooming_path{1, end};
-%     TrialRecord.User.gen_mounting_folder = gen_mounting_path{1, end};
-%     TrialRecord.User.gen_holding_folder = gen_holding_path{1, end};
-% 
-%     TrialRecord.User.gen_chasing_list = {gen_chasing_struct.name};
-%     TrialRecord.User.gen_grooming_list = {gen_grooming_struct.name};
-%     TrialRecord.User.gen_mounting_list = {gen_mounting_struct.name};
-%     TrialRecord.User.gen_holding_list = {gen_holding_struct.name};
-%     
-%     TrialRecord.User.gen_chasing_list(1:2) = [];
-%     TrialRecord.User.gen_grooming_list(1:2) = [];
-%     TrialRecord.User.gen_mounting_list(1:2) = [];
-%     TrialRecord.User.gen_holding_list(1:2) = [];
-%     
-%     gen_chasing_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\gen_chasing');
-%     gen_grooming_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\gen_grooming');
-%     gen_mounting_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\gen_mounting');
-%     gen_holding_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\gen_holding');
-%     
-%     TrialRecord.User.gen_chasing_frame_list = {gen_chasing_frame_struct.name};
-%     TrialRecord.User.gen_grooming_frame_list = {gen_grooming_frame_struct.name};
-%     TrialRecord.User.gen_mounting_frame_list = {gen_mounting_frame_struct.name};
-%     TrialRecord.User.gen_holding_frame_list = {gen_holding_frame_struct.name};
-% 
-%     TrialRecord.User.gen_chasing_frame_list(1:2) = [];
-%     TrialRecord.User.gen_grooming_frame_list(1:2) = [];
-%     TrialRecord.User.gen_mounting_frame_list(1:2) = [];
-%     TrialRecord.User.gen_holding_frame_list(1:2) = [];
-% else
-%     TrialRecord.User.gen_chasing_list = [];
-%     TrialRecord.User.gen_grooming_list = [];
-%     TrialRecord.User.gen_mounting_list = [];
-%     TrialRecord.User.gen_holding_list = [];
-%     
-%     TrialRecord.User.gen_chasing_frame_list = [];
-%     TrialRecord.User.gen_grooming_frame_list = [];
-%     TrialRecord.User.gen_mounting_frame_list = [];
-%     TrialRecord.User.gen_holding_frame_list = [];
-% end
-% 
-%     % creating general lists with all the files
-%     TrialRecord.User.general_stimulus_list = [TrialRecord.User.chasing_list, ...
-%         TrialRecord.User.gen_chasing_list, TrialRecord.User.grooming_list,...
-%         TrialRecord.User.gen_grooming_list, TrialRecord.User.mounting_list,...
-%         TrialRecord.User.gen_mounting_list, TrialRecord.User.holding_list, TrialRecord.User.gen_holding_list]; 
-%     TrialRecord.User.general_frame_list = [TrialRecord.User.chasing_frame_list,...
-%         TrialRecord.User.gen_chasing_frame_list, TrialRecord.User.grooming_frame_list,...
-%         TrialRecord.User.gen_grooming_frame_list,TrialRecord.User.mounting_frame_list,...
-%         TrialRecord.User.gen_mounting_frame_list, TrialRecord.User.holding_frame_list,...
-%         TrialRecord.User.gen_holding_frame_list];
-% end
 
 cum_length = cumsum([length(TrialRecord.User.chasing_list) length(TrialRecord.User.gen_chasing_list)...
     length(TrialRecord.User.grooming_list) length(TrialRecord.User.gen_grooming_list)...
@@ -323,48 +186,6 @@ if TrialRecord.User.current_sum_buttons ~= previous_sum_buttons             % th
     TrialRecord.User.gen_chasing_folder, TrialRecord.User.grooming_folder, TrialRecord.User.gen_grooming_folder, ...
     TrialRecord.User.mounting_folder, TrialRecord.User.gen_mounting_folder,...
     TrialRecord.User.holding_folder, TrialRecord.User.gen_holding_folder);
-%     TrialRecord.User.structure = struct('stimuli', {}, 'frames', {}, 'c_fails', {}, ... 
-%         'c_success', {},'c_completed', {}, 'a_fails', {}, 'a_success', {}, ...
-%         'a_completed', {}, 'p_fails', {}, 'p_success', {}, 'p_completed', {}, 'folder', {}, 'condition', {});
-%     for i = 1:length(stimulus_list)
-%         TrialRecord.User.structure(i).stimuli = stimulus_list(i);
-%         TrialRecord.User.structure(i).frames = frame_list(i);
-%         TrialRecord.User.structure(i).c_fails = 0;
-%         TrialRecord.User.structure(i).c_success = 0;
-%         TrialRecord.User.structure(i).c_completed = 0;
-%         TrialRecord.User.structure(i).a_fails = 0;
-%         TrialRecord.User.structure(i).a_success = 0;
-%         TrialRecord.User.structure(i).a_completed = 0;
-%         TrialRecord.User.structure(i).p_fails = 0;
-%         TrialRecord.User.structure(i).p_success = 0;
-%         TrialRecord.User.structure(i).p_completed = 0;
-%         if i <= cum_length(1)
-%             TrialRecord.User.structure(i).folder = TrialRecord.User.chasing_folder;
-%             TrialRecord.User.structure(i).condition = [1 5 6];
-%         elseif i <= cum_length(2)
-%             TrialRecord.User.structure(i).folder = TrialRecord.User.gen_chasing_folder;
-%             TrialRecord.User.structure(i).condition = [1 5 6];
-%         elseif i <= cum_length(3)
-%             TrialRecord.User.structure(i).folder = TrialRecord.User.grooming_folder;
-%             TrialRecord.User.structure(i).condition = [2 5 6];
-%         elseif i <= cum_length(4)
-%             TrialRecord.User.structure(i).folder = TrialRecord.User.gen_grooming_folder;
-%             TrialRecord.User.structure(i).condition = [2 5 6];
-%         elseif i <= cum_length(5)
-%             TrialRecord.User.structure(i).folder = TrialRecord.User.mounting_folder;
-%             TrialRecord.User.structure(i).condition = [3 5 6];
-%         elseif i <= cum_length(6)
-%             TrialRecord.User.structure(i).folder = TrialRecord.User.gen_mounting_folder;
-%             TrialRecord.User.structure(i).condition = [3 5 6];
-%         elseif i <= cum_length(7)
-%             TrialRecord.User.structure(i).folder = TrialRecord.User.holding_folder;
-%             TrialRecord.User.structure(i).condition = [4 5 6];
-%         elseif i <= cum_length(8)
-%             TrialRecord.User.structure(i).folder = TrialRecord.User.gen_holding_folder;
-%             TrialRecord.User.structure(i).condition = [4 5 6];
-%         end
-%     end
-%     disp('new structure made');
 end
 %% create a random condition order with a restriction of max consecutive conditions and a precaution for overlap across structure resets 
 
