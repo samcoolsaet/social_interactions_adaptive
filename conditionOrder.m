@@ -6,9 +6,12 @@ end
 if sum(conditions_array(2,:)) == 0
     disp('conditions_array is empty');
 end
+%%%%% ik ga het eerste deel hiervan herschrijven op de manier zoals het 2e
+%%%%% deel, conditie per condititie en geen random meer maken van 10.
 % nu moet ik nog iets maken als we op het einde aangekomen zijn ook.
 % conditions moeten ook geupdated worden of hij gaat in het negatief
 % for i = 1:46
+
     repetitions = true;
     repetition = true;
     new_conditions_array = conditions_array;
@@ -42,7 +45,7 @@ end
         end
     else
         rnd_condition_order_test = rnd_condition_order(2:10);
-        if sum(rnd_condition_order(end-(max_repeats-2):end)==rnd_condition_order(end)) == (max_repeats-1)
+        if sum(rnd_condition_order(end-(max_repeats-1):end)==rnd_condition_order(end)) == (max_repeats)
             danger_for_repeat = rnd_condition_order(end);
         else
             danger_for_repeat = [];
