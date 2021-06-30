@@ -74,7 +74,7 @@ TrialRecord.User.mounting = false;
 %% determining next block and difficulty based on a general progression number %%%%%% maybe create a vector with the length of trialerrors but displaying the stimulus sequence numbers, this way I can keep track of actual fails and just going on when failing because the number of repeats hits the limit
 if TrialRecord.User.completed_stimuli == TrialRecord.User.blocksize             % if ze have completed a blocksize of stimuli, evaluate
     [TrialRecord.User.structure, TrialRecord.User.performance, TrialRecord.NextBlock] = ...
-        evaluate(TrialRecord.User.structure, TrialRecord.CurrentBlock);
+        evaluate(TrialRecord.User.structure, TrialRecord.CurrentBlock,  TrialRecord.NextBlock, succes_threshold, fail_threshold);
 %     indexes_used_c_stimuli = find([TrialRecord.User.structure.c_completed]==1); % find the completed stimuli
 %     indexes_used_a_stimuli = find([TrialRecord.User.structure.a_completed]==1); % 
 %     indexes_used_p_stimuli = find([TrialRecord.User.structure.p_completed]==1); %
@@ -184,13 +184,13 @@ if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.mounting_folder, TrialRecord.User.holding_folder, TrialRecord.User.gen_chasing_folder, ...
     TrialRecord.User.gen_grooming_folder, TrialRecord.User.gen_mounting_folder, TrialRecord.User.gen_holding_folder,...
     TrialRecord.User.general_stimulus_list, TrialRecord.User.general_frame_list] = ...
-    stimulusList('D:\onedrive\OneDrive - KU Leuven\social_interactions', TrialRecord.User.generalizing);
+    stimulusList('C:\sam', TrialRecord.User.generalizing);
 end
 %     % dir() gives a struct of the contents of the path
-%     chasing_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\chasing');
-%     grooming_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\grooming');
-%     mounting_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\mounting');
-%     holding_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\holding');
+%     chasing_struct = dir('C:\sam\stimuli\chasing');
+%     grooming_struct = dir('C:\sam\stimuli\grooming');
+%     mounting_struct = dir('C:\sam\stimuli\mounting');
+%     holding_struct = dir('C:\sam\stimuli\holding');
 %     
 %     chasing_path = regexp(chasing_struct(1).folder,filesep,'split');
 %     grooming_path = regexp(grooming_struct(1).folder,filesep,'split');
@@ -216,10 +216,10 @@ end
 %     
 % 
 %     % analogous for the frames
-%     chasing_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\chasing');
-%     grooming_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\grooming');
-%     mounting_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\mounting');
-%     holding_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\holding');
+%     chasing_frame_struct = dir('C:\sam\frames\chasing');
+%     grooming_frame_struct = dir('C:\sam\frames\grooming');
+%     mounting_frame_struct = dir('C:\sam\frames\mounting');
+%     holding_frame_struct = dir('C:\sam\frames\holding');
 % 
 %     TrialRecord.User.chasing_frame_list = {chasing_frame_struct.name};
 %     TrialRecord.User.grooming_frame_list = {grooming_frame_struct.name};
@@ -232,10 +232,10 @@ end
 %     TrialRecord.User.holding_frame_list(1:2) = [];
 % 
 % if TrialRecord.User.generalizing
-%     gen_chasing_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\gen_chasing');
-%     gen_grooming_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\gen_grooming');
-%     gen_mounting_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\gen_mounting');
-%     gen_holding_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\gen_holding');
+%     gen_chasing_struct = dir('C:\sam\stimuli\gen_chasing');
+%     gen_grooming_struct = dir('C:\sam\stimuli\gen_grooming');
+%     gen_mounting_struct = dir('C:\sam\stimuli\gen_mounting');
+%     gen_holding_struct = dir('C:\sam\stimuli\gen_holding');
 %     
 %     gen_chasing_path = regexp(gen_chasing_struct(1).folder,filesep,'split');
 %     gen_grooming_path = regexp(gen_grooming_struct(1).folder,filesep,'split');
@@ -257,10 +257,10 @@ end
 %     TrialRecord.User.gen_mounting_list(1:2) = [];
 %     TrialRecord.User.gen_holding_list(1:2) = [];
 %     
-%     gen_chasing_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\gen_chasing');
-%     gen_grooming_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\gen_grooming');
-%     gen_mounting_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\gen_mounting');
-%     gen_holding_frame_struct = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\gen_holding');
+%     gen_chasing_frame_struct = dir('C:\sam\frames\gen_chasing');
+%     gen_grooming_frame_struct = dir('C:\sam\frames\gen_grooming');
+%     gen_mounting_frame_struct = dir('C:\sam\frames\gen_mounting');
+%     gen_holding_frame_struct = dir('C:\sam\frames\gen_holding');
 %     
 %     TrialRecord.User.gen_chasing_frame_list = {gen_chasing_frame_struct.name};
 %     TrialRecord.User.gen_grooming_frame_list = {gen_grooming_frame_struct.name};
@@ -427,10 +427,10 @@ else
     disp('condition not found');
 end
 
-TrialRecord.User.movie = strcat('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\',... 
+TrialRecord.User.movie = strcat('C:\sam\stimuli\',... 
     TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', ...
     TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli);     % complete path of the animation
-TrialRecord.User.frame = strcat('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\',... 
+TrialRecord.User.frame = strcat('C:\sam\frames\',... 
     TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', ...
     TrialRecord.User.structure(TrialRecord.User.struct_index).frames);      % and frame
 
