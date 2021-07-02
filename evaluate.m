@@ -20,6 +20,8 @@ if performance >= succes_threshold                     % if performance is over 
 elseif performance <= fail_threshold                   % if performance is under the threshold and progression number is not already at the min progression number, substract a progression number
     nextblock = ... 
         currentblock - 1;
+else
+    nextblock = currentblock;
 end
 [structure(indexes_used_c_stimuli).c_success] = deal(0);   % reset all the completed stimuli
 [structure(indexes_used_c_stimuli).c_fails] = deal(0);     % this way, the data of the used, but not completed ones stays in there

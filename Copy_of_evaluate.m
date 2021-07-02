@@ -20,6 +20,8 @@ if performance >= succes_threshold                     % if performance is over 
 elseif performance <= fail_threshold                   % if performance is under the threshold and progression number is not already at the min progression number, substract a progression number
     nextblock = ... 
         currentblock - 1;
+else
+    nextblock = currentblock;
 end
 [structure(indexes_used_c_stimuli).c_last_block] = deal(0);
 [structure(indexes_used_a_stimuli).a_last_block] = deal(0);
