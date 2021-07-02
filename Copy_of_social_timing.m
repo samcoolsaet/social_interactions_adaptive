@@ -471,28 +471,34 @@ if TrialRecord.User.test_trial
     if TrialRecord.User.structure(TrialRecord.User.struct_index).c_success ||... 
         TrialRecord.User.structure(TrialRecord.User.struct_index).c_fails == 1        
             TrialRecord.User.structure(TrialRecord.User.struct_index).c_completed = 1;
+            TrialRecord.User.structure(TrialRecord.User.struct_index).c_last_block = 1;
             disp('stimulus set to complete, should not be repeated');
     elseif TrialRecord.User.structure(TrialRecord.User.struct_index).a_success ||... 
         TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails == 1        
             TrialRecord.User.structure(TrialRecord.User.struct_index).a_completed = 1;
+            TrialRecord.User.structure(TrialRecord.User.struct_index).a_last_block = 1;
             disp('stimulus set to complete, should not be repeated');
     elseif TrialRecord.User.structure(TrialRecord.User.struct_index).p_success ||... 
         TrialRecord.User.structure(TrialRecord.User.struct_index).p_fails == 1        
             TrialRecord.User.structure(TrialRecord.User.struct_index).p_completed = 1;
+            TrialRecord.User.structure(TrialRecord.User.struct_index).p_last_block = 1;
             disp('stimulus set to complete, should not be repeated');
     end
 else
     if TrialRecord.User.structure(TrialRecord.User.struct_index).c_success == 1 ...
             || TrialRecord.User.structure(TrialRecord.User.struct_index).c_fails >= TrialRecord.User.max_fails
         TrialRecord.User.structure(TrialRecord.User.struct_index).c_completed = 1;
+        TrialRecord.User.structure(TrialRecord.User.struct_index).c_last_block = 1;
         disp('stimulus set to complete, should not be repeated');
     elseif TrialRecord.User.structure(TrialRecord.User.struct_index).a_success == 1 ...
             || TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails >= TrialRecord.User.max_fails
         TrialRecord.User.structure(TrialRecord.User.struct_index).a_completed = 1;
+        TrialRecord.User.structure(TrialRecord.User.struct_index).a_last_block = 1;
         disp('stimulus set to complete, should not be repeated');
     elseif TrialRecord.User.structure(TrialRecord.User.struct_index).p_success == 1 ...
             || TrialRecord.User.structure(TrialRecord.User.struct_index).p_fails >= TrialRecord.User.max_fails
         TrialRecord.User.structure(TrialRecord.User.struct_index).p_completed = 1;
+        TrialRecord.User.structure(TrialRecord.User.struct_index).p_last_block = 1;
         disp('stimulus set to complete, should not be repeated');
     else
         if repeating

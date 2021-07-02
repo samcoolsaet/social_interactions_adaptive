@@ -72,9 +72,16 @@ TrialRecord.User.mounting = false;
 
 
 %% determining next block and difficulty based on a general progression number %%%%%% maybe create a vector with the length of trialerrors but displaying the stimulus sequence numbers, this way I can keep track of actual fails and just going on when failing because the number of repeats hits the limit
+% if TrialRecord.User.completed_stimuli == TrialRecord.User.blocksize             % if ze have completed a blocksize of stimuli, evaluate
+%     [TrialRecord.User.structure, TrialRecord.User.performance, TrialRecord.NextBlock] = ...
+%         evaluate(TrialRecord.User.structure, TrialRecord.CurrentBlock, succes_threshold, fail_threshold);
+% end
 if TrialRecord.User.completed_stimuli == TrialRecord.User.blocksize             % if ze have completed a blocksize of stimuli, evaluate
     [TrialRecord.User.structure, TrialRecord.User.performance, TrialRecord.NextBlock] = ...
-        evaluate(TrialRecord.User.structure, TrialRecord.CurrentBlock, succes_threshold, fail_threshold);
+        Copy_of_evaluate(TrialRecord.User.structure, TrialRecord.CurrentBlock, succes_threshold, fail_threshold);
+end
+if TrialRecord.User.structure_completion == 1
+    TrialRecord.User.structure = resetStructure(TrialRecord.User.structure);
 end
 
 if TrialRecord.NextBlock > TrialRecord.User.max_block
@@ -181,8 +188,14 @@ end
 
 
 %% create an empty structure
+% if TrialRecord.User.current_sum_buttons ~= previous_sum_buttons             % this comes dozn to: on start and zhen button added within training
+%     [TrialRecord.User.structure] = createStructure(stimulus_list, frame_list, cum_length, TrialRecord.User.chasing_folder,...
+%     TrialRecord.User.gen_chasing_folder, TrialRecord.User.grooming_folder, TrialRecord.User.gen_grooming_folder, ...
+%     TrialRecord.User.mounting_folder, TrialRecord.User.gen_mounting_folder,...
+%     TrialRecord.User.holding_folder, TrialRecord.User.gen_holding_folder);
+% end
 if TrialRecord.User.current_sum_buttons ~= previous_sum_buttons             % this comes dozn to: on start and zhen button added within training
-    [TrialRecord.User.structure] = createStructure(stimulus_list, frame_list, cum_length, TrialRecord.User.chasing_folder,...
+    [TrialRecord.User.structure] = Copy_of_createStructure(stimulus_list, frame_list, cum_length, TrialRecord.User.chasing_folder,...
     TrialRecord.User.gen_chasing_folder, TrialRecord.User.grooming_folder, TrialRecord.User.gen_grooming_folder, ...
     TrialRecord.User.mounting_folder, TrialRecord.User.gen_mounting_folder,...
     TrialRecord.User.holding_folder, TrialRecord.User.gen_holding_folder);
