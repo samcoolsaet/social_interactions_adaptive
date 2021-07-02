@@ -1,4 +1,4 @@
-function [structure, performance, nextblock] = evaluate(structure, currentblock, succes_threshold, fail_threshold)
+function [structure, performance, nextblock] = evaluate(structure, currentblock, nextblock, succes_threshold, fail_threshold)
 % evaluate old structure and create new one
 % ik heb hier wel het probleem dat ik de structure al reset wnr die
 % eigenlijk nog niet compleet is, dit zorgt ervoor dat ik bepaalde stimuli
