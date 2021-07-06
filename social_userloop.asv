@@ -227,13 +227,15 @@ if TrialRecord.User.current_sum_buttons ~= previous_sum_buttons
         Copy_of_conditionOrder(TrialRecord.User.structure, ...
         TrialRecord.User.max_fails, TrialRecord.User.rnd_condition_order, ...
         TrialRecord.User.training_categorization, TrialRecord.User.training_agent_patient);
-elseif ~TrialRecord.User.repeat && TrialRecord.User.engaged
+end
+
+if ~TrialRecord.User.repeat && TrialRecord.User.engaged
     [TrialRecord.User.conditions_array, TrialRecord.User.rnd_condition_order] = ...
         conditionOrder(TrialRecord.User.conditions_array, TrialRecord.User.conditions,...
         TrialRecord.User.max_fails, TrialRecord.User.rnd_condition_order);
 end
 disp(TrialRecord.User.rnd_condition_order);
-disp(TrialRecord.User.conditions_array);
+condition = TrialRecord.User.rnd_condition_order(1);
 %% given the condition, pick a stimulus that has not yet been completed in the current structure
 if ~TrialRecord.User.repeat && TrialRecord.User.engaged || ...
         TrialRecord.User.current_sum_buttons ~= previous_sum_buttons                    % if this, we should just do everything the same as previous trial
