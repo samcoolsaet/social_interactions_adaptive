@@ -1,14 +1,13 @@
 [y3, fs3] = audioread('alarm.wav');
+% hotkey('k','sound(y3, fs3); TrialRecord.User.engaged = false; trialerror(8); return;');
 hotkey('x', 'escape_screen(); assignin(''caller'',''continue_'',false);');
 hotkey('r', 'goodmonkey(reward_dur, ''juiceline'', MLConfig.RewardFuncArgs.JuiceLine, ''eventmarker'', 14, ''nonblocking'', 1);');   % manual reward
 hotkey('p', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock + 1;');
 % hotkey('o', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock + (TrialRecord.User.size_progression_factor - TrialRecord.User.size_progression)+1;');
 hotkey('o', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock + 5;');
 % hotkey('l', 'TrialRecord.User.progression_number = TrialRecord.CurrentBlock - TrialRecord.User.size_progression;');
-hotkey('l', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock - 5;');
+hotkey('l', 'TrialRecord.User.progression_number = TrialRecord.CurrentBlock - 5;');
 hotkey('m', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock - 1;');
-hotkey('y', 'sound(y3, fs3);');
-% hotkey('k', 'TrialRecord.User.engaged = false; trialerror(8); return;');
 bhv_code(1, 'run_engagement_scene', 2, 'run_video', 3, 'run_answer_scene', 5, 'end_aswer_scene');
 %% constants
 touch_threshold = 2;
@@ -204,8 +203,6 @@ tc_movie = TimeCounter(null_);
 tc_movie.Duration = movie_duration;
 tc_answer = TimeCounter(touch);
 tc_answer.Duration = answer_time;
-tc_frame = TimeCounter(touch);
-tc_frame.Duration = answer_time;
 
 % webcam
 cam = WebcamMonitor(null_);
@@ -226,10 +223,10 @@ con2.add(cam);
 % if agent patient, run the frame scene
 if TrialRecord.User.agenting || TrialRecord.User.patienting
     frame_or = OrAdapter(frame_touch);
-    frame_or.add(tc_frame);
-    con5 = Concurrent(frame_or);
-    con5.add(img);
-    con5.add(cam);
+    frame_or.add(tc_answer);
+    con4 = Concurrent(frame_or);
+    con4.add(img);
+    con4.add(cam);
 end
 
 
@@ -264,6 +261,11 @@ end
 scene2 = create_scene(con2);
 run_scene(scene2, 2);
 
+% run frame and answering scene
+% tf = istouching;
+% while istouching  % while touching, do not proceed to the buttons
+%     idle(2000);
+% end
 if TrialRecord.User.categorizing
     set_bgcolor([1 0.5 1]);   % change the background color  
 elseif TrialRecord.User.agenting || TrialRecord.User.patienting
@@ -271,16 +273,17 @@ elseif TrialRecord.User.agenting || TrialRecord.User.patienting
 end
 
 if TrialRecord.User.agenting || TrialRecord.User.patienting
-    scene5 = create_scene(con5);
-    run_scene(scene5, 4);
+    scene4 = create_scene(con4);
+    run_scene(scene4, 4);
 %     find a trialerror for when the frametouching times out
 end
-if TrialRecord.User.categorizing || ~tc_frame.Success
-    scene3 = create_scene(con3);
-    fliptime = run_scene(scene3, 3);
-end
+
+scene3 = create_scene(con3);
+fliptime = run_scene(scene3, 3);
+
 set_bgcolor([]);        % change it back to the original color
 idle(0);
+
 if TrialRecord.User.current_sum_categories == 1
     answer_time = touch.Time - fliptime;
 else
@@ -375,11 +378,6 @@ elseif TrialRecord.User.current_sum_buttons == 1 && TrialRecord.User.agenting_pa
         trialerror(1);
         TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails = TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails + 1; %%%% dit ook nog voor de rest doen
         reward = false;
-    elseif tc_frame.Success
-        dashboard(2, 'did not touch frame');
-        trialerror(2);
-        TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails = TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails + 1;
-        reward = false;
     end
 elseif TrialRecord.User.categorizing & TrialRecord.User.current_sum_buttons ~= 1
     if (TrialRecord.User.chasing & touch.ChosenTarget == 1) | ...
@@ -413,9 +411,6 @@ elseif TrialRecord.User.agenting & TrialRecord.User.current_sum_buttons ~= 1
         if tc_answer.Success
             dashboard(2, 'no response');
             trialerror(1);
-        elseif tc_frame.Success
-            dashboard(2, 'did not touch frame');
-            trialerror(2);
         else
             dashboard(2, 'FAIL!!!');
             trialerror(6);
@@ -433,9 +428,6 @@ elseif TrialRecord.User.patienting & TrialRecord.User.current_sum_buttons ~= 1
         if tc_answer.Success
             dashboard(2, 'no response');
             trialerror(1);
-        elseif tc_frame.Success
-            dashboard(2, 'did not touch frame');
-            trialerror(2);
         else
             dashboard(2, 'FAIL!!!');
             trialerror(6);
@@ -466,39 +458,33 @@ reward_scene.DurationUnit = 'msec';
 con4 = Concurrent(reward_scene);
 con4.add(cam);
 scene4 = create_scene(con4);
-run_scene(scene4);
+run_scene(scene4, 5);
 if TrialRecord.User.test_trial
     if TrialRecord.User.structure(TrialRecord.User.struct_index).c_success ||... 
         TrialRecord.User.structure(TrialRecord.User.struct_index).c_fails == 1        
             TrialRecord.User.structure(TrialRecord.User.struct_index).c_completed = 1;
-            TrialRecord.User.structure(TrialRecord.User.struct_index).c_last_block = 1;
             disp('stimulus set to complete, should not be repeated');
     elseif TrialRecord.User.structure(TrialRecord.User.struct_index).a_success ||... 
         TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails == 1        
             TrialRecord.User.structure(TrialRecord.User.struct_index).a_completed = 1;
-            TrialRecord.User.structure(TrialRecord.User.struct_index).a_last_block = 1;
             disp('stimulus set to complete, should not be repeated');
     elseif TrialRecord.User.structure(TrialRecord.User.struct_index).p_success ||... 
         TrialRecord.User.structure(TrialRecord.User.struct_index).p_fails == 1        
             TrialRecord.User.structure(TrialRecord.User.struct_index).p_completed = 1;
-            TrialRecord.User.structure(TrialRecord.User.struct_index).p_last_block = 1;
             disp('stimulus set to complete, should not be repeated');
     end
 else
     if TrialRecord.User.structure(TrialRecord.User.struct_index).c_success == 1 ...
             || TrialRecord.User.structure(TrialRecord.User.struct_index).c_fails >= TrialRecord.User.max_fails
         TrialRecord.User.structure(TrialRecord.User.struct_index).c_completed = 1;
-        TrialRecord.User.structure(TrialRecord.User.struct_index).c_last_block = 1;
         disp('stimulus set to complete, should not be repeated');
     elseif TrialRecord.User.structure(TrialRecord.User.struct_index).a_success == 1 ...
             || TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails >= TrialRecord.User.max_fails
         TrialRecord.User.structure(TrialRecord.User.struct_index).a_completed = 1;
-        TrialRecord.User.structure(TrialRecord.User.struct_index).a_last_block = 1;
         disp('stimulus set to complete, should not be repeated');
     elseif TrialRecord.User.structure(TrialRecord.User.struct_index).p_success == 1 ...
             || TrialRecord.User.structure(TrialRecord.User.struct_index).p_fails >= TrialRecord.User.max_fails
         TrialRecord.User.structure(TrialRecord.User.struct_index).p_completed = 1;
-        TrialRecord.User.structure(TrialRecord.User.struct_index).p_last_block = 1;
         disp('stimulus set to complete, should not be repeated');
     else
         if repeating
@@ -526,7 +512,7 @@ bhv_variable('size_progression', TrialRecord.User.size_progression,...
     'structure_completion', TrialRecord.User.structure_completion, ...
     'structure', TrialRecord.User.structure, ...
     'completed_stim', TrialRecord.User.completed_stimuli,...
-    'random_condition_order', TrialRecord.User.rnd_condition_order,...
+    'random_condition_order_index', TrialRecord.User.random_condition_order_index,...
     'repeat', TrialRecord.User.repeat,...
     'target', touch.ChosenTarget,...
     'test_trial', TrialRecord.User.test_trial);
