@@ -229,9 +229,11 @@ if TrialRecord.User.current_sum_buttons ~= previous_sum_buttons
         TrialRecord.User.training_categorization, TrialRecord.User.training_agent_patient);
 elseif ~TrialRecord.User.repeat && TrialRecord.User.engaged
     [TrialRecord.User.conditions_array, TrialRecord.User.rnd_condition_order] = ...
-        conditionOrder(TrialRecord.User.conditions_array, TrialRecord.User.conditions,...
-        TrialRecord.User.max_fails, TrialRecord.User.rnd_condition_order);
+        Copy_of_conditionOrder(TrialRecord.User.structure, ...
+        TrialRecord.User.max_fails, TrialRecord.User.rnd_condition_order, ...
+        TrialRecord.User.training_categorization, TrialRecord.User.training_agent_patient);
 end
+condition = TrialRecord.User.rnd_condition_order(end);
 disp(TrialRecord.User.rnd_condition_order);
 disp(TrialRecord.User.conditions_array);
 %% given the condition, pick a stimulus that has not yet been completed in the current structure
