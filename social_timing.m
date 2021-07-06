@@ -21,7 +21,7 @@ y_spacing = 6.66;
 y_center = -(TrialRecord.User.current_sum_buttons-1)*y_spacing/2;
 movie_duration = 1000;
 answer_time = 8000;
-standard_time_out = 5000;
+standard_time_out = 6000;
 engagement_duration = 8000;
 repeating = true;
 TrialRecord.User.repeat = false;
@@ -298,9 +298,9 @@ end
 
 % reward multiplier goes up whenn he gets trials right in a row
 if TrialRecord.CurrentTrialNumber > (1+TrialRecord.User.test_trial_counter)
-    TrialRecord.User.reward_factors = linspace(1,2,4);
+    TrialRecord.User.reward_factors = linspace(1,1.6,6);
     if TrialRecord.TrialErrors(end-TrialRecord.User.test_trial_counter)...
-            == 0 && TrialRecord.User.reward_index < 5 ...
+            == 0 && TrialRecord.User.reward_index < 7 ...
             && ~TrialRecord.User.test_trial
         TrialRecord.User.reward_multiplicator = TrialRecord.User.reward_multiplicator + ...
             ( TrialRecord.User.reward_factors(TrialRecord.User.reward_index)^2 * 0.6 );
@@ -353,8 +353,8 @@ else
     boolean_last_ten = TrialRecord.TrialErrors(end-9:end) == 0;
     performance_last_ten = mean(boolean_last_ten);
     time_out = standard_time_out / sqrt(performance_last_ten);
-    if time_out > 7000
-        time_out = 7000;
+    if time_out > 11000
+        time_out = 11000;
     end
 end
 
