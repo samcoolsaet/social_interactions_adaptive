@@ -21,7 +21,7 @@ if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.NextBlock = TrialRecord.User.start_block;
     previous_sum_buttons = 0;
     TrialRecord.User.engaged = true;
-    TrialRecord.User.max_fails = 3;
+    TrialRecord.User.max_fails = 6;
     TrialRecord.User.repeat = false;
     TrialRecord.User.completed_stimuli = 0;
     TrialRecord.User.c_structure_completion = 0;
@@ -225,15 +225,15 @@ if TrialRecord.User.current_sum_buttons ~= previous_sum_buttons
     TrialRecord.User.rnd_condition_order = [];
     [TrialRecord.User.conditions_array, TrialRecord.User.rnd_condition_order] = ...
         Copy_of_conditionOrder(TrialRecord.User.structure, ...
-        TrialRecord.User.max_fails, TrialRecord.User.rnd_condition_order, ...
+        3, TrialRecord.User.rnd_condition_order, ...
         TrialRecord.User.training_categorization, TrialRecord.User.training_agent_patient);
 elseif ~TrialRecord.User.repeat && TrialRecord.User.engaged
     [TrialRecord.User.conditions_array, TrialRecord.User.rnd_condition_order] = ...
         Copy_of_conditionOrder(TrialRecord.User.structure, ...
-        TrialRecord.User.max_fails, TrialRecord.User.rnd_condition_order, ...
+        3, TrialRecord.User.rnd_condition_order, ...
         TrialRecord.User.training_categorization, TrialRecord.User.training_agent_patient);
 end
-condition = TrialRecord.User.rnd_condition_order(end);
+condition = TrialRecord.User.rnd_condition_order(1);
 disp(TrialRecord.User.rnd_condition_order);
 disp(TrialRecord.User.conditions_array);
 %% given the condition, pick a stimulus that has not yet been completed in the current structure
