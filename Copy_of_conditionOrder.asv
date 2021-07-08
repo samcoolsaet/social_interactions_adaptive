@@ -30,9 +30,9 @@ elseif ~agent_patient && ~categorizing
     free_conditions = [c_available' a_available' p_available'];
 end
 
-starting_no_conditions  = histc(free_conditions, unique(active_conditions));
+starting_no_conditions  = histc(free_conditions, unique(free_conditions));
 
-conditions_array = [unique(active_conditions)'; starting_no_conditions];
+conditions_array = [unique(free_conditions); starting_no_conditions];
 
 
 if sum(conditions_array(2,:)) > (4*(sum(conditions_array(2,:))-max(conditions_array(2,:)))+max_repeats)  % this formula ensures that it is mathematical possible to create a list with the restriction of max_repeats of the same consecutive conditions
@@ -83,7 +83,7 @@ else
         available_conditions_list = free_conditions(ismember(free_conditions, available_conditions));
         added_condition = available_conditions_list(randperm(length(available_conditions_list), 1));
         rnd_condition_order(end+1) = added_condition;
-    end
+        
 %     rnd_condition_order = rnd_condition_order(2:10);
 %     if sum(rnd_condition_order(end-(max_repeats-1):end)==rnd_condition_order(end)) == (max_repeats)
 %         danger_for_repeat = rnd_condition_order(end);

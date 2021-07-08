@@ -233,8 +233,14 @@ elseif ~TrialRecord.User.repeat && TrialRecord.User.engaged
         3, TrialRecord.User.rnd_condition_order, ...
         TrialRecord.User.training_categorization, TrialRecord.User.training_agent_patient);
 end
-condition = TrialRecord.User.rnd_condition_order(1);
-disp(TrialRecord.User.rnd_condition_order);
+% condition = TrialRecord.User.rnd_condition_order(1);
+% disp(TrialRecord.User.rnd_condition_order);
+condition = TrialRecord.User.rnd_condition_order(end);
+if length(TrialRecord.User.rnd_condition_order) <= 10
+    disp(TrialRecord.User.rnd_condition_order);
+else
+    disp(TrialRecord.User.rnd_condition_order(end-9:end));
+end
 disp(TrialRecord.User.conditions_array);
 %% given the condition, pick a stimulus that has not yet been completed in the current structure
 if ~TrialRecord.User.repeat && TrialRecord.User.engaged || ...
