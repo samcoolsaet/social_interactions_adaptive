@@ -78,13 +78,16 @@ TrialRecord.User.mounting = false;
 %         evaluate(TrialRecord.User.structure, TrialRecord.CurrentBlock, succes_threshold, fail_threshold);
 % end
 % if TrialRecord.User.completed_stimuli == TrialRecord.User.blocksize %%%%%%% dit is het probleem!!!!!completed_stim is maar 1 keer gelijk aan de blocksize en blijft dan verder gaan            % if ze have completed a blocksize of stimuli, evaluate
-cum_last_block = sum([TrialRecord.User.structure.c_last_block]) + ...
-    sum([TrialRecord.User.structure.a_last_block]) + ...
-    sum([TrialRecord.User.structure.p_last_block]);
-if cum_last_block == TrialRecord.User.blocksize %%%%%%% oplossing? completed_stim is maar 1 keer gelijk aan de blocksize en blijft dan verder gaan            % if ze have completed a blocksize of stimuli, evaluate
-    [TrialRecord.User.structure, TrialRecord.User.performance, TrialRecord.NextBlock] = ...
-        Copy_of_evaluate(TrialRecord.User.structure, TrialRecord.CurrentBlock, succes_threshold, fail_threshold);
+if TrialRecord.CurrentTrialNumber ~= 0
+    cum_last_block = sum([TrialRecord.User.structure.c_last_block]) + ...
+        sum([TrialRecord.User.structure.a_last_block]) + ...
+        sum([TrialRecord.User.structure.p_last_block]);
+    if cum_last_block == TrialRecord.User.blocksize %%%%%%% oplossing? completed_stim is maar 1 keer gelijk aan de blocksize en blijft dan verder gaan            % if ze have completed a blocksize of stimuli, evaluate
+        [TrialRecord.User.structure, TrialRecord.User.performance, TrialRecord.NextBlock] = ...
+            Copy_of_evaluate(TrialRecord.User.structure, TrialRecord.CurrentBlock, succes_threshold, fail_threshold);
+    end
 end
+
 if TrialRecord.User.structure_completion == 1
     TrialRecord.User.structure = resetStructure(TrialRecord.User.structure);
 end
