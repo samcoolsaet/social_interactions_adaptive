@@ -8,8 +8,17 @@ mounting_frames = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\fram
 mounting_frames(1:2) = [];
 holding_frames = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\holding');
 holding_frames(1:2) = [];
+gen_chasing_frames = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\gen_chasing');
+gen_chasing_frames(1:2) = [];
+gen_grooming_frames = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\gen_grooming');
+gen_grooming_frames(1:2) = [];
+gen_mounting_frames = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\gen_mounting');
+gen_mounting_frames(1:2) = [];
+gen_holding_frames = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\gen_holding');
+gen_holding_frames(1:2) = [];
 
-frame_list = horzcat({chasing_frames.name},{grooming_frames.name},{mounting_frames.name},{holding_frames.name});
+frame_list = horzcat({chasing_frames.name},{grooming_frames.name},{mounting_frames.name},{holding_frames.name},...
+    {gen_chasing_frames.name},{gen_grooming_frames.name},{gen_mounting_frames.name},{gen_holding_frames.name});
 frame_list = string(frame_list);
 
 for i = 1:length(frame_list)
@@ -17,6 +26,41 @@ for i = 1:length(frame_list)
         updated_inventory(end+1).name = frame_list(i);
     end
 end
+
+% sort alphabetically
+order = sort(lower([updated_inventory.name]));
+match_list = [];
+for i = 1:length([updated_inventory.name])
+    match = find(matches(lower([updated_inventory.name]), order(i)));
+    match_list(end+1) = match;
+end
+updated_inventory = updated_inventory(match_list);
+inventory = updated_inventory;
+% fill in gray coordinates
+for i = 1:length(inventory)
+    if contains(inventory(i).name, 'gray')
+        char_array = convertStringsToChars(inventory(i).name);
+        start_index = strfind(char_array, '_gray');
+        char_array(start_index:start_index+length('gray')) = [];
+        if ismember(char_array, [inventory.name])
+            index = find(matches([inventory.name], char_array));
+            if ~isempty(inventory(index).a_origin)
+                inventory(i).a_origin = inventory(index).a_origin;
+                inventory(i).a_width = inventory(index).a_width;
+                inventory(i).a_height = inventory(index).a_height;
+                inventory(i).p_origin = inventory(index).p_origin;
+                inventory(i).p_width = inventory(index).p_width;
+                inventory(i).p_height = inventory(index).p_height;
+                inventory(i).a_degrees = inventory(index).a_degrees;
+                inventory(i).p_degrees = inventory(index).p_degrees;
+            end
+        end
+    end
+end
+
+% calculate mirrored origins
+
+
 
 % pix_per_deg =  MLConfig.PixelsPerDegree.
 % Images are 512*288
