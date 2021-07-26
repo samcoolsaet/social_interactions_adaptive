@@ -38,9 +38,9 @@ updated_inventory = updated_inventory(match_list);
 inventory = updated_inventory;
 % fill in gray coordinates
 for i = 1:length(inventory)
-    if contains(inventory(i).name, 'gray')
+    if contains(inventory(i).name, '_gray.')
         char_array = convertStringsToChars(inventory(i).name);
-        start_index = strfind(char_array, '_gray');
+        start_index = strfind(char_array, '_gray.');
         char_array(start_index:start_index+length('gray')) = [];
         if ismember(char_array, [inventory.name])
             index = find(matches([inventory.name], char_array));
@@ -59,6 +59,27 @@ for i = 1:length(inventory)
 end
 
 % calculate mirrored origins
+for i = 1:length(inventory)
+    if contains(inventory(i).name, '_mirror.')
+        char_array = convertStringsToChars(inventory(i).name);
+        start_index = strfind(char_array, '_mirror.');
+        char_array(start_index:start_index+length('mirror')) = [];
+        if ismember(char_array, [inventory.name])
+            index = find(matches([inventory.name], char_array));
+            if ~isempty(inventory(index).a_origin)
+                inventory(i).a_origin = [512-inventory(index).a_origin(1) inventory(index).a_origin(2)];
+                inventory(i).a_width = inventory(index).a_width;
+                inventory(i).a_height = inventory(index).a_height;
+                inventory(i).p_origin = [512-inventory(index).p_origin(1) inventory(index).p_origin(2)];
+                inventory(i).p_width = inventory(index).p_width;
+                inventory(i).p_height = inventory(index).p_height;
+                inventory(i).a_degrees = inventory(index).a_degrees;
+                inventory(i).p_degrees = inventory(index).p_degrees;
+            end
+        end
+    end
+end
+
 
 
 

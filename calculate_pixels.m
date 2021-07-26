@@ -26,12 +26,12 @@ inventory(inventory_index).p_origin = origin_patient;
 inventory(inventory_index).p_width = width_patient;
 inventory(inventory_index).p_height = height_patient;
 
-inventory_index = input('geef inventory index: ');
-
-inventory(inventory_index).a_origin = origin_agent;
-inventory(inventory_index).a_width = width_agent;
-inventory(inventory_index).a_height = height_agent;
-
-inventory(inventory_index).p_origin = origin_patient;
-inventory(inventory_index).p_width = width_patient;
-inventory(inventory_index).p_height = height_patient;
+% inventory_index = input('geef inventory index: ');
+% 
+% inventory(inventory_index).a_origin = origin_agent;
+% inventory(inventory_index).a_width = width_agent;
+% inventory(inventory_index).a_height = height_agent;
+% 
+% inventory(inventory_index).p_origin = origin_patient;
+% inventory(inventory_index).p_width = width_patient;
+% inventory(inventory_index).p_height = height_patient;
