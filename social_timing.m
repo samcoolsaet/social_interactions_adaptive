@@ -146,14 +146,14 @@ fix.Threshold = touch_threshold;
 trial_box = BoxGraphic(null_);
 
 if TrialRecord.User.categorizing                                            % if question is related to category
-    if TrialRecord.User.current_sum_categories >= 4                         % if all categories are involved, show the 4 boxes
+    if TrialRecord.User.current_sum_buttons >= 4                         % if all categories are involved, show the 4 boxes
         trial_box.List = all_boxes(1:4, 1:4);
     else
         trial_box.List = ... 
             all_boxes(1:TrialRecord.User.current_sum_categories, 1:4);      % else, show the number of involved categories
     end
 elseif TrialRecord.User.agenting || TrialRecord.User.patienting             % analogous when agent patient
-    if TrialRecord.User.current_sum_categories == 1
+    if TrialRecord.User.current_sum_buttons == 1
         trial_box.List = all_boxes(TrialRecord.CurrentCondition, 1:4);
     else
         trial_box.List = all_boxes(5:6, 1:4);
@@ -161,7 +161,7 @@ elseif TrialRecord.User.agenting || TrialRecord.User.patienting             % an
 end
 
 % setting touch targets
-if TrialRecord.User.current_sum_categories == 1                             % if only 1 category is active, I have to use single target adapter 
+if TrialRecord.User.current_sum_buttons == 1                             % if only 1 category is active, I have to use single target adapter 
     touch = SingleTarget(touch_);
 else
     touch = MultiTarget(touch_);                                            % else, I can use the Multitarget adapter
@@ -177,7 +177,7 @@ if TrialRecord.User.categorizing
             all_targets(1:TrialRecord.User.current_sum_categories, :);      % else, show the number of involved categories
     end
 elseif TrialRecord.User.agenting || TrialRecord.User.patienting
-    if TrialRecord.User.current_sum_categories == 1
+    if TrialRecord.User.current_sum_buttons == 1
         touch.Target = all_targets(TrialRecord.CurrentCondition, :);
     else
         touch.Target = all_targets(5:6, :);
@@ -188,7 +188,7 @@ touch.Threshold = touch_threshold;
 mov = MovieGraphic(fix);
 mov.List = { TrialRecord.User.movie, [0 0], 0, 1.25, 90 };   % movie filename
 % tc = TimeCounter(mov);
-img = ImageGraphic(null_);
+img = ImageGraphic(null_);  
 if TrialRecord.User.categorizing
     img.List = { TrialRecord.User.frame, [0 0], 0, 1.25, 90 };
 elseif TrialRecord.User.agenting || TrialRecord.User.patienting
@@ -289,7 +289,7 @@ if TrialRecord.User.categorizing || ~tc_frame.Success
 end
 set_bgcolor([]);        % change it back to the original color
 idle(0);
-if TrialRecord.User.current_sum_categories == 1
+if TrialRecord.User.current_sum_buttons == 1
     answer_time = touch.Time - fliptime;
 else
     answer_time = touch.RT;
@@ -298,9 +298,9 @@ end
 
 % reward multiplier goes up whenn he gets trials right in a row
 if TrialRecord.CurrentTrialNumber > (1+TrialRecord.User.test_trial_counter)
-    TrialRecord.User.reward_factors = linspace(1,1.1,10);
+    TrialRecord.User.reward_factors = linspace(1,0.7,15);
     if TrialRecord.TrialErrors(end-TrialRecord.User.test_trial_counter)...
-            == 0 && TrialRecord.User.reward_index < 11 ...
+            == 0 && TrialRecord.User.reward_index < 16 ...
             && ~TrialRecord.User.test_trial
         TrialRecord.User.reward_multiplicator = TrialRecord.User.reward_multiplicator + ...
             ( TrialRecord.User.reward_factors(TrialRecord.User.reward_index)^2 * 0.6 );

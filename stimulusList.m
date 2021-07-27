@@ -101,6 +101,11 @@ else
     gen_grooming_frame_list = [];
     gen_mounting_frame_list = [];
     gen_holding_frame_list = [];
+    
+    gen_chasing_folder = [];
+    gen_grooming_folder = [];
+    gen_mounting_folder = [];
+    gen_holding_folder = [];
 end
 
     % creating general lists with all the files

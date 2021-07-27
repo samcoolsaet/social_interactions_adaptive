@@ -15,6 +15,7 @@ if categorizing
 elseif agent_patient
     a_active_conditions = struct_conditions(:,2);
     p_active_conditions = struct_conditions(:,3);
+    active_conditions = [a_active_conditions p_active_conditions];
     not_completed_indexes = [[structure.a_completed]==0; [structure.p_completed]==0];
     a_available = a_active_conditions(not_completed_indexes(1,:));
     p_available = p_active_conditions(not_completed_indexes(2,:));
@@ -23,6 +24,7 @@ elseif ~agent_patient && ~categorizing
     c_active_conditions = struct_conditions(:,1);
     a_active_conditions = struct_conditions(:,2);
     p_active_conditions = struct_conditions(:,3);
+    a_active_conditions = [c_active_conditions a_active_conditions p_active_conditions];
     not_completed_indexes = [[structure.c_completed]==0; [structure.a_completed]==0; [structure.p_completed]==0];
     c_available = c_active_conditions(not_completed_indexes(1,:));
     a_available = a_active_conditions(not_completed_indexes(2,:));
@@ -77,7 +79,7 @@ else
         if isempty(not_excluded_conditions)
             not_excluded_conditions = conditions_array(1,:);
         end
-        not_empty_conditions = find(conditions_array(2, :)~=0);
+        not_empty_conditions = conditions_array(1,find(conditions_array(2, :)~=0));
         available_conditions = intersect(not_excluded_conditions, not_empty_conditions);
         available_conditions = setdiff(available_conditions, danger_for_repeat);
         available_conditions_list = free_conditions(ismember(free_conditions, available_conditions));

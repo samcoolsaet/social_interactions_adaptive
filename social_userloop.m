@@ -11,7 +11,7 @@ persistent timing_filenames_retrieved
     return
     end
 %% initializing for first trial
-TrialRecord.User.start_block = 56;                                               % the progression number to start training with
+TrialRecord.User.start_block = 1;                                               % the progression number to start training with
 TrialRecord.User.generalizing = true;
 
 if TrialRecord.CurrentTrialNumber == 0
@@ -20,6 +20,7 @@ if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.performance = 0;
     TrialRecord.NextBlock = TrialRecord.User.start_block;
     previous_sum_buttons = 0;
+    previous_sum_categories = 0;
     TrialRecord.User.engaged = true;
     TrialRecord.User.max_fails = 6;
     TrialRecord.User.repeat = false;
@@ -31,6 +32,7 @@ if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.structure_completion = 0;
 else
     previous_sum_buttons = TrialRecord.User.current_sum_buttons;      % calculations of previous sum categories
+    previous_sum_categories = TrialRecord.User.current_sum_categories;    
 end
 %% constants
 % progression
@@ -51,8 +53,8 @@ TrialRecord.User.max_block = TrialRecord.User.button_progression_factor * 3 ...
 TrialRecord.User.min_block = TrialRecord.User.start_block;
 
 % training
-TrialRecord.User.training_categorization = true;                            % complete task or training
-TrialRecord.User.training_agent_patient = false;
+TrialRecord.User.training_categorization = false;                            % complete task or training
+TrialRecord.User.training_agent_patient = true;
 
 % fixed constants
 TrialRecord.User.chasing_on = false;                                        % all false for script to work
@@ -113,6 +115,7 @@ TrialRecord.User.size_progression = ...
 % training progression switches. at the end ( if not training ) all switches
 % are turned on 
 if TrialRecord.User.training_categorization
+    TrialRecord.User.category = true;
     if TrialRecord.User.button_progression >=0
         TrialRecord.User.chasing_on = true;
     end
@@ -126,11 +129,20 @@ if TrialRecord.User.training_categorization
         TrialRecord.User.holding_on = true;
     end
 elseif TrialRecord.User.training_agent_patient
+    TrialRecord.User.agent_on = true;
+    TrialRecord.User.patient_on = true;
+    TrialRecord.User.category = false;
     if TrialRecord.User.button_progression >=0
-        TrialRecord.User.agent_on = true;
+        TrialRecord.User.chasing_on = true;
     end
     if TrialRecord.User.button_progression >=1
-        TrialRecord.User.patient_on = true;
+        TrialRecord.User.grooming_on = true;
+    end
+    if TrialRecord.User.button_progression >=2
+        TrialRecord.User.mounting_on = true;
+    end
+    if TrialRecord.User.button_progression >=3
+        TrialRecord.User.holding_on = true;
     end
 else
     TrialRecord.User.chasing_on = true;
@@ -139,12 +151,9 @@ else
     TrialRecord.User.mounting_on = true;
     TrialRecord.User.agent_on = true;
     TrialRecord.User.patient_on = true;
-end
-if TrialRecord.User.chasing_on || TrialRecord.User.grooming_on || TrialRecord.User.holding_on || TrialRecord.User.mounting_on
     TrialRecord.User.category = true;
-else
-    TrialRecord.User.category = false;
 end
+
 % calculation current sum categories after switches have been altered
 
 TrialRecord.User.current_sum_categories = sum([TrialRecord.User.chasing_on, ... % difference between current and previous sum of categories acts as a 
@@ -152,10 +161,19 @@ TrialRecord.User.current_sum_categories = sum([TrialRecord.User.chasing_on, ... 
     TrialRecord.User.mounting_on,]);
 display(TrialRecord.User.current_sum_categories);
 
-TrialRecord.User.current_sum_buttons = sum([TrialRecord.User.chasing_on, ... % difference between current and previous sum of categories acts as a 
-    TrialRecord.User.grooming_on,TrialRecord.User.holding_on, ...               % switch for new stimulus list creation involving new categories and other
-    TrialRecord.User.mounting_on, TrialRecord.User.agent_on, ...                % changes that have to be made when categories are added
-    TrialRecord.User.patient_on]);
+if TrialRecord.User.training_categorization
+    TrialRecord.User.current_sum_buttons = sum([TrialRecord.User.chasing_on, ... 
+        TrialRecord.User.grooming_on,TrialRecord.User.holding_on, ...           
+        TrialRecord.User.mounting_on]);
+elseif TrialRecord.User.training_agent_patient   
+    TrialRecord.User.current_sum_buttons = sum([TrialRecord.User.agent_on, ...  
+        TrialRecord.User.patient_on]);
+else   
+    TrialRecord.User.current_sum_buttons = sum([TrialRecord.User.chasing_on, ... % difference between current and previous sum of categories acts as a 
+        TrialRecord.User.grooming_on,TrialRecord.User.holding_on, ...               % switch for new stimulus list creation involving new categories and other
+        TrialRecord.User.mounting_on, TrialRecord.User.agent_on, ...                % changes that have to be made when categories are added
+        TrialRecord.User.patient_on]);
+end
 %% orienting between stimuli and frame files creating individual folder lists and general stim and frame lists
 % Do all of this for trial 0 because it would be inefficient to repeat and
 % I want these variables to be fixed throughout the run
@@ -170,7 +188,7 @@ if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.mounting_folder, TrialRecord.User.holding_folder, TrialRecord.User.gen_chasing_folder, ...
     TrialRecord.User.gen_grooming_folder, TrialRecord.User.gen_mounting_folder, TrialRecord.User.gen_holding_folder,...
     TrialRecord.User.general_stimulus_list, TrialRecord.User.general_frame_list] = ...
-    stimulusList('D:\onedrive\OneDrive - KU Leuven\social_interactions', TrialRecord.User.generalizing);
+    stimulusList('D:\onedrive\OneDrive - KU Leuven\social_interactions\categorizing', TrialRecord.User.generalizing);
 end
 
 cum_length = cumsum([length(TrialRecord.User.chasing_list) length(TrialRecord.User.gen_chasing_list)...
@@ -180,7 +198,7 @@ cum_length = cumsum([length(TrialRecord.User.chasing_list) length(TrialRecord.Us
 
 % creating useable stimulus list depending on the switches
 
-if TrialRecord.User.holding_on || TrialRecord.User.agent_on || TrialRecord.User.patient_on
+if TrialRecord.User.holding_on % || TrialRecord.User.agent_on || TrialRecord.User.patient_on
     stimulus_list = TrialRecord.User.general_stimulus_list;
     frame_list = TrialRecord.User.general_frame_list;
 elseif  ~TrialRecord.User.holding_on && TrialRecord.User.mounting_on
@@ -202,7 +220,7 @@ end
 %     TrialRecord.User.mounting_folder, TrialRecord.User.gen_mounting_folder,...
 %     TrialRecord.User.holding_folder, TrialRecord.User.gen_holding_folder);
 % end
-if TrialRecord.User.current_sum_buttons ~= previous_sum_buttons             % this comes dozn to: on start and zhen button added within training
+if TrialRecord.User.current_sum_categories ~= previous_sum_categories             % this comes dozn to: on start and zhen button added within training
     [TrialRecord.User.structure] = Copy_of_createStructure(stimulus_list, frame_list, cum_length, TrialRecord.User.chasing_folder,...
     TrialRecord.User.gen_chasing_folder, TrialRecord.User.grooming_folder, TrialRecord.User.gen_grooming_folder, ...
     TrialRecord.User.mounting_folder, TrialRecord.User.gen_mounting_folder,...
@@ -283,10 +301,10 @@ else
     disp('condition not found');
 end
 
-TrialRecord.User.movie = strcat('D:\onedrive\OneDrive - KU Leuven\social_interactions\stimuli\',... 
+TrialRecord.User.movie = strcat('D:\onedrive\OneDrive - KU Leuven\social_interactions\categorizing\stimuli\',... 
     TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', ...
     TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli);     % complete path of the animation
-TrialRecord.User.frame = strcat('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\',... 
+TrialRecord.User.frame = strcat('D:\onedrive\OneDrive - KU Leuven\social_interactions\categorizing\frames\',... 
     TrialRecord.User.structure(TrialRecord.User.struct_index).folder, '\', ...
     TrialRecord.User.structure(TrialRecord.User.struct_index).frames);      % and frame
 
