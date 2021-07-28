@@ -21,7 +21,7 @@ y_spacing = 6.66;
 y_center = -(TrialRecord.User.current_sum_buttons-1)*y_spacing/2;
 movie_duration = 1000;
 answer_time = 8000;
-standard_time_out = 6000;
+standard_time_out = 2000; % 6000
 engagement_duration = 8000;
 repeating = true;
 TrialRecord.User.repeat = false;
@@ -112,17 +112,17 @@ if TrialRecord.User.training_agent_patient
     switch TrialRecord.User.current_sum_buttons
         case 1
             if TrialRecord.User.agenting
-                agent_box(3) = {correct_button_size};
+                agent_box(3) = {standard_button_size};
             else
                 agent_box(3) = {wrong_button_size};
             end
         case 2
             if TrialRecord.User.patienting
-                patient_box(3) = {correct_button_size};
+                patient_box(3) = {standard_button_size};
                 agent_box(3) = {wrong_button_size};
             else
                 patient_box(3) = {wrong_button_size};
-                agent_box(3) = {correct_button_size};
+                agent_box(3) = {standard_button_size};
             end
     end
 end
@@ -297,55 +297,55 @@ end
 %% evaluate
 
 % reward multiplier goes up whenn he gets trials right in a row
-if TrialRecord.CurrentTrialNumber > (1+TrialRecord.User.test_trial_counter)
-    TrialRecord.User.reward_factors = linspace(1,0.7,15);
-    if TrialRecord.TrialErrors(end-TrialRecord.User.test_trial_counter)...
-            == 0 && TrialRecord.User.reward_index < 16 ...
-            && ~TrialRecord.User.test_trial
-        TrialRecord.User.reward_multiplicator = TrialRecord.User.reward_multiplicator + ...
-            ( TrialRecord.User.reward_factors(TrialRecord.User.reward_index)^2 * 0.6 );
-        TrialRecord.User.reward_index = TrialRecord.User.reward_index + 1;
-    elseif TrialRecord.TrialErrors(end-TrialRecord.User.test_trial_counter)...
-            ~= 0 && ~TrialRecord.User.test_trial
-        TrialRecord.User.reward_multiplicator = 1;
-        TrialRecord.User.reward_index = 1;
-    end
-else
-    TrialRecord.User.reward_multiplicator = 1;
-    TrialRecord.User.reward_index = 1;
-end
-disp(['reward_multiplicator' string(TrialRecord.User.reward_multiplicator)]);
+% if TrialRecord.CurrentTrialNumber > (1+TrialRecord.User.test_trial_counter)
+%     TrialRecord.User.reward_factors = linspace(1,0.7,15);
+%     if TrialRecord.TrialErrors(end-TrialRecord.User.test_trial_counter)...
+%             == 0 && TrialRecord.User.reward_index < 16 ...
+%             && ~TrialRecord.User.test_trial
+%         TrialRecord.User.reward_multiplicator = TrialRecord.User.reward_multiplicator + ...
+%             ( TrialRecord.User.reward_factors(TrialRecord.User.reward_index)^2 * 0.6 );
+%         TrialRecord.User.reward_index = TrialRecord.User.reward_index + 1;
+%     elseif TrialRecord.TrialErrors(end-TrialRecord.User.test_trial_counter)...
+%             ~= 0 && ~TrialRecord.User.test_trial
+%         TrialRecord.User.reward_multiplicator = 1;
+%         TrialRecord.User.reward_index = 1;
+%     end
+% else
+%     TrialRecord.User.reward_multiplicator = 1;
+%     TrialRecord.User.reward_index = 1;
+% end
+% disp(['reward_multiplicator' string(TrialRecord.User.reward_multiplicator)]);
 
 % calculate baseline reward
-if TrialRecord.User.training_categorization ||...
-        TrialRecord.User.training_agent_patient
-    random_portion = randi(25, 1);
-    max_reward = 100;
-    min_reward = 50;
-    reward_window = max_reward - min_reward;
-    progression_goal_window = (3*TrialRecord.User.button_progression_factor-1)...
-    - TrialRecord.User.start_block;
-    category_bonus = 0;
-%     if TrialRecord.CurrentBlock >= (3*TrialRecord.User.button_progression_factor-1)
-%         category_bonus = 100;                                                   % bonus when he reaches extra button ( check thism should be zhen he gi9ves correct answer to equal sized buttons )
-%     elseif TrialRecord.CurrentBlock >= (2*TrialRecord.User.button_progression_factor-1)
-%         category_bonus = 75;
+% if TrialRecord.User.training_categorization ||...
+%         TrialRecord.User.training_agent_patient
+%     random_portion = randi(25, 1);
+%     max_reward = 100;
+%     min_reward = 50;
+%     reward_window = max_reward - min_reward;
+%     progression_goal_window = (3*TrialRecord.User.button_progression_factor-1)...
+%     - TrialRecord.User.start_block;
+%     category_bonus = 0;
+% %     if TrialRecord.CurrentBlock >= (3*TrialRecord.User.button_progression_factor-1)
+% %         category_bonus = 100;                                                   % bonus when he reaches extra button ( check thism should be zhen he gi9ves correct answer to equal sized buttons )
+% %     elseif TrialRecord.CurrentBlock >= (2*TrialRecord.User.button_progression_factor-1)
+% %         category_bonus = 75;
+% %     end
+%     
+%     progression_relative_start = TrialRecord.CurrentBlock - ...
+%         TrialRecord.User.start_block;                          % reward goes from min to max over x progression numbers
+%     
+%     variable_reward_portion = (progression_relative_start/progression_goal_window) * ...                   % here the variable portion is calculated based on a fraction of the complete task.
+%         reward_window + category_bonus;                                     % moet overslaan op 10 21 32 
+%     
+%     reward_dur1 = min_reward + variable_reward_portion + random_portion;
+%     if reward_dur1 < min_reward
+%         reward_dur1 = min_reward;
 %     end
-    
-    progression_relative_start = TrialRecord.CurrentBlock - ...
-        TrialRecord.User.start_block;                          % reward goes from min to max over x progression numbers
-    
-    variable_reward_portion = (progression_relative_start/progression_goal_window) * ...                   % here the variable portion is calculated based on a fraction of the complete task.
-        reward_window + category_bonus;                                     % moet overslaan op 10 21 32 
-    
-    reward_dur1 = min_reward + variable_reward_portion + random_portion;
-    if reward_dur1 < min_reward
-        reward_dur1 = min_reward;
-    end
-    reward_dur1 = reward_dur1*TrialRecord.User.reward_multiplicator;
-else
-    reward_dur1 = 400;
-end
+%     reward_dur1 = reward_dur1*TrialRecord.User.reward_multiplicator;
+% else
+    reward_dur1 = 300;
+% end
 
 if TrialRecord.CurrentTrialNumber <= 10
     time_out = standard_time_out;
@@ -353,8 +353,8 @@ else
     boolean_last_ten = TrialRecord.TrialErrors(end-9:end) == 0;
     performance_last_ten = mean(boolean_last_ten);
     time_out = standard_time_out / sqrt(performance_last_ten);
-    if time_out > 11000
-        time_out = 11000;
+    if time_out > 6000 % 11000
+        time_out = 6000;
     end
 end
 
