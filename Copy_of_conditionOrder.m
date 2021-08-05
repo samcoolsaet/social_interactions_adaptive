@@ -81,7 +81,7 @@ else
         if maximum_left == (rest_left+1)*max_repeats
             not_excluded_conditions = conditions_array(1,find(conditions_array(2,:)==maximum_left));
         else
-            not_excluded_conditions = [];
+            not_excluded_conditions = conditions_array(1,:);
         end
 %         not_excluded_conditions = conditions_array(1,find(conditions_array(2,:) == ...     % this is based on having enough of a condition left to fullfil the no more than 3 repeats criterium
 %             (max_repeats*(sum(conditions_array(2,:))-max(conditions_array(2,:)))+max_repeats)));
