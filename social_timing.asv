@@ -320,7 +320,7 @@ disp(['reward_multiplicator' string(TrialRecord.User.reward_multiplicator)]);
 if TrialRecord.User.training_categorization ||...
         TrialRecord.User.training_agent_patient
     random_portion = randi(25, 1);
-    max_reward = 125;
+    max_reward = 100;
     min_reward = 75;
     reward_window = max_reward - min_reward;
     progression_goal_window = (3*TrialRecord.User.button_progression_factor-1)...
