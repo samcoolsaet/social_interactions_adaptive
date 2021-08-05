@@ -48,8 +48,8 @@ TrialRecord.User.button_progression_factor = ...
     TrialRecord.User.size_progression_factor + 1;                            % number of progression number steps needed to add a category button
                                                                             % progression_trials 
                                                                             
-TrialRecord.User.max_block = TrialRecord.User.button_progression_factor * 3 ...
-    - 1;                                                                    % last button active + at final size
+TrialRecord.User.max_block = 20; % TrialRecord.User.button_progression_factor * 3 ...
+%    - 1;                                                                    % last button active + at final size
 TrialRecord.User.min_block = TrialRecord.User.start_block;
 
 % training
