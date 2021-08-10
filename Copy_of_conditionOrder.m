@@ -38,7 +38,10 @@ conditions_array = [unique(active_conditions)'; starting_no_conditions];
 
 maximum_left = max(conditions_array(2,:));
 rest_left = sum(conditions_array(2,:)) - maximum_left;
-if maximum_left > (rest_left+1)*max_repeats
+% if maximum_left > (rest_left+1)*max_repeats
+%     disp('starting proportions do not allow the restricted randomization');
+% end
+if maximum_left > (rest_left)*max_repeats
     disp('starting proportions do not allow the restricted randomization');
 end
 % if sum(conditions_array(2,:)) > (4*(sum(conditions_array(2,:))-max(conditions_array(2,:)))+max_repeats)  % this formula ensures that it is mathematical possible to create a list with the restriction of max_repeats of the same consecutive conditions
@@ -78,7 +81,12 @@ else
         else
             danger_for_repeat = [];
         end
-        if maximum_left == (rest_left+1)*max_repeats
+%         if maximum_left == (rest_left+1)*max_repeats
+%             not_excluded_conditions = conditions_array(1,find(conditions_array(2,:)==maximum_left));
+%         else
+%             not_excluded_conditions = conditions_array(1,:);
+%         end
+        if maximum_left == (rest_left)*max_repeats
             not_excluded_conditions = conditions_array(1,find(conditions_array(2,:)==maximum_left));
         else
             not_excluded_conditions = conditions_array(1,:);
