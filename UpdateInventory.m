@@ -1,20 +1,20 @@
 function [updated_inventory] = UpdateInventory(inventory) % this is to update the inventory.m file with al the frame names, their origin, length and width.
 updated_inventory  = inventory;
-chasing_frames = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\chasing');
+chasing_frames = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\categorizing\frames\chasing');
 chasing_frames(1:2) = [];
-grooming_frames = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\grooming');
+grooming_frames = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\categorizing\frames\grooming');
 grooming_frames(1:2) = [];
-mounting_frames = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\mounting');
+mounting_frames = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\categorizing\frames\mounting');
 mounting_frames(1:2) = [];
-holding_frames = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\holding');
+holding_frames = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\categorizing\frames\holding');
 holding_frames(1:2) = [];
-gen_chasing_frames = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\gen_chasing');
+gen_chasing_frames = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\categorizing\frames\gen_chasing');
 gen_chasing_frames(1:2) = [];
-gen_grooming_frames = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\gen_grooming');
+gen_grooming_frames = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\categorizing\frames\gen_grooming');
 gen_grooming_frames(1:2) = [];
-gen_mounting_frames = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\gen_mounting');
+gen_mounting_frames = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\categorizing\frames\gen_mounting');
 gen_mounting_frames(1:2) = [];
-gen_holding_frames = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\frames\gen_holding');
+gen_holding_frames = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\categorizing\frames\gen_holding');
 gen_holding_frames(1:2) = [];
 
 frame_list = horzcat({chasing_frames.name},{grooming_frames.name},{mounting_frames.name},{holding_frames.name},...
@@ -60,9 +60,9 @@ end
 
 % calculate mirrored origins
 for i = 1:length(inventory)
-    if contains(inventory(i).name, '_mirror.')
+    if contains(inventory(i).name, '_mirror')
         char_array = convertStringsToChars(inventory(i).name);
-        start_index = strfind(char_array, '_mirror.');
+        start_index = strfind(char_array, '_mirror');
         char_array(start_index:start_index+length('mirror')) = [];
         if ismember(char_array, [inventory.name])
             index = find(matches([inventory.name], char_array));
