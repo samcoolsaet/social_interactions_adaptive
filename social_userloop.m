@@ -22,7 +22,7 @@ if TrialRecord.CurrentTrialNumber == 0
     previous_sum_buttons = 0;
     previous_sum_categories = 0;
     TrialRecord.User.engaged = true;
-    TrialRecord.User.max_fails = 3;
+    TrialRecord.User.max_fails = 6;
     TrialRecord.User.repeat = false;
     TrialRecord.User.completed_stimuli = 0;
     TrialRecord.User.c_structure_completion = 0;
