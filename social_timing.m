@@ -21,7 +21,7 @@ y_spacing = 6.66;
 y_center = -(TrialRecord.User.current_sum_buttons-1)*y_spacing/2;
 movie_duration = 1000;
 answer_time = 8000;
-standard_time_out = 5000; % 6000
+standard_time_out = 6000; % 6000
 engagement_duration = 8000;
 repeating = true;
 TrialRecord.User.repeat = false;
@@ -353,8 +353,8 @@ else
     boolean_last_ten = TrialRecord.TrialErrors(end-9:end) == 0;
     performance_last_ten = mean(boolean_last_ten);
     time_out = standard_time_out / sqrt(performance_last_ten);
-    if time_out > 10000 % 11000
-        time_out = 10000;
+    if time_out > 11000 % 11000
+        time_out = 11000;
     end
 end
 
