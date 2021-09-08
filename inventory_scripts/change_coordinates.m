@@ -1,4 +1,4 @@
-path = "D:\onedrive\OneDrive - KU Leuven\social_interactions\edgeless\frames\chasing";
+path = "D:\onedrive\OneDrive - KU Leuven\social_interactions\agent_patient\frames\gen_grooming\edgeless";
 directory = dir(path);
 stimuli = string({directory.name});
 stimuli(1:2) = [];

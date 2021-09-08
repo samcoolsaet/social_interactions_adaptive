@@ -17,13 +17,13 @@ gen_mounting_frames(1:2) = [];
 gen_holding_frames = dir('D:\onedrive\OneDrive - KU Leuven\social_interactions\categorizing\frames\gen_holding');
 gen_holding_frames(1:2) = [];
 
-% edgeless = dir("D:\onedrive\OneDrive - KU Leuven\social_interactions\edgeless\frames\chasing");
-% edgeless(1:2) = [];
-% frame_list = string({edgeless.name});
+edgeless = dir("D:\onedrive\OneDrive - KU Leuven\social_interactions\agent_patient\frames\gen_grooming");
+edgeless(1:2) = [];
+frame_list = string({edgeless.name});
 
-frame_list = horzcat({chasing_frames.name},{grooming_frames.name},{mounting_frames.name},{holding_frames.name},...
-    {gen_chasing_frames.name},{gen_grooming_frames.name},{gen_mounting_frames.name},{gen_holding_frames.name});
-frame_list = string(frame_list);
+% frame_list = horzcat({chasing_frames.name},{grooming_frames.name},{mounting_frames.name},{holding_frames.name},...
+%     {gen_chasing_frames.name},{gen_grooming_frames.name},{gen_mounting_frames.name},{gen_holding_frames.name});
+% frame_list = string(frame_list);
 
 for i = 1:length(frame_list)
     if ~ismember(frame_list(i), string({inventory.name}))
