@@ -228,8 +228,6 @@ elseif ~TrialRecord.User.repeat && TrialRecord.User.engaged
         4, TrialRecord.User.rnd_condition_order, ...
         TrialRecord.User.training_categorization, TrialRecord.User.training_agent_patient);
 end
-% condition = TrialRecord.User.rnd_condition_order(1);
-% disp(TrialRecord.User.rnd_condition_order);
 condition = TrialRecord.User.rnd_condition_order(end);
 if length(TrialRecord.User.rnd_condition_order) <= 10
     disp(TrialRecord.User.rnd_condition_order);
