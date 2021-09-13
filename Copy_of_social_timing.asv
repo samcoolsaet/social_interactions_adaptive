@@ -86,11 +86,13 @@ if TrialRecord.User.training_categorization                                 % if
                 mounting_box(3) = {wrong_button_size};
             end
             if TrialRecord.User.chasing                                     % if the stimulus is chasing
+                chasing_box(3) = {standard_button_size};                    % then chasing is the correct button and size should be accordingly to the size progression
                 grooming_box(3) = {wrong_button_size};
                 mounting_box(3) = {wrong_button_size};
             end
         case 4
             if TrialRecord.User.holding
+                holding_box(3) = {standard_button_size};
                 chasing_box(3) = {wrong_button_size};
                 grooming_box(3) = {wrong_button_size};
                 mounting_box(3) = {wrong_button_size};

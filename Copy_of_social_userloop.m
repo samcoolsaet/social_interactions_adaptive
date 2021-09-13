@@ -63,10 +63,12 @@ TrialRecord.User.holding_on = false;
 TrialRecord.User.mounting_on = false;
 TrialRecord.User.agent_on = false;
 TrialRecord.User.patient_on = false;
+TrialRecord.User.bystander = false;
 
 TrialRecord.User.categorizing = false;
 TrialRecord.User.agenting = false;
 TrialRecord.User.patienting = false;
+TrialRecord.User.bystanding = false;
 
 TrialRecord.User.grooming = false;
 TrialRecord.User.chasing = false;
@@ -265,6 +267,9 @@ elseif condition == 5
 elseif condition == 6
     TrialRecord.NextCondition = 6;
     TrialRecord.User.patienting = true;
+elseif condition == 7
+    TrialRecord.NextCondition = 7;
+    TrialRecord.User.bystanding = true;
 else
     disp('condition not found');
 end
