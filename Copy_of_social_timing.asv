@@ -567,23 +567,17 @@ else
 end
 
 % for initial_active_stim
-total_c = sum(cellfun(@(x) x== 1 || x==2 || x==3 || x==4, TrialRecord.User.struct_conditions(:,:,1)), 'all');
-total_a = sum(cellfun(@(x) x== 5, TrialRecord.User.struct_conditions(:,:,1)), 'all');
-total_p = sum(cellfun(@(x) x== 6, TrialRecord.User.struct_conditions(:,:,1)), 'all');
-total_b = sum(cellfun(@(x) x== 7, TrialRecord.User.struct_conditions(:,:,1)), 'all');
+total_c = cellfun(@(x) x== 1 || x==2 || 3 || 4, struct_conditions(:,:,1));
+TrialRecord.User.c_structure_completion = mean([TrialRecord.User.structure.c_completed]);
+TrialRecord.User.a_structure_completion = mean([TrialRecord.User.structure.a_completed]);
+TrialRecord.User.p_structure_completion = mean([TrialRecord.User.structure.p_completed]);
+TrialRecord.User.b_structure_completion = mean([TrialRecord.User.structure.p_completed]);
 
-TrialRecord.User.c_structure_completion = sum([TrialRecord.User.structure.c_completed])/total_c;
-TrialRecord.User.a_structure_completion = sum([TrialRecord.User.structure.a_completed])/total_a;
-TrialRecord.User.p_structure_completion = sum([TrialRecord.User.structure.p_completed])/total_p;
-TrialRecord.User.b_structure_completion = sum([TrialRecord.User.structure.b_completed])/total_b;
+TrialRecord.User.structure_completion = mean([TrialRecord.User.structure.c_completed] + ...
+    [TrialRecord.User.structure.a_completed] + [TrialRecord.User.structure.p_completed])/...
+    (TrialRecord.User.agent_on+TrialRecord.User.patient_on+TrialRecord.User.category);
 
-TrialRecord.User.structure_completion = sum([TrialRecord.User.structure.c_completed] + ...
-    [TrialRecord.User.structure.a_completed] + [TrialRecord.User.structure.p_completed] + ...
-    [TrialRecord.User.structure.b_completed])/ sum([total_c total_a total_p total_b]);
-
-TrialRecord.User.completed_stimuli = sum([TrialRecord.User.structure.c_completed] + ...
-    [TrialRecord.User.structure.a_completed] + [TrialRecord.User.structure.p_completed] + ...
-    [TrialRecord.User.structure.b_completed], 'all');
+TrialRecord.User.completed_stimuli = sum([TrialRecord.User.structure.c_completed] + [TrialRecord.User.structure.a_completed] + [TrialRecord.User.structure.p_completed], 'all');
 
 bhv_variable('size_progression', TrialRecord.User.size_progression,...
     'button_progression', TrialRecord.User.button_progression,...

@@ -2,7 +2,7 @@ function [C,timingfile,userdefined_trialholder] = social_userloop(MLConfig,Trial
 %% template
 % return values
 C = [];
-timingfile = 'social_timing.m';                                 % Placeholder, real timing file assigned below.
+timingfile = 'Copy_of_social_timing.m';                                 % Placeholder, real timing file assigned below.
 userdefined_trialholder = '';
 
 persistent timing_filenames_retrieved

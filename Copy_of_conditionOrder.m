@@ -7,8 +7,8 @@ for i = 1:length(structure)
 end
 % parallel in 3e dimense booleans creeren voor de struct_conditions om de
 % niet gebruikt te isoleren
-for i = 1:length(struct_conditions(:,1))
-    for j = 1:length(struct_conditions(1,:))
+for i = 1:length(struct_conditions(:,1,1))
+    for j = 1:length(struct_conditions(1,:,1))
         if ~isempty(struct_conditions(i,j))
             if ismember(struct_conditions{i,j}, [1 2 3 4])
                 struct_conditions{i,j,2} = structure(i).c_completed;
