@@ -15,6 +15,7 @@ TrialRecord.User.start_block = 1;                                               
 TrialRecord.User.generalizing = true;
 
 if TrialRecord.CurrentTrialNumber == 0
+    TrialRecord.User.repeat_vector = [];
     TrialRecord.User.performance = 0;
     TrialRecord.NextBlock = TrialRecord.User.start_block;
     previous_sum_buttons = 0;
@@ -34,7 +35,7 @@ else
 end
 %% constants
 % progression
-TrialRecord.User.blocksize = 10;                                            % The TrialRecord.User.blocksize is the number of animations the monkey has to complete.
+TrialRecord.User.blocksize = 5;                                            % The TrialRecord.User.blocksize is the number of animations the monkey has to complete.
                                                                             %%% maybe later create a blocksize as a function of previous performance to quickly skip to his level when starting again.
 
 succes_threshold = 0.80;                                                    % if performance is bigger than or equal to this, progression number + 1
@@ -75,14 +76,19 @@ TrialRecord.User.mounting = false;
 
 
 %% determining next block and difficulty based on a general progression number %%%%%% maybe create a vector with the length of trialerrors but displaying the stimulus sequence numbers, this way I can keep track of actual fails and just going on when failing because the number of repeats hits the limit
-if TrialRecord.CurrentTrialNumber ~= 0
-    cum_last_block = sum([TrialRecord.User.structure.c_last_block]) + ...
-        sum([TrialRecord.User.structure.a_last_block]) + ...
-        sum([TrialRecord.User.structure.p_last_block]);
-    if cum_last_block == TrialRecord.User.blocksize 
-        [TrialRecord.User.structure, TrialRecord.User.performance, TrialRecord.NextBlock] = ...
-            evaluate(TrialRecord.User.structure, TrialRecord.CurrentBlock, succes_threshold, fail_threshold);
-    end
+% if TrialRecord.CurrentTrialNumber ~= 0
+%     cum_last_block = sum([TrialRecord.User.structure.c_last_block]) + ...
+%         sum([TrialRecord.User.structure.a_last_block]) + ...
+%         sum([TrialRecord.User.structure.p_last_block]);
+%     if cum_last_block == TrialRecord.User.blocksize 
+%         [TrialRecord.User.structure, TrialRecord.User.performance, TrialRecord.NextBlock] = ...
+%             evaluate(TrialRecord.User.structure, TrialRecord.CurrentBlock, succes_threshold, fail_threshold);
+%     end
+% end
+
+if sum(TrialRecord.User.repeat_vector == 0) == TrialRecord.User.blocksize
+    [TrialRecord.User.performance, TrialRecord.User.NextBlock, TrialRecord.User.repeat_vector] = ...
+        Copy_of_evaluate(TrialRecord.TrialErrors, TrialRecord.User.repeat_vector, succes_threshold, fail_threshold, TrialRecord.CurrentBlock);
 end
 
 if TrialRecord.User.structure_completion == 1
@@ -240,7 +246,9 @@ disp(TrialRecord.User.conditions_array);
 if ~TrialRecord.User.repeat && TrialRecord.User.engaged || ...
         TrialRecord.User.current_sum_buttons ~= previous_sum_buttons                    % if this, we should just do everything the same as previous trial
     [TrialRecord.User.struct_index] = Copy_of_pickStimulus(condition, TrialRecord.User.structure, TrialRecord.User.struct_conditions);
+    TrialRecord.User.repeat_vector = [TrialRecord.User.repeat_vector 0];
 else
+    TrialRecord.User.repeat_vector = [TrialRecord.User.repeat_vector 1];
     disp('same struct index used');
 end
 %% set the condition for the timing file
