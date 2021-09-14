@@ -38,7 +38,7 @@ if TrialRecord.User.training_categorization ||...
     holding_box = {[0 0 1], [0 0 1], standard_button_size, [x_axes(1) (y_center + 3*y_spacing)]};
     agent_box = {[0 1 1], [0 1 1], standard_button_size, [x_axes(2) y_center]};
     patient_box = {[1 0 1], [1 0 1], standard_button_size, [x_axes(2) (y_center + y_spacing)]};
-% % % % % % %     bystander_box = 
+    bystander_box = {[0.5 0.5 0.5], [0.5 0.5 0.5], standard_button_size, [x_axes(1) (y_center + 2*y_spacing)]};
 else
     engaging_box = { [1 1 1], [1 1 1], standard_button_size, [10 0] };
     chasing_box = {[1 0.8 0.6], [1 0.8 0.6], standard_button_size, [x_axes(1) y_axes(1)]};
@@ -126,29 +126,10 @@ if TrialRecord.User.training_agent_patient
     end
 end
         
-if TrialRecord.User.training_agent_patient
-    switch TrialRecord.User.current_sum_categories
-        case 1
-            if TrialRecord.User.agenting
-                agent_box(3) = {standard_button_size};
-            else
-                agent_box(3) = {wrong_button_size};
-            end
-        case 2
-            if TrialRecord.User.patienting
-                patient_box(3) = {standard_button_size};
-                agent_box(3) = {wrong_button_size};
-            else
-                patient_box(3) = {wrong_button_size};
-                agent_box(3) = {standard_button_size};
-            end
-    end
-end
-
 all_boxes = [chasing_box; grooming_box; mounting_box; ...                    % making a list with all the boxes
-    holding_box; agent_box; patient_box];
+    holding_box; agent_box; patient_box; bystander_box];
 all_targets = [all_boxes{1, 4}; all_boxes{2, 4}; all_boxes{3, 4}; ...       % isolating the coordinates from the boxes
-    all_boxes{4, 4}; all_boxes{5, 4}; all_boxes{6, 4}];
+    all_boxes{4, 4}; all_boxes{5, 4}; all_boxes{6, 4}; all_boxes{7, 4}];
 
 %% designing engage_button
 % draw button box
