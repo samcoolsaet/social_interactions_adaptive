@@ -29,8 +29,8 @@ TrialRecord.NextBlock = TrialRecord.CurrentBlock;
 
 
 %  init boxes
-if TrialRecord.User.training_categorization ||...
-        TrialRecord.User.training_agent_patient
+% if TrialRecord.User.training_categorization ||...
+%         TrialRecord.User.training_agent_patient
     engaging_box = { [1 1 1], [1 1 1], standard_button_size, [10 0] };
     chasing_box = {[1 0.8 0.6], [1 0.8 0.6], standard_button_size, [x_axes(1) y_center]};
     grooming_box = {[0.5 1 1], [0.5 1 1], standard_button_size, [x_axes(1) (y_center + y_spacing)]};
@@ -38,17 +38,17 @@ if TrialRecord.User.training_categorization ||...
     holding_box = {[0 0 1], [0 0 1], standard_button_size, [x_axes(1) (y_center + 3*y_spacing)]};
     agent_box = {[0 1 1], [0 1 1], standard_button_size, [x_axes(2) y_center]};
     patient_box = {[1 0 1], [1 0 1], standard_button_size, [x_axes(2) (y_center + y_spacing)]};
-    bystander_box = {[0.5 0.5 0.5], [0.5 0.5 0.5], standard_button_size, [x_axes(1) (y_center + 2*y_spacing)]};
-else
-    engaging_box = { [1 1 1], [1 1 1], standard_button_size, [10 0] };
-    chasing_box = {[1 0.8 0.6], [1 0.8 0.6], standard_button_size, [x_axes(1) y_axes(1)]};
-    grooming_box = {[0.5 1 1], [0.5 1 1], standard_button_size, [x_axes(1) y_axes(2)]};
-    mounting_box = {[1 1 0], [1 1 0], standard_button_size, [x_axes(1) y_axes(3)]};
-    holding_box = {[0 0 1], [0 0 1], standard_button_size, [x_axes(1) y_axes(4)]};
-    agent_box = {[0 1 1], [0 1 1], standard_button_size, [x_axes(2) y_axes(2)]};
-    patient_box = {[1 0 1], [1 0 1], standard_button_size, [x_axes(2) y_axes(3)]};
-% % % % % % %     bystander_box = 
-end
+    bystander_box = {[0.5 0.5 0.5], [0.5 0.5 0.5], standard_button_size, [x_axes(2) (y_center + 2*y_spacing)]};
+% else
+%     engaging_box = { [1 1 1], [1 1 1], standard_button_size, [10 0] };
+%     chasing_box = {[1 0.8 0.6], [1 0.8 0.6], standard_button_size, [x_axes(1) y_axes(1)]};
+%     grooming_box = {[0.5 1 1], [0.5 1 1], standard_button_size, [x_axes(1) y_axes(2)]};
+%     mounting_box = {[1 1 0], [1 1 0], standard_button_size, [x_axes(1) y_axes(3)]};
+%     holding_box = {[0 0 1], [0 0 1], standard_button_size, [x_axes(1) y_axes(4)]};
+%     agent_box = {[0 1 1], [0 1 1], standard_button_size, [x_axes(2) y_axes(2)]};
+%     patient_box = {[1 0 1], [1 0 1], standard_button_size, [x_axes(2) y_axes(3)]};
+% % % % % % % %     bystander_box = 
+% end
 %% sizing buttons
 % determining correct button size in case of training
 correct_button_size_step = (1 - TrialRecord.User.size_progression/...
@@ -64,7 +64,7 @@ else
     correct_button_size = standard_button_size;                             % else, it means that maximum progression through the size difference is reached
     wrong_button_size = standard_button_size;                               % thus the button size is the final button size
 end
-disp(['absolute button sizes: ' string(correct_button_size) string(wrong_button_size)]);
+disp(['absolute button sizes: ' string(standard_button_size) string(wrong_button_size)]);
 
 % only adjust last added button to correct, wrong or standard size,
 % depending on corrext answer
@@ -151,11 +151,11 @@ if TrialRecord.User.categorizing                                            % if
         trial_box.List = ... 
             all_boxes(1:TrialRecord.User.current_sum_categories, 1:4);      % else, show the number of involved categories
     end
-elseif TrialRecord.User.agenting || TrialRecord.User.patienting             % analogous when agent patient
+elseif TrialRecord.User.agenting || TrialRecord.User.patienting || TrialRecord.User.bystanding            % analogous when agent patient
     if TrialRecord.User.current_sum_buttons == 1
         trial_box.List = all_boxes(TrialRecord.CurrentCondition, 1:4);
     else
-        trial_box.List = all_boxes(5:6, 1:4);
+        trial_box.List = all_boxes(5:7, 1:4);
     end
 end
 
@@ -175,11 +175,11 @@ if TrialRecord.User.categorizing
         touch.Target = ... 
             all_targets(1:TrialRecord.User.current_sum_categories, :);      % else, show the number of involved categories
     end
-elseif TrialRecord.User.agenting || TrialRecord.User.patienting
+elseif TrialRecord.User.agenting || TrialRecord.User.patienting || TrialRecord.User.bystanding
     if TrialRecord.User.current_sum_buttons == 1
         touch.Target = all_targets(TrialRecord.CurrentCondition, :);
     else
-        touch.Target = all_targets(5:6, :);
+        touch.Target = all_targets(5:7, :);
     end
 end
 touch.Threshold = touch_threshold;
