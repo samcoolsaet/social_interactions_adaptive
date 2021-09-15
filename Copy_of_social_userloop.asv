@@ -16,7 +16,6 @@ TrialRecord.User.generalizing = true;
 
 if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.next_stim_index = 1;
-    TrialRecord.User.next_stim = false;
     TrialRecord.User.repeat_vector = [];
     TrialRecord.User.performance = 0;
     TrialRecord.NextBlock = TrialRecord.User.start_block;
@@ -217,11 +216,10 @@ elseif ~TrialRecord.User.grooming_on && TrialRecord.User.chasing_on
 end
 
 
+
 stimulus_list = stimulus_list(mod(TrialRecord.User.next_stim_index, length(frame_list))+1);
 %% create an empty structure
-if TrialRecord.User.current_sum_categories ~= previous_sum_categories || ...
-        TrialRecord.User.next_stim                                          % this comes dozn to: on start and zhen button added within training
-    TrialRecord.User.next_stim = false;
+if TrialRecord.User.current_sum_categories ~= previous_sum_categories             % this comes dozn to: on start and zhen button added within training
     [TrialRecord.User.structure] = Copy_of_createStructure(stimulus_list, frame_list, cum_length, TrialRecord.User.chasing_folder,...
     TrialRecord.User.gen_chasing_folder, TrialRecord.User.grooming_folder, TrialRecord.User.gen_grooming_folder, ...
     TrialRecord.User.mounting_folder, TrialRecord.User.gen_mounting_folder,...
