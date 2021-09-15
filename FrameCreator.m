@@ -13,6 +13,10 @@ elseif condition == 6
     origin = [inventory(inventory_index).p_degrees(:,:,1) inventory(inventory_index).p_degrees(:,:,2)];
     width = inventory(inventory_index).p_width;
     height = inventory(inventory_index).p_height;
+elseif condition == 7
+    origin = [inventory(inventory_index).b_degrees(:,:,1) inventory(inventory_index).b_degrees(:,:,2)];
+    width = inventory(inventory_index).b_width;
+    height = inventory(inventory_index).b_height;    
 else
     disp('condition not found');
 end
