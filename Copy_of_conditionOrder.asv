@@ -30,8 +30,7 @@ end
 num_array_not_completed = cell2mat(struct_conditions(:,:,2))==0;
 free_conditions = [struct_conditions{num_array_not_completed}];
 if isempty(free_conditions)
-    free_conditions = zeros(size(unique([struct_conditions{:,:,1}])));
-end
+    free_conditions = zeros(size
 
 
 starting_no_conditions  = histc(free_conditions, unique([struct_conditions{:,:,1}]));

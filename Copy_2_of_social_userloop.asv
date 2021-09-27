@@ -35,8 +35,8 @@ if TrialRecord.CurrentTrialNumber == 0
 else
     previous_sum_buttons = TrialRecord.User.current_sum_buttons;      % calculations of previous sum categories
 end
-disp(['num_cats:' string(TrialRecord.User.num_cats) TrialRecord.User.num_cats_changed]);
-disp(['string_index:' string(TrialRecord.User.next_stim_index) TrialRecord.User.next_stim]);
+disp(['num_cats:' string(TrialRecord.User.num_cats)]);
+disp(['string_index:' string(TrialRecord.User.next_stim_index)]);
 
 %% constants
 % progression
@@ -178,13 +178,12 @@ end
 
 if TrialRecord.User.per_stimulus
     stimulus_list = stimulus_list(mod(TrialRecord.User.next_stim_index, length(frame_list))+1);
-    frame_list = frame_list(mod(TrialRecord.User.next_stim_index, length(frame_list))+1);    
 end
 %% create an empty structure
 if TrialRecord.User.num_cats_changed || ...
         TrialRecord.User.next_stim                                          % this comes dozn to: on start and zhen button added within training
     TrialRecord.User.next_stim = false;
-    TrialRecord.User.num_cats_changed = false;
+    TrialRecord.User.num_cats_changed
     [TrialRecord.User.structure] = Copy_of_createStructure(stimulus_list, frame_list, cum_length, TrialRecord.User.chasing_folder,...
     TrialRecord.User.gen_chasing_folder, TrialRecord.User.grooming_folder, TrialRecord.User.gen_grooming_folder, ...
     TrialRecord.User.mounting_folder, TrialRecord.User.gen_mounting_folder,...
