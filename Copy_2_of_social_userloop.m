@@ -2,7 +2,7 @@ function [C,timingfile,userdefined_trialholder] = social_userloop(MLConfig,Trial
 %% template
 % return values
 C = [];
-timingfile = 'Copy_of_social_timing.m';                                 % Placeholder, real timing file assigned below.
+timingfile = 'Copy_2_of_social_timing.m';                                 % Placeholder, real timing file assigned below.
 userdefined_trialholder = '';
 
 persistent timing_filenames_retrieved
@@ -13,12 +13,13 @@ persistent timing_filenames_retrieved
 %% initializing for first trial
 TrialRecord.User.start_block = 1;                                               % the progression number to start training with
 TrialRecord.User.generalizing = true;
+TrialRecord.User.per_stimulus = true;
 
 if TrialRecord.CurrentTrialNumber == 0
     TrialRecord.User.num_cats = 1;
     TrialRecord.User.next_stim_index = 1;
     TrialRecord.User.next_stim = false;
-    TrialRecord.User.num_cats_changed = false;
+    TrialRecord.User.num_cats_changed = true;
     TrialRecord.User.repeat_vector = [];
     TrialRecord.User.performance = 0;
     TrialRecord.NextBlock = TrialRecord.User.start_block;
@@ -173,8 +174,9 @@ elseif ~TrialRecord.User.grooming_on && TrialRecord.User.chasing_on
     frame_list = TrialRecord.User.general_frame_list(1, 1:cum_length(end-6));
 end
 
-
-stimulus_list = stimulus_list(mod(TrialRecord.User.next_stim_index, length(frame_list))+1);
+if TrialRecord.User.per_stimulus
+    stimulus_list = stimulus_list(mod(TrialRecord.User.next_stim_index, length(frame_list))+1);
+end
 %% create an empty structure
 if TrialRecord.User.num_cats_changed || ...
         TrialRecord.User.next_stim                                          % this comes dozn to: on start and zhen button added within training
