@@ -211,6 +211,7 @@ else
 end
 disp(TrialRecord.User.conditions_array);
 %% given the condition, pick a stimulus that has not yet been completed in the current structure
+disp(['TETTEN' string(~TrialRecord.User.repeat && TrialRecord.User.engaged) string(TrialRecord.User.current_sum_buttons ~= previous_sum_buttons)]);
 if ~TrialRecord.User.repeat && TrialRecord.User.engaged || ...
         TrialRecord.User.current_sum_buttons ~= previous_sum_buttons                    % if this, we should just do everything the same as previous trial
     [TrialRecord.User.struct_index] = Copy_of_pickStimulus(condition, TrialRecord.User.structure, TrialRecord.User.struct_conditions);

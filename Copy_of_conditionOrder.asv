@@ -27,10 +27,13 @@ for i = 1:length(struct_conditions(:,1,1))
         end
     end
 end
-num_array_not_completed = cell2mat(struct_conditions(:,:,2))==0;
+% num_array_not_completed = cell2mat(struct_conditions(:,:,2))==0;
+%%%% hacky way: just make num_array_not_completed a zero matrix with the size of
+%%%% struct_conditions
 free_conditions = [struct_conditions{num_array_not_completed}];
 if isempty(free_conditions)
-    free_conditions = zeros(size
+    free_conditions = zeros(size(unique([struct_conditions{:,:,1}])));
+end
 
 
 starting_no_conditions  = histc(free_conditions, unique([struct_conditions{:,:,1}]));

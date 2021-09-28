@@ -27,7 +27,10 @@ for i = 1:length(struct_conditions(:,1,1))
         end
     end
 end
-num_array_not_completed = cell2mat(struct_conditions(:,:,2))==0;
+% num_array_not_completed = cell2mat(struct_conditions(:,:,2))==0;
+%%%% hacky way: just make num_array_not_completed a ones matrix with the size of
+%%%% struct_conditions
+num_array_not_completed = logical(ones(size(struct_conditions(:,:,2))));
 free_conditions = [struct_conditions{num_array_not_completed}];
 if isempty(free_conditions)
     free_conditions = zeros(size(unique([struct_conditions{:,:,1}])));

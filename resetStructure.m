@@ -9,15 +9,15 @@ indexes_p_completed = find([structure.p_completed]==1);
 indexes_p_last_block = find([structure.p_last_block]==1);
 indexes_p_reset = setdiff(indexes_p_completed, indexes_p_last_block);
 
-[structure(indexes_c_reset).c_success] = deal(0);   % reset all the completed stimuli
-[structure(indexes_c_reset).c_fails] = deal(0);     % this way, the data of the used, but not completed ones stays in there
-[structure(indexes_c_reset).c_completed] = deal(0);
-[structure(indexes_a_reset).a_success] = deal(0);
-[structure(indexes_a_reset).a_fails] = deal(0);
-[structure(indexes_a_reset).a_completed] = deal(0);
-[structure(indexes_p_reset).p_success] = deal(0);
-[structure(indexes_p_reset).p_fails] = deal(0);
-[structure(indexes_p_reset).p_completed] = deal(0);
+[structure(indexes_c_completed).c_success] = deal(0);   % reset all the completed stimuli
+[structure(indexes_c_completed).c_fails] = deal(0);     % this way, the data of the used, but not completed ones stays in there
+[structure(indexes_c_completed).c_completed] = deal(0);
+[structure(indexes_a_completed).a_success] = deal(0);
+[structure(indexes_a_completed).a_fails] = deal(0);
+[structure(indexes_a_completed).a_completed] = deal(0);
+[structure(indexes_p_completed).p_success] = deal(0);
+[structure(indexes_p_completed).p_fails] = deal(0);
+[structure(indexes_p_completed).p_completed] = deal(0);
 disp('struct reset');
 end
 
