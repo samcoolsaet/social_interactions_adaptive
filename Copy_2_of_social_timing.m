@@ -2,17 +2,15 @@
 hotkey('x', 'escape_screen(); assignin(''caller'',''continue_'',false);');
 hotkey('r', 'goodmonkey(reward_dur, ''juiceline'', MLConfig.RewardFuncArgs.JuiceLine, ''eventmarker'', 14, ''nonblocking'', 1);');   % manual reward
 hotkey('p', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock + 1;');
-% hotkey('o', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock + (TrialRecord.User.size_progression_factor - TrialRecord.User.size_progression)+1;');
 hotkey('o', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock + 5;');
-% hotkey('l', 'TrialRecord.User.progression_number = TrialRecord.CurrentBlock - TrialRecord.User.size_progression;');
 hotkey('l', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock - 5;');
 hotkey('m', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock - 1;');
 hotkey('e', 'TrialRecord.User.next_stim_index = TrialRecord.User.next_stim_index + 1; TrialRecord.User.next_stim = true');
+hotkey('k', 'TrialRecord.User.num_cats = TrialRecord.User.num_cats + 1; TrialRecord.User.num_cats_changed = true');
 hotkey('y', 'sound(y3, fs3);');
-% hotkey('k', 'TrialRecord.User.engaged = false; trialerror(8); return;');
 bhv_code(1, 'run_engagement_scene', 2, 'run_video', 3, 'run_answer_scene', 5, 'end_aswer_scene');
 %% constants
-touch_threshold = 2;
+touch_threshold = 2; 
 standard_button_size = 2;                                                   % final button size
 correct_button_size_difference = 3;                                         % the range from beginning button size to final size
 wrong_button_size_difference = 1.75;
@@ -52,11 +50,9 @@ TrialRecord.NextBlock = TrialRecord.CurrentBlock;
 % end
 %% sizing buttons
 % determining correct button size in case of training
-correct_button_size_step = (1 - TrialRecord.User.size_progression/...
-    TrialRecord.User.size_progression_factor) * ...                         % the step in wich the size decreases, size progression is linked in a 1 to 1 basis with the progression number. So play with the blocksize in order to change #trials per size
+correct_button_size_step = (1 - TrialRecord.User.size_progression) * ...                         % the step in wich the size decreases, size progression is linked in a 1 to 1 basis with the progression number. So play with the blocksize in order to change #trials per size
     correct_button_size_difference;
-wrong_button_size_step = (1 - TrialRecord.User.size_progression/...
-    TrialRecord.User.size_progression_factor) * ...                         % the step in wich the size decreases, size progression is linked in a 1 to 1 basis with the progression number. So play with the blocksize in order to change #trials per size
+wrong_button_size_step = (1 - TrialRecord.User.size_progression) * ...                         % the step in wich the size decreases, size progression is linked in a 1 to 1 basis with the progression number. So play with the blocksize in order to change #trials per size
     wrong_button_size_difference;
 if correct_button_size_step > 0                                             % if the step is larger than 0
     correct_button_size = standard_button_size + correct_button_size_step;  % add the button size step to the standard size
@@ -70,7 +66,7 @@ disp(['absolute button sizes: ' string(standard_button_size) string(wrong_button
 % only adjust last added button to correct, wrong or standard size,
 % depending on corrext answer
 if TrialRecord.User.training_categorization                                 % if training this
-    switch TrialRecord.User.current_sum_categories                          % if 1 category is active
+    switch TrialRecord.User.num_cats                          % if 1 category is active
         case 2                         % analogous to the chasing example
             if TrialRecord.User.grooming
                 chasing_box(3) = {wrong_button_size};
@@ -113,7 +109,7 @@ elseif contains(TrialRecord.User.structure(TrialRecord.User.struct_index).folder
 end
 
 if TrialRecord.User.training_agent_patient
-    if category / TrialRecord.User.current_sum_categories >= 1
+    if category / TrialRecord.User.num_cats >= 1
         if TrialRecord.User.agenting
             patient_box(3) = {wrong_button_size};
             bystander_box(3) = {wrong_button_size};
@@ -150,7 +146,7 @@ if TrialRecord.User.categorizing                                            % if
         trial_box.List = all_boxes(1:4, 1:4);
     else
         trial_box.List = ... 
-            all_boxes(1:TrialRecord.User.current_sum_categories, 1:4);      % else, show the number of involved categories
+            all_boxes(1:TrialRecord.User.num_cats, 1:4);      % else, show the number of involved categories
     end
 elseif TrialRecord.User.agenting || TrialRecord.User.patienting || TrialRecord.User.bystanding            % analogous when agent patient
     if TrialRecord.User.current_sum_buttons == 1
@@ -170,11 +166,11 @@ else
 end
 
 if TrialRecord.User.categorizing
-    if TrialRecord.User.current_sum_categories >= 4                         % if all categories are involved, 4 targets are active
+    if TrialRecord.User.num_cats >= 4                         % if all categories are involved, 4 targets are active
         touch.Target = all_targets(1:4, :);
     else
         touch.Target = ... 
-            all_targets(1:TrialRecord.User.current_sum_categories, :);      % else, show the number of involved categories
+            all_targets(1:TrialRecord.User.num_cats, :);      % else, show the number of involved categories
     end
 elseif TrialRecord.User.agenting || TrialRecord.User.patienting || TrialRecord.User.bystanding
     if TrialRecord.User.current_sum_buttons == 1
@@ -323,7 +319,7 @@ if TrialRecord.User.training_categorization ||...
     max_reward = 125;
     min_reward = 75;
     reward_window = max_reward - min_reward;
-    progression_goal_window = (3*TrialRecord.User.button_progression_factor-1)...
+    progression_goal_window = (3*TrialRecord.User.max_block)...
     - TrialRecord.User.start_block;
     category_bonus = 0;
 %     if TrialRecord.CurrentBlock >= (3*TrialRecord.User.button_progression_factor-1)
@@ -332,7 +328,7 @@ if TrialRecord.User.training_categorization ||...
 %         category_bonus = 75;
 %     end
     
-    progression_relative_start = TrialRecord.CurrentBlock - ...
+    progression_relative_start = TrialRecord.CurrentBlock*TrialRecord.User.num_cats - ...
         TrialRecord.User.start_block;                          % reward goes from min to max over x progression numbers
     
     variable_reward_portion = (progression_relative_start/progression_goal_window) * ...                   % here the variable portion is calculated based on a fraction of the complete task.
@@ -483,10 +479,13 @@ if reward
     goodmonkey(reward_dur1, 'numreward', 3, 'pausetime', 1000, 'eventmarker', 90, 'nonblocking', 1); % 'numreward', 3, 'pausetime', 1000, 'eventmarker', 90, 'nonblocking', 1);
     background = [0 1 0 1000];
     disp(['reward given:' string(reward_dur1)]);
+    TrialRecord.User.repeat = false;
 else
     sound(y2, fs2);
     background = [1 0 0 time_out];
     disp(['no reward, time out' string(time_out)]);
+    TrialRecord.User.repeat = true;
+    disp('stimulus will be repeated');
 end
 reward_scene = BackgroundColorChanger(null_);
 reward_scene.List = background;
@@ -502,7 +501,7 @@ if TrialRecord.User.test_trial
             TrialRecord.User.structure(TrialRecord.User.struct_index).c_completed = 1;
             TrialRecord.User.structure(TrialRecord.User.struct_index).c_last_block = 1;
             disp('stimulus set to complete, should not be repeated');
-        repeating = false;
+%         repeating = false;
     end
     if (TrialRecord.User.structure(TrialRecord.User.struct_index).a_success ||... 
         TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails == 1) && ...
@@ -510,7 +509,7 @@ if TrialRecord.User.test_trial
             TrialRecord.User.structure(TrialRecord.User.struct_index).a_completed = 1;
             TrialRecord.User.structure(TrialRecord.User.struct_index).a_last_block = 1;
             disp('stimulus set to complete, should not be repeated');
-        repeating = false;
+%         repeating = false;
     end
     if (TrialRecord.User.structure(TrialRecord.User.struct_index).p_success ||... 
         TrialRecord.User.structure(TrialRecord.User.struct_index).p_fails == 1) && ...
@@ -518,7 +517,7 @@ if TrialRecord.User.test_trial
             TrialRecord.User.structure(TrialRecord.User.struct_index).p_completed = 1;
             TrialRecord.User.structure(TrialRecord.User.struct_index).p_last_block = 1;
             disp('stimulus set to complete, should not be repeated');
-        repeating = false;
+%         repeating = false;
     end
     if (TrialRecord.User.structure(TrialRecord.User.struct_index).b_success ||... 
         TrialRecord.User.structure(TrialRecord.User.struct_index).b_fails == 1) && ...
@@ -526,7 +525,7 @@ if TrialRecord.User.test_trial
             TrialRecord.User.structure(TrialRecord.User.struct_index).b_completed = 1;
             TrialRecord.User.structure(TrialRecord.User.struct_index).b_last_block = 1;
             disp('stimulus set to complete, should not be repeated');
-        repeating = false;
+%         repeating = false;
     end
 else
     if (TrialRecord.User.structure(TrialRecord.User.struct_index).c_success == 1 ...
@@ -535,7 +534,7 @@ else
         TrialRecord.User.structure(TrialRecord.User.struct_index).c_completed = 1;
         TrialRecord.User.structure(TrialRecord.User.struct_index).c_last_block = 1;
         disp('stimulus set to complete, should not be repeated');
-        repeating = false;
+%         repeating = false;
     end
     if (TrialRecord.User.structure(TrialRecord.User.struct_index).a_success == 1 ...
             || TrialRecord.User.structure(TrialRecord.User.struct_index).a_fails >= TrialRecord.User.max_fails) && ...
@@ -543,7 +542,7 @@ else
         TrialRecord.User.structure(TrialRecord.User.struct_index).a_completed = 1;
         TrialRecord.User.structure(TrialRecord.User.struct_index).a_last_block = 1;
         disp('stimulus set to complete, should not be repeated');
-        repeating = false;
+%         repeating = false;
     end
     if (TrialRecord.User.structure(TrialRecord.User.struct_index).p_success == 1 ...
             || TrialRecord.User.structure(TrialRecord.User.struct_index).p_fails >= TrialRecord.User.max_fails) && ...
@@ -551,7 +550,7 @@ else
         TrialRecord.User.structure(TrialRecord.User.struct_index).p_completed = 1;
         TrialRecord.User.structure(TrialRecord.User.struct_index).p_last_block = 1;
         disp('stimulus set to complete, should not be repeated');
-        repeating = false;
+%         repeating = false;
     end
     if (TrialRecord.User.structure(TrialRecord.User.struct_index).b_success == 1 ...
             || TrialRecord.User.structure(TrialRecord.User.struct_index).b_fails >= TrialRecord.User.max_fails) && ...
@@ -559,12 +558,12 @@ else
         TrialRecord.User.structure(TrialRecord.User.struct_index).b_completed = 1;
         TrialRecord.User.structure(TrialRecord.User.struct_index).b_last_block = 1;
         disp('stimulus set to complete, should not be repeated');
-        repeating = false;
+%         repeating = false;
     end
-    if repeating
-        TrialRecord.User.repeat = true;
-        disp('stimulus will be repeated');
-    end
+%     if repeating
+%         TrialRecord.User.repeat = true;
+%         disp('stimulus will be repeated');
+%     end
 end
 
 % for initial_active_stim
@@ -587,12 +586,13 @@ TrialRecord.User.completed_stimuli = sum([TrialRecord.User.structure.c_completed
     [TrialRecord.User.structure.b_completed], 'all');
 
 bhv_variable('size_progression', TrialRecord.User.size_progression,...
-    'button_progression', TrialRecord.User.button_progression,...
+    'num_cats', TrialRecord.User.num_cats,...
     'performance_previous_block', TrialRecord.User.performance,...
     'stimulus_name', TrialRecord.User.structure(TrialRecord.User.struct_index).stimuli,...
     'structure_completion', TrialRecord.User.structure_completion, ...
     'structure', TrialRecord.User.structure, ...
     'struct_index', TrialRecord.User.struct_index, ...
+    'category', category, ...
     'completed_stim', TrialRecord.User.completed_stimuli,...
     'random_condition_order', TrialRecord.User.rnd_condition_order,...
     'repeat', TrialRecord.User.repeat,...
