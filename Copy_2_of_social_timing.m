@@ -485,7 +485,8 @@ disp(['testtrialcounter' string(TrialRecord.User.test_trial_counter)]);
 
 if reward
     sound(y1, fs1);
-    goodmonkey(reward_dur1, 'numreward', 3, 'pausetime', 1000, 'eventmarker', 90, 'nonblocking', 1); % 'numreward', 3, 'pausetime', 1000, 'eventmarker', 90, 'nonblocking', 1);
+%     goodmonkey(reward_dur1, 'numreward', 3, 'pausetime', 1000, 'eventmarker', 90, 'nonblocking', 1); % 'numreward', 3, 'pausetime', 1000, 'eventmarker', 90, 'nonblocking', 1);
+    goodmonkey(reward_dur1); % 'numreward', 3, 'pausetime', 1000, 'eventmarker', 90, 'nonblocking', 1);
     background = [0 1 0 1000];
     disp(['reward given:' string(reward_dur1)]);
     TrialRecord.User.repeat = false;
