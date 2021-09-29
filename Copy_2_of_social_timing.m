@@ -212,20 +212,26 @@ tc_frame = TimeCounter(touch);
 tc_frame.Duration = answer_time;
 
 % webcam
-cam = WebcamMonitor(null_);
-cam.CamNumber = 1;
+cam1 = WebcamMonitor(null_);
+cam1.CamNumber = 1;
+cam1.Position = [0.8 0.2 0.5 0.5];
+cam2 = WebcamMonitor(null_);
+cam2.CamNumber = 2;
+cam2.Position = [0.8 0.8 0.5 0.5];
 
 % merging touch and visual for engagement button
 ac = OrAdapter(fix);
 ac.add(tc_engagement);
 con1 = Concurrent(ac);
 con1.add(engage_box);
-con1.add(cam);
+con1.add(cam1);
+con1.add(cam2);
 
 % running timecounter and showing buttons together for first scene
 con2 = Concurrent(tc_movie);
 con2.add(mov)
-con2.add(cam);
+con2.add(cam1);
+con2.add(cam2);
 
 % if agent patient, run the frame scene
 if TrialRecord.User.agenting || TrialRecord.User.patienting
@@ -233,7 +239,8 @@ if TrialRecord.User.agenting || TrialRecord.User.patienting
     frame_or.add(tc_frame);
     con5 = Concurrent(frame_or);
     con5.add(img);
-    con5.add(cam);
+    con5.add(cam1);
+    con5.add(cam2);
 end
 
 
@@ -244,7 +251,9 @@ or.add(tc_answer);
 con3 = Concurrent(or);
 con3.add(img);
 con3.add(trial_box);
-con3.add(cam);
+con3.add(cam1);
+con3.add(cam2);
+
 %% running scenes
 % run engagement scene
 
@@ -491,7 +500,8 @@ reward_scene = BackgroundColorChanger(null_);
 reward_scene.List = background;
 reward_scene.DurationUnit = 'msec';
 con4 = Concurrent(reward_scene);
-con4.add(cam);
+con4.add(cam1);
+con4.add(cam2);
 scene4 = create_scene(con4);
 run_scene(scene4);
 if TrialRecord.User.test_trial
