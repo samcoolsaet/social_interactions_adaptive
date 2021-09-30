@@ -1,3 +1,5 @@
+% coordinaten berekenen voor stimuli waar de randen ervan af zijn
+
 path = "D:\onedrive\OneDrive - KU Leuven\social_interactions\agent_patient\frames\gen_grooming";
 directory = dir(path);
 stimuli = string({directory.name});
