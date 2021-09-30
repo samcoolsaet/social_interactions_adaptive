@@ -20,7 +20,7 @@ y_spacing = 6.66;
 y_center = -(TrialRecord.User.current_sum_buttons-1)*y_spacing/2;
 movie_duration = 1000;
 answer_time = 8000;
-standard_time_out = 6000; % 6000
+standard_time_out = 10000; % 6000
 engagement_duration = 8000;
 repeating = true;
 TrialRecord.User.repeat = false;
@@ -187,7 +187,7 @@ mov.List = { TrialRecord.User.movie, [0 0], 0, 1.25, 90 };   % movie filename
 img = ImageGraphic(null_);  
 if TrialRecord.User.categorizing
     img.List = { TrialRecord.User.frame, [0 0], 0, 1.25, 90 };
-elseif TrialRecord.User.agenting || TrialRecord.User.patienting
+elseif TrialRecord.User.agenting || TrialRecord.User.patienting || TrialRecord.User.bystanding
     [bitmap, origin, width, height] = FrameCreator(TrialRecord.User.structure(TrialRecord.User.struct_index).frames, TrialRecord.CurrentCondition); % in framecreator, give input voor length and
     img.List = { bitmap, origin, 0, 1.25, 90;... % origin from inventory is placed here
     TrialRecord.User.frame, [0 0], 0, 1.25, 90};
@@ -234,7 +234,7 @@ con2.add(cam1);
 con2.add(cam2);
 
 % if agent patient, run the frame scene
-if TrialRecord.User.agenting || TrialRecord.User.patienting
+if TrialRecord.User.agenting || TrialRecord.User.patienting || TrialRecord.User.bystanding
     frame_or = OrAdapter(frame_touch);
     frame_or.add(tc_frame);
     con5 = Concurrent(frame_or);
@@ -352,16 +352,34 @@ else
     reward_dur1 = 300;
 end
 
-if TrialRecord.CurrentTrialNumber <= 10
+if TrialRecord.CurrentTrialNumber ~= 1
+    completed_trials = TrialRecord.TrialErrors(TrialRecord.TrialErrors~=8);
+else
+    completed_trials = 1; % just a random value
+end
+disp(["completed trials" string(completed_trials)]);
+if length(completed_trials) < 10
     time_out = standard_time_out;
 else
-    boolean_last_ten = TrialRecord.TrialErrors(end-9:end) == 0;
+    boolean_last_ten = completed_trials(end-9:end) == 0;
     performance_last_ten = mean(boolean_last_ten);
     time_out = standard_time_out / sqrt(performance_last_ten);
-    if time_out > 11000 % 11000
-        time_out = 11000;
+    if time_out > 20000 % 11000
+        time_out = 20000;
     end
 end
+
+
+% if TrialRecord.CurrentTrialNumber <= 10
+%     time_out = standard_time_out;
+% else
+%     boolean_last_ten = TrialRecord.TrialErrors(end-9:end) == 0;
+%     performance_last_ten = mean(boolean_last_ten);
+%     time_out = standard_time_out / sqrt(performance_last_ten);
+%     if time_out > 20000 % 11000
+%         time_out = 20000;
+%     end
+% end
 
 [y1, fs1] = audioread('right.wav');
 [y2, fs2] = audioread('wrong.wav');
