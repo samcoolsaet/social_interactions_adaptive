@@ -176,36 +176,41 @@ elseif ~TrialRecord.User.grooming_on && TrialRecord.User.chasing_on
     frame_list = TrialRecord.User.general_frame_list(1, 1:cum_length(end-6));
 end
 
-mirror_indices = contains(stimulus_list, 'mirror');
-cropped_indices = contains(stimulus_list, 'cropped');
-gray_indices = contains(stimulus_list, 'gray');
+% mirror_indices = contains(stimulus_list, 'mirror');
+% cropped_indices = contains(stimulus_list, 'cropped');
+% gray_indices = contains(stimulus_list, 'gray');
+% 
+% blocked = mirror_indices | cropped_indices | gray_indices;
+% originals = blocked == 0;
+% blocked_indices = find(originals==1);
+% shuffled_originals = blocked_indices(randperm(length(blocked_indices)));
+% 
+% if TrialRecord.User.num_cats_changed
+%     final_order = [];
+%     for i = 1:length(shuffled_originals)
+%         between_indices = [];
+%         j = 1;
+%         while originals(shuffled_originals(i)+j) == 0
+%             between_indices(end+1) = shuffled_originals(i)+j;
+%             if shuffled_originals(i)+j < length(originals)
+%                 j = j+1;
+%             else
+%                 break
+%             end
+%         end
+%         TrialRecord.User.final_order = [final_order shuffled_originals(i) between_indices];
+%     end
+% end
 
-blocked = mirror_indices | cropped_indices | gray_indices;
-originals = blocked == 0;
-blocked_indices = find(originals==1);
-shuffled_originals = blocked_indices(randperm(length(blocked_indices)));
-
-if TrialRecord.User.num_cats_changed
-    final_order = [];
-    for i = 1:length(shuffled_originals)
-        between_indices = [];
-        j = 1;
-        while originals(shuffled_originals(i)+j) == 0
-            between_indices(end+1) = shuffled_originals(i)+j;
-            if shuffled_originals(i)+j < length(originals)
-                j = j+1;
-            else
-                break
-            end
-        end
-        TrialRecord.User.final_order = [final_order shuffled_originals(i) between_indices];
-    end
-end
-
+% if TrialRecord.User.per_stimulus
+%     stimulus_list = stimulus_list(TrialRecord.User.final_order(mod(TrialRecord.User.next_stim_index, length(frame_list))+1));
+%     frame_list = frame_list(TrialRecord.User.final_order(mod(TrialRecord.User.next_stim_index, length(frame_list))+1));    
+% end
 if TrialRecord.User.per_stimulus
-    stimulus_list = stimulus_list(TrialRecord.User.final_order(mod(TrialRecord.User.next_stim_index, length(frame_list))+1));
-    frame_list = frame_list(TrialRecord.User.final_order(mod(TrialRecord.User.next_stim_index, length(frame_list))+1));    
+    stimulus_list = stimulus_list(mod(TrialRecord.User.next_stim_index, length(frame_list))+1);
+    frame_list = frame_list(mod(TrialRecord.User.next_stim_index, length(frame_list))+1);    
 end
+
 %% create an empty structure
 if TrialRecord.User.num_cats_changed || ...
         TrialRecord.User.next_stim                                          % this comes dozn to: on start and zhen button added within training

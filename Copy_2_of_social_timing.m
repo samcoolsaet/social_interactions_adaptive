@@ -214,10 +214,10 @@ tc_frame.Duration = answer_time;
 % webcam
 cam1 = WebcamMonitor(null_);
 cam1.CamNumber = 1;
-cam1.Position = [0.8 0.2 0.5 0.5];
+cam1.Position = [0 0 150 150];
 cam2 = WebcamMonitor(null_);
 cam2.CamNumber = 2;
-cam2.Position = [0.8 0.8 0.5 0.5];
+cam2.Position = [0 200 150 150];
 
 % merging touch and visual for engagement button
 ac = OrAdapter(fix);
