@@ -357,7 +357,7 @@ if TrialRecord.CurrentTrialNumber ~= 1
 else
     completed_trials = 1; % just a random value
 end
-disp(["completed trials" string(completed_trials)]);
+% disp(["completed trials" string(completed_trials)]);
 if length(completed_trials) < 10
     time_out = standard_time_out;
 else
