@@ -6,15 +6,15 @@ inventory_index = find(identify_frame_inventory==1);
 pix_per_deg = 26.6462;
 
 if condition == 5
-    origin = [inventory(inventory_index).a_degrees(:,:,1) inventory(inventory_index).a_degrees(:,:,2)];
+    origin = [inventory(inventory_index).a_degrees(1) inventory(inventory_index).a_degrees(2)];
     width = inventory(inventory_index).a_width;
     height = inventory(inventory_index).a_height;
 elseif condition == 6
-    origin = [inventory(inventory_index).p_degrees(:,:,1) inventory(inventory_index).p_degrees(:,:,2)];
+    origin = [inventory(inventory_index).p_degrees(1) inventory(inventory_index).p_degrees(2)];
     width = inventory(inventory_index).p_width;
     height = inventory(inventory_index).p_height;
 elseif condition == 7
-    origin = [inventory(inventory_index).b_degrees(:,:,1) inventory(inventory_index).b_degrees(:,:,2)];
+    origin = [inventory(inventory_index).b_degrees(1) inventory(inventory_index).b_degrees(2)];
     width = inventory(inventory_index).b_width;
     height = inventory(inventory_index).b_height;    
 else

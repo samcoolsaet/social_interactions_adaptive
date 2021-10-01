@@ -148,13 +148,13 @@ for i = 1:length(inventory)
 end
 for i = 1:length(inventory)
     if ~isempty(inventory(i).a_origin)
-        inventory(i).a_degrees = [degrees(1,i,1) degrees(1,i,2)];
+        inventory(i).a_degrees = degrees(1,i,:);
     end
     if ~isempty(inventory(i).p_origin)
-        inventory(i).p_degrees = [degrees(2,i,1) degrees(2,i,2)];
+        inventory(i).p_degrees = degrees(2,i,:);
     end
     if ~isempty(inventory(i).b_origin)
-        inventory(i).b_degrees = [degrees(3,i,1) degrees(3,i,2)];
+        inventory(i).b_degrees = degrees(3,i,:);
     end
 end
 end
