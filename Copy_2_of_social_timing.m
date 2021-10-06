@@ -6,6 +6,7 @@ hotkey('o', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock + 5;');
 hotkey('l', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock - 5;');
 hotkey('m', 'TrialRecord.NextBlock = TrialRecord.CurrentBlock - 1;');
 hotkey('e', 'TrialRecord.User.next_stim_index = TrialRecord.User.next_stim_index + 1; TrialRecord.User.next_stim = true');
+hotkey('w', 'TrialRecord.User.next_stim_index = TrialRecord.User.next_stim_index - 1; TrialRecord.User.next_stim = true');
 hotkey('k', 'TrialRecord.User.num_cats = TrialRecord.User.num_cats + 1; TrialRecord.User.num_cats_changed = true');
 hotkey('y', 'sound(y3, fs3);');
 bhv_code(1, 'run_engagement_scene', 2, 'run_video', 3, 'run_answer_scene', 5, 'end_aswer_scene');
@@ -384,7 +385,7 @@ if TrialRecord.CurrentTrialNumber ~= 1
 else
     completed_trials = 1; % just a random value
 end
-disp(["completed trials" string(completed_trials)]);
+% disp(["completed trials" string(completed_trials)]);
 if length(completed_trials) < 10
     time_out = standard_time_out;
 else
