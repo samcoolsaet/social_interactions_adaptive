@@ -35,21 +35,7 @@ to_near1 = true;
 while to_near1
     loc_button_2 = [8+rand(1)*x_range -10+rand(1)*y_range];
     distance1 = sqrt((loc_button_2(1)-loc_button_1(1))^2+(loc_button_2(2)-loc_button_1(2))^2);
-    if distance1 > 2.5
-        to_near1 = false;
-    end
-end
-
-to_near1_2 = true;
-while to_near1_2
-    loc_button_3 = [8+rand(1)*x_range -10+rand(1)*y_range];
-    distance1 = sqrt((loc_button_3(1)-loc_button_1(1))^2+(loc_button_3(2)-loc_button_1(2))^2);
-    distance2 = sqrt((loc_button_3(1)-loc_button_2(1))^2+(loc_button_3(2)-loc_button_2(2))^2);
-    if distance1 > 2.5 && distance2 > 2.5
-        to_near1_2 = false;
-    end
-end
-
+    if 
 
 %  init boxes
 % if TrialRecord.User.training_categorization ||...
@@ -59,12 +45,9 @@ end
     grooming_box = {[0.5 1 1], [0.5 1 1], standard_button_size, [x_axes(1) (y_center + y_spacing)]};
     mounting_box = {[1 1 0], [1 1 0], standard_button_size, [x_axes(1) (y_center + 2*y_spacing)]};
     holding_box = {[0 0 1], [0 0 1], standard_button_size, [x_axes(1) (y_center + 3*y_spacing)]};
-%     agent_box = {[0 1 1], [0 1 1], standard_button_size, [x_axes(2) y_center]};
-%     patient_box = {[1 0 1], [1 0 1], standard_button_size, [x_axes(2) (y_center + y_spacing)]};
-%     bystander_box = {[0.5 0.5 0.5], [0.5 0.5 0.5], standard_button_size, [x_axes(2) (y_center + 2*y_spacing)]};
-    agent_box = {[0 1 1], [0 1 1], standard_button_size, loc_button_1};
-    patient_box = {[1 0 1], [1 0 1], standard_button_size, loc_button_2};
-    bystander_box = {[0.5 0.5 0.5], [0.5 0.5 0.5], standard_button_size, loc_button_3};
+    agent_box = {[0 1 1], [0 1 1], standard_button_size, [x_axes(2) y_center]};
+    patient_box = {[1 0 1], [1 0 1], standard_button_size, [x_axes(2) (y_center + y_spacing)]};
+    bystander_box = {[0.5 0.5 0.5], [0.5 0.5 0.5], standard_button_size, [x_axes(2) (y_center + 2*y_spacing)]};
 % else
 %     engaging_box = { [1 1 1], [1 1 1], standard_button_size, [10 0] };
 %     chasing_box = {[1 0.8 0.6], [1 0.8 0.6], standard_button_size, [x_axes(1) y_axes(1)]};
@@ -330,9 +313,9 @@ end
 
 % reward multiplier goes up whenn he gets trials right in a row
 if TrialRecord.CurrentTrialNumber > (1+TrialRecord.User.test_trial_counter)
-    TrialRecord.User.reward_factors = linspace(1,0.7,5); % linspace(1,0.7,15)
+    TrialRecord.User.reward_factors = linspace(1,0.7,15); % linspace(1,0.7,15)
     if TrialRecord.TrialErrors(end-TrialRecord.User.test_trial_counter)...
-            == 0 && TrialRecord.User.reward_index < 6 ...
+            == 0 && TrialRecord.User.reward_index < 16 ...
             && ~TrialRecord.User.test_trial
         TrialRecord.User.reward_multiplicator = TrialRecord.User.reward_multiplicator + ...
             ( TrialRecord.User.reward_factors(TrialRecord.User.reward_index)^2 * 0.6 );
