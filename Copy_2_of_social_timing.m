@@ -33,10 +33,11 @@ x_range = 12-8;
 loc_button_1 = [8+rand(1)*x_range -10+rand(1)*y_range];
 
 to_near1 = true;
+limit = 4;
 while to_near1
     loc_button_2 = [8+rand(1)*x_range -10+rand(1)*y_range];
     distance1 = sqrt((loc_button_2(1)-loc_button_1(1))^2+(loc_button_2(2)-loc_button_1(2))^2);
-    if distance1 > 2.5
+    if distance1 > limit
         to_near1 = false;
     end
 end
@@ -46,7 +47,7 @@ while to_near1_2
     loc_button_3 = [8+rand(1)*x_range -10+rand(1)*y_range];
     distance1 = sqrt((loc_button_3(1)-loc_button_1(1))^2+(loc_button_3(2)-loc_button_1(2))^2);
     distance2 = sqrt((loc_button_3(1)-loc_button_2(1))^2+(loc_button_3(2)-loc_button_2(2))^2);
-    if distance1 > 2.5 && distance2 > 2.5
+    if distance1 > limit && distance2 > limit
         to_near1_2 = false;
     end
 end
